@@ -60,7 +60,8 @@ const SettingMenu = ({ onClose }) => {
   }, []);
 
   return (
-    <div className="setting-menu" onMouseLeave={onClose}>
+    <div className="setting-menu">
+      <div className="corner-badge"></div>
       <div className="setting-item">
         <span className="setting-label row-center">
           自动隐藏

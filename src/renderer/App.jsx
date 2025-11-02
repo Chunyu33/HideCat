@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { ConfigProvider } from "antd";
 import Header from "./components/Header";
 import SettingMenu from "./components/SettingMenu";
 
 const App = () => {
   const [showSettings, setShowSettings] = useState(false);
+  const settingsRef = useRef(null);
 
   // 初始化设置
   const initSettings = async () => {
@@ -31,6 +32,25 @@ const App = () => {
     initSettings();
   }, []);
 
+  // 处理点击外部区域关闭设置菜单
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showSettings && settingsRef.current && !settingsRef.current.contains(event.target)) {
+        setShowSettings(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showSettings]);
+
+  // 控制设置菜单显示/隐藏的函数
+  const toggleSettings = () => {
+    setShowSettings(prev => !prev);
+  };
+
   // 全局快捷键 Alt+F 在主进程已注册，这里不需要
   // 这里只管理设置菜单展示和页面嵌入 iframe
 
@@ -43,9 +63,11 @@ const App = () => {
       }}
     >
       <div className="app-container">
-        <Header onOpenSettings={() => setShowSettings(true)} />
+        <Header onOpenSettings={toggleSettings} showSettings={showSettings} />
         {showSettings && (
-          <SettingMenu onClose={() => setShowSettings(false)} />
+          <div ref={settingsRef}>
+            <SettingMenu onClose={() => setShowSettings(false)} />
+          </div>
         )}
       </div>
     </ConfigProvider>

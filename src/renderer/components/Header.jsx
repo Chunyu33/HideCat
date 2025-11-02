@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./css/header.css";
 import SettingMenu from "./SettingMenu";
 
-const Header = () => {
+const Header = ({ onOpenSettings, showSettings }) => {
   const [showMenu, setShowMenu] = useState(false);
 
   const handleMinimize = () => window.electronAPI?.minimizeWindow();
@@ -10,7 +10,8 @@ const Header = () => {
   const toggleMenu = (e) => {
     // 阻止事件冒泡，避免触发最小化
     e.stopPropagation();
-    setShowMenu(!showMenu);
+    // 调用父组件方法来控制设置菜单的显示/隐藏
+    onOpenSettings();
   };
 
   return (
@@ -40,7 +41,6 @@ const Header = () => {
             />
           </svg>
         </button>
-        {showMenu && <SettingMenu onClose={() => setShowMenu(false)} />}
       </div>
     </div>
   );
