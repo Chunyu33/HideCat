@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from "react";
-import { Slider } from "antd";
+import React, { useState, useEffect, useRef } from "react";
+import { Slider, Switch, Tooltip } from "antd";
 import "./css/setting.css";
 
 const SettingMenu = ({ onClose }) => {
-  const [autoHide, setAutoHide] = useState(true);
+  const [autoHide, setAutoHide] = useState(false);
   const [opacity, setOpacity] = useState(0.9);
   const [scale, setScale] = useState(1.0);
+  const clickTimeout = useRef(null);
+  const autoHideTip = `开启后，鼠标离开窗口后自动隐藏在折叠的任务栏中。点击折叠任务栏图标菜单或按ALT+F可切换显示。`
 
   // 打开设置时从主进程获取最新状态
   useEffect(() => {
@@ -23,11 +25,18 @@ const SettingMenu = ({ onClose }) => {
     fetchSettings();
   }, []);
 
-  const handleAutoHide = (e) => {
-    const isChecked = e.target.checked;
-    setAutoHide(isChecked);
-    // 更新主进程 store 并触发自动隐藏逻辑
-    window.electronAPI?.setAutoHide?.(isChecked, 200);
+  const handleAutoHide = (checked) => {
+    // 清除之前的timeout
+    if (clickTimeout.current) {
+      clearTimeout(clickTimeout.current);
+    }
+    
+    // 设置新的timeout，防抖处理
+    clickTimeout.current = setTimeout(() => {
+      setAutoHide(checked);
+      // 更新主进程 store 并触发自动隐藏逻辑
+      window.electronAPI?.setAutoHide?.(checked, 200);
+    }, 100);
   };
 
   const handleOpacity = (value) => {
@@ -40,18 +49,27 @@ const SettingMenu = ({ onClose }) => {
     window.electronAPI?.setScale?.(value); // 更新 store 并触发窗口缩放
   };
 
+  // 清理timeout
+  useEffect(() => {
+    return () => {
+      if (clickTimeout.current) {
+        clearTimeout(clickTimeout.current);
+      }
+    };
+  }, []);
+
   return (
     <div className="setting-menu" onMouseLeave={onClose}>
       <div className="setting-item">
-        <span className="setting-label">自动隐藏</span>
-        <label className="switch">
-          <input 
-            type="checkbox" 
+        <Tooltip title={autoHideTip}>
+          <span className="setting-label">自动隐藏</span>
+        </Tooltip>
+        <div style={{ margin: '6px 0', textAlign: 'center' }}>
+          <Switch 
             checked={autoHide} 
             onChange={handleAutoHide} 
           />
-          <span className="slider"></span>
-        </label>
+        </div>
       </div>
       
       <div className="setting-item">
@@ -63,7 +81,7 @@ const SettingMenu = ({ onClose }) => {
             step={0.01}
             value={opacity}
             onChange={handleOpacity}
-            style={{ width: 120 }}
+            style={{ width: 100 }}
           />
           <span className="range-value">{Math.round(opacity * 100)}%</span>
         </div>
@@ -78,7 +96,7 @@ const SettingMenu = ({ onClose }) => {
             step={0.1}
             value={scale}
             onChange={handleScale}
-            style={{ width: 120 }}
+            style={{ width: 100 }}
           />
           <span className="range-value">{Math.round(scale * 100)}%</span>
         </div>

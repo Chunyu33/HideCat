@@ -7,7 +7,11 @@ const Header = () => {
 
   const handleMinimize = () => window.electronAPI?.minimizeWindow();
   const handleClose = () => window.electronAPI?.closeWindow();
-  const toggleMenu = () => setShowMenu(!showMenu);
+  const toggleMenu = (e) => {
+    // 阻止事件冒泡，避免触发最小化
+    e.stopPropagation();
+    setShowMenu(!showMenu);
+  };
 
   return (
     <div className="header-bar" onDoubleClick={handleMinimize}>
@@ -23,7 +27,7 @@ const Header = () => {
             <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" />
           </svg>
         </button>
-        <button className="header-btn" onClick={toggleMenu} title="设置">
+        <button className="header-btn" onClick={toggleMenu} onDoubleClick={e => e.stopPropagation()} title="设置">
           <svg width="14" height="14" viewBox="0 0 24 24">
             <path
               d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"

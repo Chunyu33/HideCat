@@ -1,3 +1,9 @@
+:root {
+  --ant-primary-color: #4caf50;
+  --ant-primary-color-hover: #66bb6a;
+  --ant-primary-color-active: #43a047;
+  --ant-primary-color-outline: rgba(76, 175, 80, 0.2);
+}
 
 html, body {
   margin: 0;

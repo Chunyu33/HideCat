@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { ConfigProvider } from "antd";
 import Header from "./components/Header";
 import SettingMenu from "./components/SettingMenu";
 
@@ -34,12 +35,20 @@ const App = () => {
   // 这里只管理设置菜单展示和页面嵌入 iframe
 
   return (
-    <div className="app-container">
-      <Header onOpenSettings={() => setShowSettings(true)} />
-      {showSettings && (
-        <SettingMenu onClose={() => setShowSettings(false)} />
-      )}
-    </div>
+    <ConfigProvider
+      theme={{
+        token: {
+          colorPrimary: '#4caf50',
+        },
+      }}
+    >
+      <div className="app-container">
+        <Header onOpenSettings={() => setShowSettings(true)} />
+        {showSettings && (
+          <SettingMenu onClose={() => setShowSettings(false)} />
+        )}
+      </div>
+    </ConfigProvider>
   );
 };
 
