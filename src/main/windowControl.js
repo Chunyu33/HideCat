@@ -16,7 +16,7 @@ function setMainWindow(win) {
 
 // 设置自动隐藏开关
 function setAutoHide(enabled, count) {
-  console.log('\n config----', enabled, '===count===', count);
+  // console.log('\n config----', enabled, '===count===', count);
 
   // 持久化状态
   store.set('autoHide', enabled);
@@ -84,9 +84,10 @@ function setOpacity(val) {
 // 设置网页缩放
 function setScale(val) {
   store.set('scale', val); // 持久化
-  if (mainWindow && !mainWindow.isDestroyed()) {
-    mainWindow.webContents.setZoomFactor(val);
-  }
+  // 为了避免整个窗口被缩放, 不使用setZoomFactor
+  // if (mainWindow && !mainWindow.isDestroyed()) {
+  //   mainWindow.webContents.setZoomFactor(val);
+  // }
 }
 
 // -----------------------------

@@ -5,6 +5,7 @@ import SettingMenu from "./components/SettingMenu";
 
 const App = () => {
   const [showSettings, setShowSettings] = useState(false);
+  const [scale, setScale] = useState(1.0); // 添加缩放状态
   const settingsRef = useRef(null);
 
   // 初始化设置
@@ -23,7 +24,8 @@ const App = () => {
       window.electronAPI?.setOpacity?.(op);
     };
     if (sc !== undefined) {
-      window.electronAPI?.setScale?.(sc);
+      // window.electronAPI?.setScale?.(sc);
+      setScale(sc); // 设置初始缩放级别
     };
   }
 
@@ -51,6 +53,11 @@ const App = () => {
     setShowSettings(prev => !prev);
   };
 
+  // 处理缩放变化
+  const handleScaleChange = (newScale) => {
+    setScale(newScale);
+  };
+
   // 全局快捷键 Alt+F 在主进程已注册，这里不需要
   // 这里只管理设置菜单展示和页面嵌入 iframe
 
@@ -64,11 +71,26 @@ const App = () => {
     >
       <div className="app-container">
         <Header onOpenSettings={toggleSettings} showSettings={showSettings} />
-        {showSettings && (
-          <div ref={settingsRef}>
-            <SettingMenu onClose={() => setShowSettings(false)} />
+        <div className="content-container">
+          {showSettings && (
+            <div ref={settingsRef}>
+              <SettingMenu onClose={() => setShowSettings(false)} onScaleChange={handleScaleChange} />
+            </div>
+          )}
+          {/* 主要内容区域，应用缩放 */}
+          <div className="main-content" style={{ 
+            transform: `scale(${scale})`, 
+            transformOrigin: 'top left',
+            width: `calc(100% / ${scale})`,
+            height: `calc(100% / ${scale})`,
+            overflow: 'auto'
+          }}>
+            {/* 这里放置你的主要内容 */}
+            <div>
+              <h1>你好兄弟的</h1>
+            </div>
           </div>
-        )}
+        </div>
       </div>
     </ConfigProvider>
   );

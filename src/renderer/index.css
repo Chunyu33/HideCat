@@ -10,11 +10,32 @@ html, body {
   padding: 0;
   height: 100%;
   font-family: Arial, sans-serif;
+  overflow: hidden; /* 防止页面级滚动条 */
 }
 
 .app-container {
-  overflow-x: hidden;
+  overflow: hidden;
   background-color: #f4f4f9;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.content-container {
+  flex: 1;
+  position: relative;
+  overflow: hidden; /* 防止内容区域出现滚动条 */
+}
+
+.main-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: auto; /* 只在缩放内容区域出现滚动条 */
+  padding: 10px;
+  box-sizing: border-box;
 }
 
 .content {
@@ -36,5 +57,3 @@ html, body {
   font-size: 14px;
   cursor: pointer;
 }
-
-

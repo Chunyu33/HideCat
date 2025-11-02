@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Slider, Switch, Tooltip } from "antd";
 import "./css/setting.css";
 
-const SettingMenu = ({ onClose }) => {
+const SettingMenu = ({ onClose, onScaleChange }) => { // 添加onScaleChange属性
   const [autoHide, setAutoHide] = useState(false);
   const [opacity, setOpacity] = useState(0.9);
   const [scale, setScale] = useState(1.0);
@@ -18,7 +18,7 @@ const SettingMenu = ({ onClose }) => {
         window.electronAPI.getOpacity?.(),
         window.electronAPI.getScale?.(),
       ]);
-      console.log(auto, op, sc, '-----store')
+      // console.log(auto, op, sc, '-----store');
       if (auto !== undefined) setAutoHide(auto);
       if (op !== undefined) setOpacity(op);
       if (sc !== undefined) setScale(sc);
@@ -47,7 +47,12 @@ const SettingMenu = ({ onClose }) => {
 
   const handleScale = (value) => {
     setScale(value);
-    window.electronAPI?.setScale?.(value); // 更新 store 并触发窗口缩放
+    // 通过props传递缩放值而不是直接调用electronAPI
+    if (onScaleChange) {
+      onScaleChange(value);
+    }
+    // 不适用electronAPI更新缩放整个窗口，而是使用props传递缩放定义好的缩放内容
+    // window.electronAPI?.setScale?.(value); // 保留原有逻辑以保存到store
   };
 
   // 清理timeout
@@ -61,7 +66,6 @@ const SettingMenu = ({ onClose }) => {
 
   return (
     <div className="setting-menu">
-      <div className="corner-badge"></div>
       <div className="setting-item">
         <span className="setting-label row-center">
           自动隐藏
