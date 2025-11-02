@@ -1,0 +1,143 @@
+// src/components/HomePage.js (精简版)
+
+import React, { useState } from "react";
+import { Input, Space, Typography, Button, message, Card } from "antd";
+import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
+
+const { Title, Text } = Typography;
+const { Search } = Input;
+
+// 假设的快捷入口数据
+const shortcuts = [
+  { name: "SlackeFish", icon: "🚀", url: "https://www.google.com" }, // 简化的图标
+  { name: "小红书", icon: "📕", url: "https://www.xiaohongshu.com" },
+];
+
+const BING_SEARCH_URL = "https://www.bing.com/search?q=";
+
+// 接受 onNavigate 属性 (由 Tab 父组件传入)
+const HomePage = ({ onNavigate }) => {
+  const [searchValue, setSearchValue] = useState("");
+
+  // 搜索框提交事件处理
+  const handleSearch = (value) => {
+    if (!value) {
+      message.warning("请输入搜索关键词或网址");
+      return;
+    }
+
+    let targetUrl = value;
+    let tabName = value;
+
+    // 简单的网址/关键词判断
+    if (value.includes(".") && value.length > 5 && !value.startsWith("http")) {
+      targetUrl = "http://" + value;
+    } else if (!value.includes(".")) {
+      // 关键词搜索
+      targetUrl = BING_SEARCH_URL + encodeURIComponent(value);
+      tabName = `搜索: ${value}`;
+    }
+
+    // 调用父组件传入的回调函数，告诉父组件新建一个 Tab
+    onNavigate({
+      url: targetUrl,
+      label: tabName,
+      isNewTab: true, // 标记需要新建 Tab
+    });
+
+    setSearchValue("");
+  };
+
+  // 快捷入口点击事件
+  const handleShortcutClick = (item) => {
+    onNavigate({
+      url: item.url,
+      label: item.name,
+      isNewTab: true,
+    });
+  };
+
+  const backgroundStyle = {
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    // background: "#EAEFF2",
+    color: "#555",
+    textAlign: "center",
+    padding: "20px 20px",
+  };
+
+  return (
+    <div style={backgroundStyle}>
+      <Title
+        level={1}
+        style={{
+          color: "#6A7D8F",
+          fontSize: "3rem",
+          fontWeight: 300,
+          marginBottom: 50,
+        }}
+      >
+        SlackeFish
+      </Title>
+
+      {/* 搜索框 */}
+      <Search
+        placeholder={"在 Bing 上搜索，或者输入一个网址"}
+        allowClear
+        enterButton={<SearchOutlined />}
+        size="large"
+        value={searchValue}
+        onChange={(e) => setSearchValue(e.target.value)}
+        onSearch={handleSearch}
+        style={{ width: "min(600px, 90%)", marginBottom: 40 }}
+      />
+
+      {/* 快捷入口区域 */}
+      <Space size={32} wrap>
+        {shortcuts.map((item, index) => (
+          <Card
+            key={index}
+            hoverable
+            onClick={() => handleShortcutClick(item)}
+            style={{ width: 100, borderRadius: 8, textAlign: "center" }}
+            bodyStyle={{ padding: "12px 0" }}
+          >
+            {/* ... 渲染快捷入口图标和文字 ... */}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <Button
+                shape="circle"
+                icon={item.icon}
+                size="large"
+                style={{
+                  marginBottom: 8,
+                  backgroundColor: "#FFF",
+                  borderColor: "#EFEFEF",
+                  width: 48,
+                  height: 48,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                {item.icon}
+              </Button>
+              <Text type="secondary">{item.name}</Text>
+            </div>
+          </Card>
+        ))}
+        {/* ... 添加快捷方式按钮 ... */}
+      </Space>
+    </div>
+  );
+};
+
+export default HomePage;

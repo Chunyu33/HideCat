@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { ConfigProvider } from "antd";
 import Header from "./components/Header";
 import SettingMenu from "./components/SettingMenu";
+import MainPage from "./pages/main";
 
 const App = () => {
   const [showSettings, setShowSettings] = useState(false);
@@ -85,10 +86,7 @@ const App = () => {
             height: `calc(100% / ${scale})`,
             overflow: 'auto'
           }}>
-            {/* 这里放置你的主要内容 */}
-            <div>
-              <h1>你好兄弟的</h1>
-            </div>
+            <MainPage />
           </div>
         </div>
       </div>
