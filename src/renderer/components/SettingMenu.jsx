@@ -7,7 +7,8 @@ const SettingMenu = ({ onClose }) => {
   const [opacity, setOpacity] = useState(0.9);
   const [scale, setScale] = useState(1.0);
   const clickTimeout = useRef(null);
-  const autoHideTip = `开启后，鼠标离开窗口后自动隐藏在折叠的任务栏中。点击折叠任务栏图标菜单或按ALT+F可切换显示。`
+
+  const autoHideTip = `开启后，鼠标离开窗口后自动隐藏在折叠的任务栏中。点击折叠任务栏图标菜单或按ALT+F可恢复显示。`
 
   // 打开设置时从主进程获取最新状态
   useEffect(() => {
@@ -61,13 +62,21 @@ const SettingMenu = ({ onClose }) => {
   return (
     <div className="setting-menu" onMouseLeave={onClose}>
       <div className="setting-item">
-        <Tooltip title={autoHideTip}>
-          <span className="setting-label">自动隐藏</span>
-        </Tooltip>
+        <span className="setting-label row-center">
+          自动隐藏
+          <Tooltip title={autoHideTip}>
+            <svg width="14" height="14" viewBox="0 0 24 24" style={{ marginLeft: 4, verticalAlign: 'middle', cursor: 'pointer' }}>
+              <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="2" />
+              <path d="M12 16v-4" stroke="currentColor" strokeWidth="2" />
+              <circle cx="12" cy="8" r="1" fill="currentColor" />
+            </svg>
+          </Tooltip>
+        </span>
         <div style={{ margin: '6px 0', textAlign: 'center' }}>
           <Switch 
             checked={autoHide} 
             onChange={handleAutoHide} 
+            style={{ marginLeft: 'auto' }}
           />
         </div>
       </div>
