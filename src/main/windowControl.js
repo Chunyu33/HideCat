@@ -1,7 +1,8 @@
-const { screen } = require("electron");
-const store = require('./store'); // 使用持久化 store
+const { BrowserWindow, BrowserView, screen, session } = require("electron");
+const store = require("./store"); // 使用持久化 store
 
 let mainWindow = null;
+let settingsWin = undefined;
 let isWindowVisible = true;
 let checkTimer = null;
 let startupTimer = null;
@@ -9,17 +10,61 @@ let lastCursorInside = true;
 
 const COUNTDOWN = 3500; // 倒计时
 
+// -----------------------------
 // 设置主窗口引用
+// -----------------------------
 function setMainWindow(win) {
   mainWindow = win;
 }
 
-// 设置自动隐藏开关
+// -----------------------------
+// 设置窗口逻辑
+// -----------------------------
+function openSettingsWindow() {
+  settingsWin = new BrowserWindow({
+    width: 420,
+    height: 360,
+    resizable: false,
+    frame: false,
+    parent: mainWindow,
+    modal: true, // 模态，阻止主窗口交互
+    show: false,
+    webPreferences: {
+      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
+      nodeIntegration: false,
+      contextIsolation: true,
+    },
+  });
+
+  // 关键点：带上 query 参数告诉 React “我是设置窗口”
+  settingsWin.loadURL(`${MAIN_WINDOW_WEBPACK_ENTRY}?window=settings`);
+
+  settingsWin.once("ready-to-show", () => {
+    settingsWin.show();
+  });
+
+  settingsWin.on("closed", () => {
+    settingsWin = null;
+  });
+
+  return true;
+}
+
+function closeSettingsWindow() {
+  if (settingsWin) {
+    settingsWin.close();
+    settingsWin = null;
+  }
+}
+
+// -----------------------------
+// 自动隐藏逻辑
+// -----------------------------
 function setAutoHide(enabled, count) {
   // console.log('\n config----', enabled, '===count===', count);
 
   // 持久化状态
-  store.set('autoHide', enabled);
+  store.set("autoHide", enabled);
 
   if (!enabled) {
     clearInterval(checkTimer);
@@ -35,7 +80,7 @@ function setAutoHide(enabled, count) {
 
 // 获取自动隐藏状态
 function getAutoHideState() {
-  return store.get('autoHide', true);
+  return store.get("autoHide", true);
 }
 
 // 显示窗口
@@ -75,7 +120,7 @@ function hideImmediately() {
 
 // 设置透明度
 function setOpacity(val) {
-  store.set('opacity', val); // 持久化
+  store.set("opacity", val); // 持久化
   if (mainWindow && !mainWindow.isDestroyed()) {
     mainWindow.setOpacity(val);
   }
@@ -83,7 +128,7 @@ function setOpacity(val) {
 
 // 设置网页缩放
 function setScale(val) {
-  store.set('scale', val); // 持久化
+  store.set("scale", val); // 持久化
   // 为了避免整个窗口被缩放, 不使用setZoomFactor
   // if (mainWindow && !mainWindow.isDestroyed()) {
   //   mainWindow.webContents.setZoomFactor(val);
@@ -151,8 +196,89 @@ function initAutoHideWatcher(customCountDown = undefined) {
   }, customCountDown ?? COUNTDOWN);
 }
 
+// -----------------------------
+// BrowserView 标签管理逻辑
+// -----------------------------
+let mainWindowRef = null;
+const browserViews = new Map();
+let activeTabKey = null;
+
+// 提供外部初始化方法
+function setMainWindowRef(win) {
+  mainWindowRef = win;
+}
+
+async function addTab(key, url) {
+  if (!mainWindowRef) return;
+  if (browserViews.has(key)) return;
+
+  const view = new BrowserView({
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true,
+      sandbox: false, // ✅ 关闭 sandbox，允许正常访问网络
+      webSecurity: true, // ✅ 保留安全策略
+      partition: `persist:tab-${key}`, // 每个 tab 拥有独立会话
+    },
+  });
+
+  // 拦截新窗口事件
+  view.webContents.setWindowOpenHandler(({ url: targetUrl }) => {
+    // 让新链接在当前 view 内加载
+    view.webContents.loadURL(targetUrl);
+    return { action: "deny" };
+  });
+
+  browserViews.set(key, view);
+  view.webContents.loadURL(url);
+}
+
+async function setActiveTab(key) {
+  if (!mainWindowRef) return;
+  if (activeTabKey === key) return;
+
+  const currentView = browserViews.get(activeTabKey);
+  const newView = browserViews.get(key);
+
+  if (currentView) mainWindowRef.removeBrowserView(currentView);
+
+  if (newView) {
+    mainWindowRef.setBrowserView(newView);
+    const [width, height] = mainWindowRef.getContentSize();
+    newView.setBounds({ x: 0, y: 66, width: width, height: height - 66 }); // header 高度 80
+    newView.setAutoResize({ width: true, height: true });
+  }
+
+  activeTabKey = key;
+}
+
+async function removeTab(key) {
+  const view = browserViews.get(key);
+  if (!view) return;
+
+  if (activeTabKey === key && mainWindowRef) {
+    mainWindowRef.removeBrowserView(view);
+    activeTabKey = null;
+  }
+
+  // 销毁会话缓存
+  const viewSession = view.webContents.session;
+  if (viewSession) {
+    try {
+      await viewSession.clearCache();
+      await viewSession.clearStorageData();
+    } catch {}
+  }
+
+  browserViews.delete(key);
+  view.webContents.destroy();
+}
+
 module.exports = {
   setMainWindow,
+  setMainWindowRef,
+  openSettingsWindow,
+  closeSettingsWindow,
   showWindow,
   hideWindow,
   hideImmediately,
@@ -162,4 +288,7 @@ module.exports = {
   setScale,
   initAutoHideWatcher,
   clearAllTimer,
+  addTab,
+  setActiveTab,
+  removeTab,
 };
