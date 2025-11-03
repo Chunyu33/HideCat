@@ -74,7 +74,7 @@ app.whenReady().then(() => {
   createTray();
 
   // 注册IPC事件
-  registerIpcHandlers(ipcMain);
+  registerIpcHandlers(ipcMain, mainWindow);
   // 注册快捷键
   registerShortcuts();
   app.on("activate", () => {

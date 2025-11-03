@@ -15,8 +15,8 @@ const shortcuts = [
 
 const BING_SEARCH_URL = "https://www.bing.com/search?q=";
 
-// 接受 onNavigate 属性 (由 Tab 父组件传入)
-const HomePage = ({ onNavigate }) => {
+// 接受 onNewTab 属性 (由 Tab 父组件传入)
+const HomePage = ({ onNewTab }) => {
   const [searchValue, setSearchValue] = useState("");
 
   // 搜索框提交事件处理
@@ -38,23 +38,14 @@ const HomePage = ({ onNavigate }) => {
       tabName = `搜索: ${value}`;
     }
 
-    // 调用父组件传入的回调函数，告诉父组件新建一个 Tab
-    onNavigate({
-      url: targetUrl,
-      label: tabName,
-      isNewTab: true, // 标记需要新建 Tab
-    });
-
+    // 调用父组件传入的回调函数
+    onNewTab(targetUrl, tabName); 
     setSearchValue("");
   };
 
   // 快捷入口点击事件
   const handleShortcutClick = (item) => {
-    onNavigate({
-      url: item.url,
-      label: item.name,
-      isNewTab: true,
-    });
+    onNewTab(item.url, item.name);
   };
 
   const backgroundStyle = {
