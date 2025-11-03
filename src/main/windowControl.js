@@ -96,8 +96,8 @@ function getAutoHideState() {
 function showWindow(customCountDown = undefined) {
   if (!mainWindow || mainWindow.isDestroyed()) return;
 
-  // mainWindow.show(); // 原来的抢焦点方式
-  mainWindow.showInactive(); // 不抢焦点
+  mainWindow.show(); // 原来的抢焦点方式
+  // mainWindow.showInactive(); // 不抢焦点
   isWindowVisible = true;
 
   // 重新启动 秒定时器
@@ -118,6 +118,7 @@ function hideWindow(ms = 0) {
 
   setTimeout(() => {
     mainWindow.hide();
+    closeSettingsWindow();
     isWindowVisible = false;
   }, ms);
 }
@@ -175,6 +176,7 @@ function startMouseWatcher() {
       // 鼠标离开窗口范围
       if (isWindowVisible) {
         mainWindow.hide();
+        closeSettingsWindow();
         isWindowVisible = false;
         console.log("🔴 leave -> hide");
       }

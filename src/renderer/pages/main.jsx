@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Tabs, Button, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import HomePage from "./HomePage";
+import "./css/main.css"
 
 // 占位符组件 (BrowserView 将在主进程中覆盖这个区域)
 const BrowserViewPlaceholder = () => (
@@ -127,7 +128,7 @@ const EditableTabsPage = () => {
   });
 
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
+    <div className="main">
       <Tabs
         type="editable-card"
         hideAdd={true}

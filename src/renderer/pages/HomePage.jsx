@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Input, Space, Typography, Button, message, Card } from "antd";
 import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
+import './css/homepage.css'
 
 const { Title, Text } = Typography;
 const { Search } = Input;
@@ -48,20 +49,8 @@ const HomePage = ({ onNewTab }) => {
     onNewTab(item.url, item.name);
   };
 
-  const backgroundStyle = {
-    height: "100%",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    // background: "#EAEFF2",
-    color: "#555",
-    textAlign: "center",
-    padding: "20px 20px",
-  };
-
   return (
-    <div style={backgroundStyle}>
+    <div className="home-page">
       <Title
         level={1}
         style={{
@@ -94,9 +83,10 @@ const HomePage = ({ onNewTab }) => {
             hoverable
             onClick={() => handleShortcutClick(item)}
             style={{ width: 100, borderRadius: 8, textAlign: "center" }}
-            bodyStyle={{ padding: "12px 0" }}
+            styles={{
+              body: { padding: "12px 0" } // 👈 替换为 styles 属性和 body 键
+            }}
           >
-            {/* ... 渲染快捷入口图标和文字 ... */}
             <div
               style={{
                 display: "flex",

@@ -79,3 +79,6 @@
 .close-btn:hover {
   color: #f44336;
 }
+:where(.css-dev-only-do-not-override-1hp2dlu).ant-tabs-top >.ant-tabs-nav::before, :where(.css-dev-only-do-not-override-1hp2dlu).ant-tabs-bottom >.ant-tabs-nav::before, :where(.css-dev-only-do-not-override-1hp2dlu).ant-tabs-top >div>.ant-tabs-nav::before, :where(.css-dev-only-do-not-override-1hp2dlu).ant-tabs-bottom >div>.ant-tabs-nav::before {
+  border-bottom: none;
+}

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import "./css/header.css";
-import SettingMenu from "./SettingMenu";
 
 const Header = ({ onOpenSettings, showSettings }) => {
   const [showMenu, setShowMenu] = useState(false);

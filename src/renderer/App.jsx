@@ -59,12 +59,6 @@ const App = () => {
 
   // 控制设置菜单显示/隐藏的函数
   const toggleSettings = () => {
-    // setShowSettings(prev => !prev);
-    // setShowSettings((prev) => {
-    //   const next = !prev;
-    //   window.electronAPI.toggleSettings(next);
-    //   return next;
-    // });
     window.electronAPI.openSettingsWindow();
   };
 

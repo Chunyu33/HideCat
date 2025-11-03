@@ -16,11 +16,14 @@ body {
 
 .app-container {
   overflow: hidden;
-  background: radial-gradient(
-    circle,
-    rgba(238, 174, 202, 1) 0%,
-    rgba(148, 187, 233, 1) 100%
-  );
+  background:
+    linear-gradient(238.72deg, #ffb864 0%, #006c4c 100%),
+    radial-gradient(100% 224.43% at 0% 0%, #fcc482 0%, #002e74 100%),
+    linear-gradient(121.28deg, #ffd464 0%, #00553b 100%),
+    linear-gradient(229.79deg, #7534ff 0%, #248900 94.19%),
+    radial-gradient(56.26% 101.79% at 50% 0%, #8f00ff 0%, #493500 100%),
+    linear-gradient(96.19deg, #500052 3.37%, #d5b300 96.63%);
+  background-blend-mode: overlay, screen, lighten, hard-light, screen, normal;
   height: 100vh;
   display: flex;
   flex-direction: column;
