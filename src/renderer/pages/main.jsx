@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { Tabs, Button, message } from "antd";
+import { Tabs, Button, message, Tooltip } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import HomePage from "./HomePage";
-import "./css/main.css"
+import "./css/main.css";
 
 // 占位符组件 (BrowserView 将在主进程中覆盖这个区域)
 const BrowserViewPlaceholder = () => (
@@ -54,7 +54,7 @@ const EditableTabsPage = () => {
       key: newKey,
     };
 
-    // 【关键修改 2】: 调用 preload.js 中暴露的 addTab 并传入 URL
+    // 调用 preload.js 中暴露的 addTab 并传入 URL
     if (window.electronAPI) {
       window.electronAPI.addTab(newKey, url);
       window.electronAPI.setActiveTab(newKey);
@@ -105,15 +105,24 @@ const EditableTabsPage = () => {
   };
 
   const operations = (
-    <Button
-      type="text"
-      icon={<PlusOutlined />}
-      // 点击加号时创建一个新 Tab
-      onClick={() => handleNewTab("about:blank", "新标签页")}
-      disabled={items.length >= MAX_TABS}
-      style={{ marginRight: 8, opacity: items.length >= MAX_TABS ? 0.5 : 1 }}
-      aria-label="Add Tab"
-    />
+    <Tooltip
+      title="点击新建标签页"
+      placement="bottomRight"
+      color="#4caf50"
+      styles={{
+        body: { color: "#fff" },
+      }}
+    >
+      <Button
+        type="text"
+        icon={<PlusOutlined />}
+        // 点击加号时创建一个新 Tab
+        onClick={() => handleNewTab("about:blank", "新标签页")}
+        disabled={items.length >= MAX_TABS}
+        style={{ marginRight: 8, opacity: items.length >= MAX_TABS ? 0.5 : 1 }}
+        aria-label="Add Tab"
+      />
+    </Tooltip>
   );
 
   const mappedItems = items.map((item) => {

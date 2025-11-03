@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Slider, Switch, Tooltip } from "antd";
-import QuestionMark from './QuestionMark';
+import QuestionMark from "./QuestionMark";
 import "./css/setting.css";
 
 const SettingMenu = ({ onClose, onScaleChange }) => {
@@ -75,7 +75,14 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
       <div className="setting-item">
         <span className="setting-label row-center">
           自动隐藏
-          <Tooltip title="开启后，鼠标离开窗口后自动隐藏在任务栏中。" placement="bottomRight">
+          <Tooltip
+            title="开启后，鼠标离开窗口后自动隐藏在任务栏中。"
+            placement="bottomRight"
+            color="#4caf50"
+            styles={{
+              body: { color: "#fff" },
+            }}
+          >
             <QuestionMark size="13" />
           </Tooltip>
         </span>
@@ -87,7 +94,14 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
       <div className="setting-item">
         <span className="setting-label row-center">
           透明度
-          <Tooltip title="窗口的透明度，范围0.2~1.0。" placement="bottomRight">
+          <Tooltip
+            title="窗口的透明度，范围0.2~1.0。"
+            placement="bottomRight"
+            color="#4caf50"
+            styles={{
+              body: { color: "#fff" },
+            }}
+          >
             <QuestionMark size="13" />
           </Tooltip>
         </span>
