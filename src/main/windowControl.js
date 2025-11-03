@@ -227,20 +227,51 @@ async function addTab(key, url) {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
-      sandbox: false, // ✅ 关闭 sandbox，允许正常访问网络
-      webSecurity: true, // ✅ 保留安全策略
-      partition: `persist:tab-${key}`, // 每个 tab 拥有独立会话
+      sandbox: false,
+      partition: `persist:tab-${key}`,
     },
   });
 
-  // 拦截新窗口事件
+  // 立即把 view 放到 map（但不立即 setBrowserView）
+  browserViews.set(key, view);
+
+  // 通知 renderer：该 tab 正在加载（开始）
+  try {
+    mainWindowRef.webContents.send("tab-loading", { key, url });
+  } catch (e) {
+    console.warn("tab-loading send failed", e);
+  }
+
   view.webContents.setWindowOpenHandler(({ url: targetUrl }) => {
-    // 让新链接在当前 view 内加载
     view.webContents.loadURL(targetUrl);
     return { action: "deny" };
   });
 
-  browserViews.set(key, view);
+  // 失败回调
+  view.webContents.once(
+    "did-fail-load",
+    (e, errorCode, errorDescription, validatedURL) => {
+      try {
+        mainWindowRef.webContents.send("tab-load-failed", {
+          key,
+          errorCode,
+          errorDescription,
+          url: validatedURL,
+        });
+      } catch (e) {}
+    }
+  );
+
+  // DOM 就绪时通知 renderer
+  view.webContents.once("dom-ready", () => {
+    const title = view.webContents.getTitle?.() || "";
+    try {
+      mainWindowRef.webContents.send("tab-loaded", { key, url, title });
+      console.log(`\n DOM ready...Tab ${key} loaded: ${url}`)
+    } catch (e) {}
+  });
+
+  // 开始加载 URL
   view.webContents.loadURL(url);
 }
 

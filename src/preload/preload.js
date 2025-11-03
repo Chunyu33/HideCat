@@ -26,4 +26,12 @@ contextBridge.exposeInMainWorld("electronAPI", {
   addTab: (key, url) => ipcRenderer.invoke("add-tab", { key, url }),
   removeTab: (key) => ipcRenderer.invoke("remove-tab", key),
   setActiveTab: (key) => ipcRenderer.invoke("set-active-tab", key),
+
+  // 窗口加载
+  onTabLoading: (cb) =>
+    ipcRenderer.on("tab-loading", (_, data) => cb && cb(data)),
+  onTabLoaded: (cb) =>
+    ipcRenderer.on("tab-loaded", (_, data) => cb && cb(data)),
+  onTabLoadFailed: (cb) =>
+    ipcRenderer.on("tab-load-failed", (_, data) => cb && cb(data)),
 });
