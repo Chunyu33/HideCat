@@ -21,9 +21,18 @@ function setMainWindow(win) {
 // 设置窗口逻辑
 // -----------------------------
 function openSettingsWindow() {
+  // ✅ 获取主窗口当前尺寸
+  const [parentWidth, parentHeight] = mainWindow.getSize();
+
+  // ✅ 按比例计算子窗口尺寸
+  const width = Math.floor(parentWidth * 0.6);
+  const height = Math.floor(parentHeight * 0.5);
   settingsWin = new BrowserWindow({
-    width: 420,
-    height: 360,
+    // width: 420,
+    // height: 360,
+    width,
+    height,
+    minWidth: 340,
     resizable: false,
     frame: false,
     parent: mainWindow,

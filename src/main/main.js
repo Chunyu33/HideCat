@@ -26,6 +26,7 @@ const createWindow = () => {
     height: 600,
     x: width - 820,
     y: height - 620,
+    minWidth: 350, // 限制最小宽度
     frame: false,
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Slider, Switch, Tooltip } from "antd";
+import QuestionMark from './QuestionMark';
 import "./css/setting.css";
 
 const SettingMenu = ({ onClose, onScaleChange }) => {
@@ -55,6 +56,13 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
     }
   };
 
+  const formatTip = (tipValue) => {
+    if (tipValue == null) {
+      return null;
+    }
+    return `${Math.round(tipValue * 100)}%`;
+  };
+
   return (
     <div className="setting-menu">
       <div className="setting-header">
@@ -68,29 +76,44 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
         <span className="setting-label row-center">
           自动隐藏
           <Tooltip title="开启后，鼠标离开窗口后自动隐藏在任务栏中。">
-            <svg width="14" height="14" viewBox="0 0 24 24" style={{ marginLeft: 4, cursor: "pointer" }}>
-              <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="2" />
-              <path d="M12 16v-4" stroke="currentColor" strokeWidth="2" />
-              <circle cx="12" cy="8" r="1" fill="currentColor" />
-            </svg>
+            <QuestionMark size="13" />
           </Tooltip>
         </span>
         <Switch checked={autoHide} onChange={handleAutoHide} />
       </div>
 
       <div className="setting-item">
-        <span className="setting-label">透明度</span>
+        <span className="setting-label row-center">
+          透明度
+          <Tooltip title="窗口的透明度，范围0.2~1.0。">
+            <QuestionMark size="13" />
+          </Tooltip>
+        </span>
         <div className="range-input">
-          <Slider min={0.4} max={1} step={0.01} value={opacity} onChange={handleOpacity} style={{ width: 100 }} />
-          <span className="range-value">{Math.round(opacity * 100)}%</span>
+          <Slider
+            min={0.2}
+            max={1}
+            step={0.01}
+            value={opacity}
+            onChange={handleOpacity}
+            style={{ width: 100 }}
+            tipFormatter={formatTip}
+          />
         </div>
       </div>
 
       <div className="setting-item">
-        <span className="setting-label">网页缩放</span>
+        <span className="setting-label row-center">网页缩放</span>
         <div className="range-input">
-          <Slider min={0.5} max={1.5} step={0.1} value={scale} onChange={handleScale} style={{ width: 100 }} />
-          <span className="range-value">{Math.round(scale * 100)}%</span>
+          <Slider
+            min={0.5}
+            max={1.5}
+            step={0.1}
+            value={scale}
+            onChange={handleScale}
+            style={{ width: 100 }}
+            tipFormatter={formatTip}
+          />
         </div>
       </div>
     </div>
