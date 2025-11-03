@@ -2,15 +2,12 @@ import React, { useState, useEffect, useRef } from "react";
 import { Slider, Switch, Tooltip } from "antd";
 import "./css/setting.css";
 
-const SettingMenu = ({ onClose, onScaleChange }) => { // 添加onScaleChange属性
+const SettingMenu = ({ onClose, onScaleChange }) => {
   const [autoHide, setAutoHide] = useState(false);
   const [opacity, setOpacity] = useState(0.9);
   const [scale, setScale] = useState(1.0);
   const clickTimeout = useRef(null);
 
-  const autoHideTip = `开启后，鼠标离开窗口后自动隐藏在折叠的任务栏中。点击折叠任务栏图标菜单或按ALT+F可恢复显示。`
-
-  // 打开设置时从主进程获取最新状态
   useEffect(() => {
     const fetchSettings = async () => {
       const [auto, op, sc] = await Promise.all([
@@ -18,7 +15,6 @@ const SettingMenu = ({ onClose, onScaleChange }) => { // 添加onScaleChange属�
         window.electronAPI.getOpacity?.(),
         window.electronAPI.getScale?.(),
       ]);
-      // console.log(auto, op, sc, '-----store');
       if (auto !== undefined) setAutoHide(auto);
       if (op !== undefined) setOpacity(op);
       if (sc !== undefined) setScale(sc);
@@ -27,91 +23,73 @@ const SettingMenu = ({ onClose, onScaleChange }) => { // 添加onScaleChange属�
   }, []);
 
   const handleAutoHide = (checked) => {
-    // 清除之前的timeout
-    if (clickTimeout.current) {
-      clearTimeout(clickTimeout.current);
-    }
-    
-    // 设置新的timeout，防抖处理
+    if (clickTimeout.current) clearTimeout(clickTimeout.current);
     clickTimeout.current = setTimeout(() => {
       setAutoHide(checked);
-      // 更新主进程 store 并触发自动隐藏逻辑
       window.electronAPI?.setAutoHide?.(checked, 200);
     }, 100);
   };
 
   const handleOpacity = (value) => {
     setOpacity(value);
-    window.electronAPI?.setOpacity?.(value); // 更新 store 并立即设置窗口透明度
+    window.electronAPI?.setOpacity?.(value);
   };
 
   const handleScale = (value) => {
     setScale(value);
-    // 通过props传递缩放值而不是直接调用electronAPI
-    if (onScaleChange) {
-      onScaleChange(value);
-    }
-    // 不适用electronAPI更新缩放整个窗口，而是使用props传递缩放定义好的缩放内容
-    // window.electronAPI?.setScale?.(value); // 保留原有逻辑以保存到store
+    if (onScaleChange) onScaleChange(value);
   };
 
-  // 清理timeout
   useEffect(() => {
     return () => {
-      if (clickTimeout.current) {
-        clearTimeout(clickTimeout.current);
-      }
+      if (clickTimeout.current) clearTimeout(clickTimeout.current);
     };
   }, []);
 
+  const handleClose = () => {
+    // ✅ 优先触发 React 传入的关闭逻辑
+    if (onClose) onClose();
+    // ✅ 如果这是独立弹窗（即 settingsWindow），调用主进程关闭
+    if (window.electronAPI?.closeSettingsWindow) {
+      window.electronAPI.closeSettingsWindow();
+    }
+  };
+
   return (
     <div className="setting-menu">
+      <div className="setting-header">
+        <span className="setting-title">设置</span>
+        <button className="close-btn" onClick={handleClose}>
+          ✕
+        </button>
+      </div>
+
       <div className="setting-item">
         <span className="setting-label row-center">
           自动隐藏
-          <Tooltip title={autoHideTip}>
-            <svg width="14" height="14" viewBox="0 0 24 24" style={{ marginLeft: 4, verticalAlign: 'middle', cursor: 'pointer' }}>
+          <Tooltip title="开启后，鼠标离开窗口后自动隐藏在任务栏中。">
+            <svg width="14" height="14" viewBox="0 0 24 24" style={{ marginLeft: 4, cursor: "pointer" }}>
               <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="2" />
               <path d="M12 16v-4" stroke="currentColor" strokeWidth="2" />
               <circle cx="12" cy="8" r="1" fill="currentColor" />
             </svg>
           </Tooltip>
         </span>
-        <div style={{ margin: '6px 0', textAlign: 'center' }}>
-          <Switch 
-            checked={autoHide} 
-            onChange={handleAutoHide} 
-            style={{ marginLeft: 'auto' }}
-          />
-        </div>
+        <Switch checked={autoHide} onChange={handleAutoHide} />
       </div>
-      
+
       <div className="setting-item">
         <span className="setting-label">透明度</span>
         <div className="range-input">
-          <Slider
-            min={0.4}
-            max={1}
-            step={0.01}
-            value={opacity}
-            onChange={handleOpacity}
-            style={{ width: 100 }}
-          />
+          <Slider min={0.4} max={1} step={0.01} value={opacity} onChange={handleOpacity} style={{ width: 100 }} />
           <span className="range-value">{Math.round(opacity * 100)}%</span>
         </div>
       </div>
-      
+
       <div className="setting-item">
         <span className="setting-label">网页缩放</span>
         <div className="range-input">
-          <Slider
-            min={0.5}
-            max={1.5}
-            step={0.1}
-            value={scale}
-            onChange={handleScale}
-            style={{ width: 100 }}
-          />
+          <Slider min={0.5} max={1.5} step={0.1} value={scale} onChange={handleScale} style={{ width: 100 }} />
           <span className="range-value">{Math.round(scale * 100)}%</span>
         </div>
       </div>

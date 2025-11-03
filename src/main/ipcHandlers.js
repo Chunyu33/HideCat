@@ -6,10 +6,51 @@ const {
   getAutoHideState,
   setOpacity,
   setScale,
-  clearAllTimer,
 } = require("./windowControl");
 
-function registerIPC(ipcMain) {
+const { BrowserWindow } = require("electron");
+
+let settingsWin = undefined;
+
+function registerIPC(ipcMain, mainWindow) {
+  // 用独立窗口加载设置组件
+  ipcMain.handle("open-settings-window", () => {
+    settingsWin = new BrowserWindow({
+      width: 420,
+      height: 360,
+      resizable: false,
+      frame: false,
+      parent: mainWindow,
+      modal: true, // 模态，阻止主窗口交互
+      show: false,
+      webPreferences: {
+        preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
+        nodeIntegration: false,
+        contextIsolation: true,
+      },
+    });
+
+    // 关键点：带上 query 参数告诉 React “我是设置窗口”
+    settingsWin.loadURL(`${MAIN_WINDOW_WEBPACK_ENTRY}?window=settings`);
+
+    settingsWin.once("ready-to-show", () => {
+      settingsWin.show();
+    });
+
+    settingsWin.on("closed", () => {
+      settingsWin = null;
+    });
+
+    return true;
+  });
+
+  ipcMain.handle("close-settings-window", () => {
+    if (settingsWin) {
+      settingsWin.close();
+      settingsWin = null;
+    }
+  });
+
   ipcMain.handle("minimize-window", () => hideWindow());
   ipcMain.handle("show-window", () => showWindow());
   ipcMain.handle("hide-window", (_, ms) => hideWindow(ms));
@@ -110,7 +151,7 @@ function registerTabHandlers(ipcMain) {
 }
 
 module.exports = (ipcMain, mainWindow) => {
-  registerIPC(ipcMain);
+  registerIPC(ipcMain, mainWindow);
   setMainWindowRef(mainWindow);
   registerTabHandlers(ipcMain);
 };
