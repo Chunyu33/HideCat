@@ -20,6 +20,7 @@
   font-weight: 500;
   white-space: nowrap;
   flex-shrink: 0;
+  margin-right: 20px; /* 增加标签和控件之间的固定间隙 */
 }
 
 .setting-item:last-child {
@@ -39,6 +40,9 @@
 .range-input {
   display: flex;
   align-items: center;
+  flex-grow: 1; 
+  /* 让内部的 Slider/Switch 靠右对齐 */
+  justify-content: flex-end; 
   gap: 8px;
 }
 

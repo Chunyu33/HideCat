@@ -75,17 +75,19 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
       <div className="setting-item">
         <span className="setting-label row-center">
           自动隐藏
-          <Tooltip title="开启后，鼠标离开窗口后自动隐藏在任务栏中。">
+          <Tooltip title="开启后，鼠标离开窗口后自动隐藏在任务栏中。" placement="bottomRight">
             <QuestionMark size="13" />
           </Tooltip>
         </span>
-        <Switch checked={autoHide} onChange={handleAutoHide} />
+        <div className="range-input">
+          <Switch checked={autoHide} onChange={handleAutoHide} />
+        </div>
       </div>
 
       <div className="setting-item">
         <span className="setting-label row-center">
           透明度
-          <Tooltip title="窗口的透明度，范围0.2~1.0。">
+          <Tooltip title="窗口的透明度，范围0.2~1.0。" placement="bottomRight">
             <QuestionMark size="13" />
           </Tooltip>
         </span>
@@ -96,7 +98,7 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
             step={0.01}
             value={opacity}
             onChange={handleOpacity}
-            style={{ width: 100 }}
+            style={{ width: "100%" }}
             tipFormatter={formatTip}
           />
         </div>
@@ -111,7 +113,7 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
             step={0.1}
             value={scale}
             onChange={handleScale}
-            style={{ width: 100 }}
+            style={{ width: "100%" }}
             tipFormatter={formatTip}
           />
         </div>
