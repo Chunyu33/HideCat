@@ -224,70 +224,69 @@ function setMainWindowRef(win) {
  */
 async function addTab(key, url) {
   if (!mainWindowRef) return;
-  if (browserViews.has(key)) return;
 
-  const view = new BrowserView({
-    webPreferences: {
-      nodeIntegration: false,
-      contextIsolation: true,
-      sandbox: false,
-      partition: `persist:tab-${key}`,
-    },
-  });
+  let view = browserViews.get(key);
 
-  // 放入缓存，但暂不展示
-  browserViews.set(key, view);
+  if (!view) {
+    view = new BrowserView({
+      webPreferences: {
+        nodeIntegration: false,
+        contextIsolation: true,
+        sandbox: false,
+        partition: `persist:tab-${key}`,
+      },
+    });
 
-  // 通知 renderer：开始加载
-  try {
-    mainWindowRef.webContents.send("tab-loading", { key, url });
-  } catch (e) {
-    console.warn("tab-loading send failed", e);
-  }
+    browserViews.set(key, view);
 
-  // 拦截新窗口
-  view.webContents.setWindowOpenHandler(({ url: targetUrl }) => {
-    view.webContents.loadURL(targetUrl);
-    return { action: "deny" };
-  });
+    view.webContents.setWindowOpenHandler(({ url: targetUrl }) => {
+      view.webContents.loadURL(targetUrl);
+      return { action: "deny" };
+    });
 
-  // 监听加载失败
-  view.webContents.once(
-    "did-fail-load",
-    (e, errorCode, errorDescription, validatedURL) => {
-      try {
-        mainWindowRef.webContents.send("tab-load-failed", {
-          key,
-          errorCode,
-          errorDescription,
-          url: validatedURL,
-        });
-      } catch {}
-    }
-  );
+    view.webContents.on("did-fail-load", (e, errorCode, errorDescription, validatedURL) => {
+      mainWindowRef.webContents.send("tab-load-failed", {
+        key,
+        errorCode,
+        errorDescription,
+        url: validatedURL,
+      });
+    });
 
-  // DOM ready
-  view.webContents.once("dom-ready", () => {
-    const title = view.webContents.getTitle?.() || "";
-    try {
+    view.webContents.on("dom-ready", () => {
+      const title = view.webContents.getTitle?.() || "";
       mainWindowRef.webContents.send("tab-loaded", { key, url, title });
-      console.log(`\nDOM ready...Tab ${key} loaded: ${url}`);
-    } catch (e) {}
-  });
+      console.log(`DOM ready...Tab ${key} loaded: ${url}`);
+    });
 
-  // ✅ 新增：网页完全加载完成时通知 renderer 更新 UI
-  view.webContents.on("did-finish-load", () => {
-    try {
+    view.webContents.on("did-finish-load", () => {
       mainWindowRef.webContents.send("tab-finish", { key, url });
       console.log(`✅ Tab ${key} finished loading: ${url}`);
-    } catch (e) {
-      console.warn("send tab-finish failed", e);
-    }
-  });
+    });
+  }
 
-  // 开始加载 URL
-  view.webContents.loadURL(url);
+  try {
+    mainWindowRef.webContents.send("tab-loading", { key, url });
+    console.log(`[addTab] load url for key=${key}, url=${url}`);
+    view.webContents.loadURL(url);
+  } catch (e) {
+    console.warn("loadURL failed", e);
+  }
+
+  // ✅ 如果当前激活 tab 就是这个 key，则刷新 BrowserView 显示
+  if (activeTabKey === key) {
+    try {
+      const [width, height] = mainWindowRef.getContentSize();
+      mainWindowRef.setBrowserView(view);
+      view.setBounds({ x: 0, y: 66, width: width, height: height - 66 });
+      view.setAutoResize({ width: true, height: true });
+      console.log(`🔁 refreshed active tab view for key=${key}`);
+    } catch (e) {
+      console.warn("refresh active tab failed", e);
+    }
+  }
 }
+
 
 /**
  * 激活（切换）标签页

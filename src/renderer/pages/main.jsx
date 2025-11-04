@@ -23,12 +23,11 @@ const initialItems = [
     // status: undefined 默认
   },
 ];
-const MAX_TABS = 5;
+const MAX_TABS = 8;
 
 const EditableTabsPage = () => {
   const [activeKey, setActiveKey] = useState(HOME_TAB_KEY);
   const [items, setItems] = useState(initialItems);
-  const [nextUniqueId, setNextUniqueId] = useState(1);
   const [loadingTabs, setLoadingTabs] = useState(() => new Set());
   const [failedTabs, setFailedTabs] = useState({});
   const itemsRef = useRef(items); // 保持最新 items 的引用
@@ -43,25 +42,26 @@ const EditableTabsPage = () => {
   // 我们在这里把它合并到 setItems 中，并同步更新 loadingTabs/failedTabs。
   useTabEvents((updater) => {
     setItems((prevItems) => {
+      // 只响应加载失败事件
       const nextItems = prevItems.map((it) => {
         try {
-          return updater(it.key, it) || it;
-        } catch (e) {
+          const updated = updater(it.key, it);
+          if (updated?.status === "failed") {
+            return updated; // 只更新失败状态的 tab
+          }
+          return it; // 其他状态不变
+        } catch {
           return it;
         }
       });
 
-      // 根据 nextItems 中 status 字段，维护 loadingTabs / failedTabs
-      const nextLoading = new Set();
+      // 仅维护 failedTabs
       const nextFailed = {};
       nextItems.forEach((it) => {
-        if (it?.status === "loading") nextLoading.add(it.key);
         if (it?.status === "failed")
           nextFailed[it.key] = it.error || "加载失败";
       });
 
-      // 更新 loadingTabs / failedTabs 通过 setter（使用 functional，避免闭包问题）
-      setLoadingTabs((_) => nextLoading);
       setFailedTabs((_) => nextFailed);
 
       return nextItems;
@@ -81,9 +81,7 @@ const EditableTabsPage = () => {
   }, [activeKey]);
 
   const onChange = (key) => {
-    // 只在前端切换 activeKey（useEffect 会同步主进程）
     setActiveKey(key);
-    console.warn("\n``````````````````onChange")
   };
 
   // -----------------------------
@@ -137,7 +135,7 @@ const EditableTabsPage = () => {
             ...it,
             label,
             url,
-            status: "loading",
+            status: "idle",
             children: <BrowserViewPlaceholder />,
           };
         }
@@ -146,6 +144,9 @@ const EditableTabsPage = () => {
     );
 
     // 通知主进程在这个 tab 加载新页面
+    // ✅ 先告诉主进程切换当前活动标签（保证加载目标是对的）
+    await window.electronAPI.setActiveTab(targetKey);
+    // ✅ 然后再通知主进程加载新的网页
     await window.electronAPI.addTab(targetKey, url);
   };
 
@@ -202,7 +203,7 @@ const EditableTabsPage = () => {
   const operations = (
     <Tooltip
       title="点击新建标签页"
-      placement="bottomRight"
+      placement="left"
       color="#4caf50"
       styles={{
         body: { color: "#fff" },

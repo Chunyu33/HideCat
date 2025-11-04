@@ -52,7 +52,12 @@ const HomePage = ({ onNewTab, onUpdateTab, currentKey }) => {
 
   // 快捷入口点击事件
   const handleShortcutClick = (item) => {
-    onNewTab(item.url, item.name);
+    // onNewTab(item.url, item.name);
+    if (currentKey === "tab-home") {
+      onNewTab(item.url, item.name);
+    } else {
+      onUpdateTab(currentKey, url, item.name);
+    }
   };
 
   return (
