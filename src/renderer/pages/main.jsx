@@ -83,6 +83,7 @@ const EditableTabsPage = () => {
   const onChange = (key) => {
     // 只在前端切换 activeKey（useEffect 会同步主进程）
     setActiveKey(key);
+    console.warn("\n``````````````````onChange")
   };
 
   // -----------------------------
@@ -107,7 +108,11 @@ const EditableTabsPage = () => {
       children: isWeb ? (
         <BrowserViewPlaceholder />
       ) : (
-        <HomePage onNewTab={handleNewTab} />
+        <HomePage
+          onNewTab={handleNewTab}
+          onUpdateTab={updateTab}
+          currentKey={newKey}
+        />
       ),
       url,
       status: isWeb ? "loading" : "idle",
@@ -120,6 +125,28 @@ const EditableTabsPage = () => {
     if (isWeb) {
       await window.electronAPI.addTab(newKey, url);
     }
+  };
+
+  // 更新tab
+  const updateTab = async (targetKey, url, label) => {
+    // 更新前端 UI 状态
+    setItems((prev) =>
+      prev.map((it) => {
+        if (it.key === targetKey) {
+          return {
+            ...it,
+            label,
+            url,
+            status: "loading",
+            children: <BrowserViewPlaceholder />,
+          };
+        }
+        return it;
+      })
+    );
+
+    // 通知主进程在这个 tab 加载新页面
+    await window.electronAPI.addTab(targetKey, url);
   };
 
   // -----------------------------
@@ -197,7 +224,13 @@ const EditableTabsPage = () => {
     if (item.key === HOME_TAB_KEY && item.children === "LOADING_HOME") {
       return {
         ...item,
-        children: <HomePage onNewTab={handleNewTab} />,
+        children: (
+          <HomePage
+            onNewTab={handleNewTab}
+            onUpdateTab={updateTab}
+            currentKey={item.key}
+          />
+        ),
       };
     }
 

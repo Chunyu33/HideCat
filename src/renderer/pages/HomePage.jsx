@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Input, Space, Typography, Button, message, Card } from "antd";
 import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
-import './css/homepage.css'
+import "./css/homepage.css";
 
 const { Title, Text } = Typography;
 const { Search } = Input;
@@ -17,7 +17,7 @@ const shortcuts = [
 const BING_SEARCH_URL = "https://www.bing.com/search?q=";
 
 // 接受 onNewTab 属性 (由 Tab 父组件传入)
-const HomePage = ({ onNewTab }) => {
+const HomePage = ({ onNewTab, onUpdateTab, currentKey }) => {
   const [searchValue, setSearchValue] = useState("");
 
   // 搜索框提交事件处理
@@ -40,7 +40,13 @@ const HomePage = ({ onNewTab }) => {
     }
 
     // 调用父组件传入的回调函数
-    onNewTab(targetUrl, tabName); 
+    // onNewTab(targetUrl, tabName);
+    // 👇 判断当前 tab 是主页还是新建页
+    if (currentKey === "tab-home") {
+      onNewTab(targetUrl, tabName); // 主页 -> 新开
+    } else {
+      onUpdateTab(currentKey, targetUrl, tabName); // 新建页 -> 替换当前
+    }
     setSearchValue("");
   };
 
@@ -84,7 +90,7 @@ const HomePage = ({ onNewTab }) => {
             onClick={() => handleShortcutClick(item)}
             style={{ width: 100, borderRadius: 8, textAlign: "center" }}
             styles={{
-              body: { padding: "12px 0" } // 👈 替换为 styles 属性和 body 键
+              body: { padding: "12px 0" }, // 👈 替换为 styles 属性和 body 键
             }}
           >
             <div
