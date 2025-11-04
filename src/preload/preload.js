@@ -1,3 +1,4 @@
+// preload.js
 const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("electronAPI", {
@@ -27,11 +28,27 @@ contextBridge.exposeInMainWorld("electronAPI", {
   removeTab: (key) => ipcRenderer.invoke("remove-tab", key),
   setActiveTab: (key) => ipcRenderer.invoke("set-active-tab", key),
 
-  // 窗口加载
-  onTabLoading: (cb) =>
-    ipcRenderer.on("tab-loading", (_, data) => cb && cb(data)),
-  onTabLoaded: (cb) =>
-    ipcRenderer.on("tab-loaded", (_, data) => cb && cb(data)),
-  onTabLoadFailed: (cb) =>
-    ipcRenderer.on("tab-load-failed", (_, data) => cb && cb(data)),
+  // 窗口加载状态事件监听
+  onTabLoading: (cb) => {
+    const listener = (_, data) => cb && cb(data);
+    ipcRenderer.on("tab-loading", listener);
+    return () => ipcRenderer.removeListener("tab-loading", listener);
+  },
+  onTabLoaded: (cb) => {
+    const listener = (_, data) => cb && cb(data);
+    ipcRenderer.on("tab-loaded", listener);
+    return () => ipcRenderer.removeListener("tab-loaded", listener);
+  },
+  onTabLoadFailed: (cb) => {
+    const listener = (_, data) => cb && cb(data);
+    ipcRenderer.on("tab-load-failed", listener);
+    return () => ipcRenderer.removeListener("tab-load-failed", listener);
+  },
+  // ✅ 新增：网页完全加载完成（did-finish-load）
+  onTabFinish: (cb) => {
+    const listener = (_, data) => cb && cb(data);
+    ipcRenderer.on("tab-finish", listener);
+    console.log("preload.js 监听网页完全加载完成 --- finish");
+    return () => ipcRenderer.removeListener("tab-finish", listener);
+  },
 });

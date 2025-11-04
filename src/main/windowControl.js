@@ -219,6 +219,9 @@ function setMainWindowRef(win) {
   mainWindowRef = win;
 }
 
+/**
+ * 创建新标签页并加载 URL
+ */
 async function addTab(key, url) {
   if (!mainWindowRef) return;
   if (browserViews.has(key)) return;
@@ -232,22 +235,23 @@ async function addTab(key, url) {
     },
   });
 
-  // 立即把 view 放到 map（但不立即 setBrowserView）
+  // 放入缓存，但暂不展示
   browserViews.set(key, view);
 
-  // 通知 renderer：该 tab 正在加载（开始）
+  // 通知 renderer：开始加载
   try {
     mainWindowRef.webContents.send("tab-loading", { key, url });
   } catch (e) {
     console.warn("tab-loading send failed", e);
   }
 
+  // 拦截新窗口
   view.webContents.setWindowOpenHandler(({ url: targetUrl }) => {
     view.webContents.loadURL(targetUrl);
     return { action: "deny" };
   });
 
-  // 失败回调
+  // 监听加载失败
   view.webContents.once(
     "did-fail-load",
     (e, errorCode, errorDescription, validatedURL) => {
@@ -258,23 +262,36 @@ async function addTab(key, url) {
           errorDescription,
           url: validatedURL,
         });
-      } catch (e) {}
+      } catch {}
     }
   );
 
-  // DOM 就绪时通知 renderer
+  // DOM ready
   view.webContents.once("dom-ready", () => {
     const title = view.webContents.getTitle?.() || "";
     try {
       mainWindowRef.webContents.send("tab-loaded", { key, url, title });
-      console.log(`\n DOM ready...Tab ${key} loaded: ${url}`)
+      console.log(`\nDOM ready...Tab ${key} loaded: ${url}`);
     } catch (e) {}
+  });
+
+  // ✅ 新增：网页完全加载完成时通知 renderer 更新 UI
+  view.webContents.on("did-finish-load", () => {
+    try {
+      mainWindowRef.webContents.send("tab-finish", { key, url });
+      console.log(`✅ Tab ${key} finished loading: ${url}`);
+    } catch (e) {
+      console.warn("send tab-finish failed", e);
+    }
   });
 
   // 开始加载 URL
   view.webContents.loadURL(url);
 }
 
+/**
+ * 激活（切换）标签页
+ */
 async function setActiveTab(key) {
   if (!mainWindowRef) return;
   if (activeTabKey === key) return;
@@ -287,13 +304,16 @@ async function setActiveTab(key) {
   if (newView) {
     mainWindowRef.setBrowserView(newView);
     const [width, height] = mainWindowRef.getContentSize();
-    newView.setBounds({ x: 0, y: 66, width: width, height: height - 66 }); // header 高度 80
+    newView.setBounds({ x: 0, y: 66, width: width, height: height - 66 }); // header 高度 66
     newView.setAutoResize({ width: true, height: true });
   }
 
   activeTabKey = key;
 }
 
+/**
+ * 删除标签页
+ */
 async function removeTab(key) {
   const view = browserViews.get(key);
   if (!view) return;
@@ -303,7 +323,7 @@ async function removeTab(key) {
     activeTabKey = null;
   }
 
-  // 销毁会话缓存
+  // 清理缓存和会话数据
   const viewSession = view.webContents.session;
   if (viewSession) {
     try {
@@ -315,7 +335,6 @@ async function removeTab(key) {
   browserViews.delete(key);
   view.webContents.destroy();
 }
-
 module.exports = {
   setMainWindow,
   setMainWindowRef,
