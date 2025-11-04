@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Tabs, Button, message, Tooltip } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import HomePage from "./HomePage";
-import useTabEvents from "../hooks/useTabEvents"; // ✅ 新增
+import useTabEvents from "../hooks/useTabEvents"; // 保持使用
 import "./css/main.css";
 
 // 占位符组件 (BrowserView 将在主进程中覆盖这个区域)
@@ -20,6 +20,7 @@ const initialItems = [
     label: "主页",
     children: "LOADING_HOME",
     closable: false,
+    // status: undefined 默认
   },
 ];
 const MAX_TABS = 5;
@@ -30,100 +31,100 @@ const EditableTabsPage = () => {
   const [nextUniqueId, setNextUniqueId] = useState(1);
   const [loadingTabs, setLoadingTabs] = useState(() => new Set());
   const [failedTabs, setFailedTabs] = useState({});
+  const itemsRef = useRef(items); // 保持最新 items 的引用
 
+  // 保持 ref 与 state 同步，方便异步回调读取到最新 items
+  useEffect(() => {
+    itemsRef.current = items;
+  }, [items]);
+
+  // 使用 useTabEvents 来处理来自主进程的 tab 事件，
+  // applyUpdater 会接收一个 updater 函数 (k, item) => newItem，
+  // 我们在这里把它合并到 setItems 中，并同步更新 loadingTabs/failedTabs。
   useTabEvents((updater) => {
-    setItems((prev) => prev.map((t) => updater(t.key, t)));
-
-    // 同步更新 loading 状态
-    setLoadingTabs((prev) => {
-      const next = new Set(prev);
-      prev.forEach((key) => {
-        const item = items.find((t) => t.key === key);
-        if (item?.status === "loaded" || item?.status === "failed") {
-          next.delete(key);
+    setItems((prevItems) => {
+      const nextItems = prevItems.map((it) => {
+        try {
+          return updater(it.key, it) || it;
+        } catch (e) {
+          return it;
         }
       });
-      return next;
+
+      // 根据 nextItems 中 status 字段，维护 loadingTabs / failedTabs
+      const nextLoading = new Set();
+      const nextFailed = {};
+      nextItems.forEach((it) => {
+        if (it?.status === "loading") nextLoading.add(it.key);
+        if (it?.status === "failed")
+          nextFailed[it.key] = it.error || "加载失败";
+      });
+
+      // 更新 loadingTabs / failedTabs 通过 setter（使用 functional，避免闭包问题）
+      setLoadingTabs((_) => nextLoading);
+      setFailedTabs((_) => nextFailed);
+
+      return nextItems;
     });
   });
 
-  const onChange = (key) => {
-    setActiveKey(key);
-    if (window.electronAPI) {
-      window.electronAPI.setActiveTab(key);
+  // 当 activeKey 变化时，自动告诉主进程切换 BrowserView
+  // 这样任何地方 setActiveKey 都会同步到主进程
+  useEffect(() => {
+    if (window.electronAPI && activeKey) {
+      // ipcRenderer.invoke 返回 Promise，因此可以 await（这里直接调用即可）
+      window.electronAPI.setActiveTab(activeKey).catch((e) => {
+        // 忽略或记录错误
+        console.warn("setActiveTab failed", e);
+      });
     }
+  }, [activeKey]);
+
+  const onChange = (key) => {
+    // 只在前端切换 activeKey（useEffect 会同步主进程）
+    setActiveKey(key);
   };
 
-  // ------------------------------------------------------------------
-  // 核心功能：添加新 Tab (接收来自 HomePage 的导航请求)
-  // ------------------------------------------------------------------
-  const handleNewTab = (url, label) => {
-    console.log(label, ";b----, Received new tab:", url);
+  // -----------------------------
+  // 新建 tab：改为 async 顺序，先请求主进程创建 view (如果是网页),
+  // 然后再更新 React state 并激活 activeKey
+  // -----------------------------
+  const handleNewTab = async (url = "about:blank", label = "新标签页") => {
     if (items.length >= MAX_TABS) {
       message.warning(`最多只能添加 ${MAX_TABS} 个标签页。`);
       return;
     }
 
-    const newId = nextUniqueId;
-    const newKey = `web-tab-${newId}`;
+    // ✅ 让主进程生成唯一 key
+    const newKey = await window.electronAPI.createNewTab();
 
-    // -----------------------------
-    // 🔍 判断是否为网页 / 搜索内容
-    // -----------------------------
-    const isWebContent =
-      url !== "about:blank" &&
-      (/^https?:\/\//i.test(url) ||
-        url.startsWith("www.") ||
-        url.includes(".com") ||
-        url.includes(".cn") ||
-        url.includes(".net") ||
-        url.includes("bing.com") ||
-        url.includes("search?q="));
+    const isWeb = url !== "about:blank";
 
-    // -----------------------------
-    // 根据类型决定内容
-    // -----------------------------
-    const initialChildren = isWebContent ? (
-      <BrowserViewPlaceholder />
-    ) : (
-      <HomePage onNewTab={handleNewTab} />
-    );
-
+    // 在前端先创建 tab UI
     const newTab = {
-      label: label.substring(0, 15),
       key: newKey,
-      children: initialChildren,
+      label,
+      children: isWeb ? (
+        <BrowserViewPlaceholder />
+      ) : (
+        <HomePage onNewTab={handleNewTab} />
+      ),
+      url,
+      status: isWeb ? "loading" : "idle",
     };
 
-    const newItems = [...items, newTab];
-    setItems(newItems);
+    setItems((prev) => [...prev, newTab]);
     setActiveKey(newKey);
 
-    if (isWebContent) {
-      setLoadingTabs((prev) => {
-        const next = new Set(prev);
-        next.add(newKey);
-        return next;
-      });
+    // 如果是网页，再通知主进程加载
+    if (isWeb) {
+      await window.electronAPI.addTab(newKey, url);
     }
-
-    // -----------------------------
-    // 通知主进程加载 BrowserView
-    // -----------------------------
-    setTimeout(() => {
-      if (isWebContent && window.electronAPI) {
-        window.electronAPI.addTab(newKey, url);
-        window.electronAPI.setActiveTab(newKey);
-        console.log("Loading web tab:", url);
-      }
-    }, 0);
-
-    setNextUniqueId((prevId) => prevId + 1);
   };
 
-  // ------------------------------------------------------------------
-  // 删除标签页
-  // ------------------------------------------------------------------
+  // -----------------------------
+  // 删除 tab
+  // -----------------------------
   const remove = (targetKey) => {
     let newActiveKey = activeKey;
     let targetIndex = -1;
@@ -143,9 +144,9 @@ const EditableTabsPage = () => {
       }
     }
 
-    if (window.electronAPI) {
-      window.electronAPI.removeTab(targetKey);
-      window.electronAPI.setActiveTab(newActiveKey);
+    if (window.electronAPI && window.electronAPI.removeTab) {
+      window.electronAPI.removeTab(targetKey).catch(() => {});
+      // 不直接 setActiveTab 这里，由 useEffect(activeKey) 来处理新激活逻辑
     }
 
     setLoadingTabs((prev) => {
@@ -170,9 +171,7 @@ const EditableTabsPage = () => {
     }
   };
 
-  // ------------------------------------------------------------------
   // 新建按钮
-  // ------------------------------------------------------------------
   const operations = (
     <Tooltip
       title="点击新建标签页"
@@ -193,9 +192,7 @@ const EditableTabsPage = () => {
     </Tooltip>
   );
 
-  // ------------------------------------------------------------------
-  // 渲染逻辑：根据 tab 状态渲染 children
-  // ------------------------------------------------------------------
+  // 渲染逻辑
   const mappedItems = items.map((item) => {
     if (item.key === HOME_TAB_KEY && item.children === "LOADING_HOME") {
       return {
@@ -204,16 +201,17 @@ const EditableTabsPage = () => {
       };
     }
 
-    if (loadingTabs.has(item.key)) {
+    // 如果 useTabEvents 已把 status 设置为 loading，则显示占位符
+    if (loadingTabs.has(item.key) || item?.status === "loading") {
       return { ...item, children: <BrowserViewPlaceholder /> };
     }
 
-    if (failedTabs[item.key]) {
+    if (failedTabs[item.key] || item?.status === "failed") {
       return {
         ...item,
         children: (
           <div style={{ padding: 20 }}>
-            加载失败：{failedTabs[item.key] || "未知错误"}
+            加载失败：{failedTabs[item.key] || item?.error || "未知错误"}
           </div>
         ),
       };

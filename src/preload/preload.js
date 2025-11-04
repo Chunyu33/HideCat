@@ -27,6 +27,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
   addTab: (key, url) => ipcRenderer.invoke("add-tab", { key, url }),
   removeTab: (key) => ipcRenderer.invoke("remove-tab", key),
   setActiveTab: (key) => ipcRenderer.invoke("set-active-tab", key),
+  createNewTab: () => ipcRenderer.invoke('create-new-tab'),
 
   // 窗口加载状态事件监听
   onTabLoading: (cb) => {
@@ -44,7 +45,6 @@ contextBridge.exposeInMainWorld("electronAPI", {
     ipcRenderer.on("tab-load-failed", listener);
     return () => ipcRenderer.removeListener("tab-load-failed", listener);
   },
-  // ✅ 新增：网页完全加载完成（did-finish-load）
   onTabFinish: (cb) => {
     const listener = (_, data) => cb && cb(data);
     ipcRenderer.on("tab-finish", listener);

@@ -14,6 +14,7 @@ const {
   setActiveTab,
   removeTab,
 } = require("./windowControl");
+const { randomUUID } = require("crypto");
 
 function registerIPC(ipcMain, mainWindow) {
   // 初始化主窗口引用
@@ -64,6 +65,9 @@ function registerIPC(ipcMain, mainWindow) {
   ipcMain.handle("add-tab", async (_, { key, url }) => addTab(key, url));
   ipcMain.handle("set-active-tab", async (_, key) => setActiveTab(key));
   ipcMain.handle("remove-tab", async (_, key) => removeTab(key));
+  ipcMain.handle("create-new-tab", () => {
+    return `tab-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  });
 }
 
 module.exports = registerIPC;
