@@ -15,7 +15,7 @@ const Header = ({ onOpenSettings, showSettings }) => {
 
   return (
     <div className="header-bar" onDoubleClick={handleMinimize}>
-      <div className="header-title">🐟 Fish Slacke</div>
+      <div className="header-title">🐟SlackeFish</div>
       <div className="header-actions">
         <button className="header-btn" onClick={handleMinimize} title="最小化">
           <svg width="12" height="12" viewBox="0 0 24 24">

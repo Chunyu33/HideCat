@@ -26,13 +26,14 @@ function openSettingsWindow() {
 
   // ✅ 按比例计算子窗口尺寸
   const width = Math.floor(parentWidth * 0.6);
-  const height = Math.floor(parentHeight * 0.5);
+  const height = Math.floor(parentHeight * 0.3);
   settingsWin = new BrowserWindow({
     // width: 420,
     // height: 360,
     width,
     height,
     minWidth: 340,
+    minHeight: 240,
     resizable: false,
     frame: false,
     parent: mainWindow,

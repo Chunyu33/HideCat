@@ -1,10 +1,46 @@
 .home-page {
-  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  color: #555;
+}
+
+.shortcut-item {
+  width: 70px;
   text-align: center;
-  padding: 20px 20px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.25s ease;
+  user-select: none;
+}
+
+.shortcut-item:hover {
+  transform: translateY(-4px);
+}
+
+.shortcut-icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 6px;
+  border: 1px solid #e0e0e0;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  transition: all 0.25s ease;
+}
+
+.shortcut-item:hover .shortcut-icon {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-color: #d0d0d0;
+}
+
+.shortcut-text {
+  display: inline-block;
+  width: 100%;
+  font-size: 13px;
+  color: #555;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }

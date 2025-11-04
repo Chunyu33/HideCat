@@ -20,7 +20,7 @@ const initialItems = [
 ];
 const MAX_TABS = 8;
 
-const EditableTabsPage = () => {
+const MainPage = () => {
   const [activeKey, setActiveKey] = useState(HOME_TAB_KEY);
   const [items, setItems] = useState(initialItems);
   const [loadingTabs, setLoadingTabs] = useState(() => new Set());
@@ -268,4 +268,4 @@ const EditableTabsPage = () => {
   );
 };
 
-export default EditableTabsPage;
+export default MainPage;
