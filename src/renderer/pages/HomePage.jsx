@@ -56,7 +56,7 @@ const HomePage = ({ onNewTab, onUpdateTab, currentKey }) => {
     if (currentKey === "tab-home") {
       onNewTab(item.url, item.name);
     } else {
-      onUpdateTab(currentKey, url, item.name);
+      onUpdateTab(currentKey, item.url, item.name);
     }
   };
 
@@ -126,7 +126,6 @@ const HomePage = ({ onNewTab, onUpdateTab, currentKey }) => {
             </div>
           </Card>
         ))}
-        {/* ... 添加快捷方式按钮 ... */}
       </Space>
     </div>
   );

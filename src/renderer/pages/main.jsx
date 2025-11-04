@@ -3,14 +3,9 @@ import { Tabs, Button, message, Tooltip } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import HomePage from "./HomePage";
 import useTabEvents from "../hooks/useTabEvents"; // 保持使用
-import "./css/main.css";
+import WebViewSkeleton from "../components/WebViewSkeleton"; // 骨架屏组件
 
-// 占位符组件 (BrowserView 将在主进程中覆盖这个区域)
-const BrowserViewPlaceholder = () => (
-  <div style={{ height: "100%", padding: 20, textAlign: "center" }}>
-    <p>正在加载网页内容...</p>
-  </div>
-);
+import "./css/main.css";
 
 // Tab 常量
 const HOME_TAB_KEY = "tab-home";
@@ -104,7 +99,7 @@ const EditableTabsPage = () => {
       key: newKey,
       label,
       children: isWeb ? (
-        <BrowserViewPlaceholder />
+        <WebViewSkeleton />
       ) : (
         <HomePage
           onNewTab={handleNewTab}
@@ -136,7 +131,7 @@ const EditableTabsPage = () => {
             label,
             url,
             status: "idle",
-            children: <BrowserViewPlaceholder />,
+            children: <WebViewSkeleton />,
           };
         }
         return it;
@@ -237,7 +232,7 @@ const EditableTabsPage = () => {
 
     // 如果 useTabEvents 已把 status 设置为 loading，则显示占位符
     if (loadingTabs.has(item.key) || item?.status === "loading") {
-      return { ...item, children: <BrowserViewPlaceholder /> };
+      return { ...item, children: <WebViewSkeleton /> };
     }
 
     if (failedTabs[item.key] || item?.status === "failed") {
