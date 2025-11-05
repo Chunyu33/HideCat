@@ -1,4 +1,3 @@
-// preload.js
 const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("electronAPI", {
@@ -51,7 +50,6 @@ contextBridge.exposeInMainWorld("electronAPI", {
   onTabFinish: (cb) => {
     const listener = (_, data) => cb && cb(data);
     ipcRenderer.on("tab-finish", listener);
-    console.log("preload.js 监听网页完全加载完成 --- finish");
     return () => ipcRenderer.removeListener("tab-finish", listener);
   },
 });

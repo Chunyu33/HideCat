@@ -35,8 +35,8 @@ const App = () => {
       window.electronAPI?.setOpacity?.(op);
     }
     if (sc !== undefined) {
-      // window.electronAPI?.setScale?.(sc);
       setScale(sc); // 设置初始缩放级别
+      window.electronAPI?.setScale?.(sc);
     }
     if (key !== undefined) {
       setCurrentKey(key);
@@ -71,10 +71,6 @@ const App = () => {
     window.electronAPI.openSettingsWindow();
   };
 
-  // 处理缩放变化
-  const handleScaleChange = (newScale) => {
-    setScale(newScale);
-  };
 
   // 条件渲染
   const getDom = () => {

@@ -38,6 +38,7 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
 
   const handleScale = (value) => {
     setScale(value);
+    window.electronAPI?.setScale?.(value);
     if (onScaleChange) onScaleChange(value);
   };
 
@@ -48,9 +49,9 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
   }, []);
 
   const handleClose = () => {
-    // ✅ 优先触发 React 传入的关闭逻辑
+    // 优先触发 React 传入的关闭逻辑
     if (onClose) onClose();
-    // ✅ 如果这是独立弹窗（即 settingsWindow），调用主进程关闭
+    // 如果这是独立弹窗（即 settingsWindow），调用主进程关闭
     if (window.electronAPI?.closeSettingsWindow) {
       window.electronAPI.closeSettingsWindow();
     }
@@ -119,7 +120,19 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
       </div>
 
       <div className="setting-item">
-        <span className="setting-label row-center">网页缩放</span>
+        <span className="setting-label row-center">
+          网页缩放
+          <Tooltip
+            title="网页缩放，范围50%~150%。首页不会进行缩放。"
+            placement="topRight"
+            color="#4caf50"
+            styles={{
+              body: { color: "#fff" },
+            }}
+          >
+            <QuestionMark size="13" />
+          </Tooltip>
+        </span>
         <div className="range-input">
           <Slider
             min={0.5}

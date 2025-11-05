@@ -21,12 +21,12 @@ function setMainWindow(win) {
 // 设置窗口逻辑
 // -----------------------------
 function openSettingsWindow() {
-  // ✅ 获取主窗口当前尺寸
+  // 获取主窗口当前尺寸
   const [parentWidth, parentHeight] = mainWindow.getSize();
 
-  // ✅ 按比例计算子窗口尺寸
+  // 按比例计算子窗口尺寸
   const width = Math.floor(parentWidth * 0.6);
-  const height = Math.floor(parentHeight * 0.3);
+  const height = Math.floor(parentHeight * 0.4);
   settingsWin = new BrowserWindow({
     // width: 420,
     // height: 360,
@@ -138,12 +138,24 @@ function setOpacity(val) {
 }
 
 // 设置网页缩放
-function setScale(val) {
-  store.set("scale", val); // 持久化
-  // 为了避免整个窗口被缩放, 不使用setZoomFactor
+function setScale(scale) {
+  store.set("scale", scale); // 持久化
+  // 为了避免整个主窗口被缩放, 不在mainWindow使用setZoomFactor
   // if (mainWindow && !mainWindow.isDestroyed()) {
-  //   mainWindow.webContents.setZoomFactor(val);
+  //   mainWindow.webContents.setZoomFactor(scale);
   // }
+
+  // 缩放BrowserView
+  // 更新所有的 BrowserView 缩放
+  browserViews.forEach((view) => {
+    view.webContents.setZoomFactor(scale);
+  });
+
+  // 更新当前活动 BrowserView 的缩放
+  if (activeTabKey && browserViews.has(activeTabKey)) {
+    const activeView = browserViews.get(activeTabKey);
+    activeView.webContents.setZoomFactor(scale);
+  }
 }
 
 // -----------------------------
@@ -279,6 +291,10 @@ async function addTab(key, url) {
 
     view.webContents.on("did-finish-load", () => {
       mainWindowRef.webContents.send("tab-finish", { key, url });
+      // 加载完成后 确保缩放比例立即生效
+      const scale = store.get("scale", 1.0); // 获取全局缩放比例
+      view.webContents.setZoomFactor(scale); // 立即应用缩放
+      console.log(`\n setZoomFactor for scale=${scale}`);
       console.log(`✅ Tab ${key} finished loading: ${url}`);
     });
   }
@@ -291,7 +307,7 @@ async function addTab(key, url) {
     console.warn("loadURL failed", e);
   }
 
-  // ✅ 如果当前激活 tab 就是这个 key，则刷新 BrowserView 显示
+  // 如果当前激活 tab 就是这个 key，则刷新 BrowserView 显示
   if (activeTabKey === key) {
     try {
       mainWindowRef.setBrowserView(view);
@@ -373,7 +389,6 @@ function navigateView(action) {
       wc.reload();
       break;
     case "home":
-      // TODO: 改成核心页面 不需要header
       wc.loadURL(`${MAIN_WINDOW_WEBPACK_ENTRY}?window=home`);
       break;
   }
@@ -397,5 +412,5 @@ module.exports = {
   setActiveTab,
   removeTab,
   navigateView,
-  getActiveKey
+  getActiveKey,
 };
