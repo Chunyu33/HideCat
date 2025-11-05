@@ -220,6 +220,19 @@ function setMainWindowRef(win) {
   mainWindowRef = win;
 }
 
+function _getBorserSize() {
+  // if(!mainWindowRef) return;
+  // let [x, y] = mainWindowRef.getPosition();
+  const [width, height] = mainWindowRef.getContentSize();
+  let sizeObj = {
+    width,
+    height,
+    x: 0,
+    y: 66,
+  }
+  return sizeObj;
+}
+
 /**
  * 创建新标签页并加载 URL
  */
@@ -277,9 +290,8 @@ async function addTab(key, url) {
   // ✅ 如果当前激活 tab 就是这个 key，则刷新 BrowserView 显示
   if (activeTabKey === key) {
     try {
-      const [width, height] = mainWindowRef.getContentSize();
       mainWindowRef.setBrowserView(view);
-      view.setBounds({ x: 0, y: 66, width: width, height: height - 66 });
+      view.setBounds(_getBorserSize());
       view.setAutoResize({ width: true, height: true });
       console.log(`🔁 refreshed active tab view for key=${key}`);
     } catch (e) {
@@ -303,8 +315,7 @@ async function setActiveTab(key) {
 
   if (newView) {
     mainWindowRef.setBrowserView(newView);
-    const [width, height] = mainWindowRef.getContentSize();
-    newView.setBounds({ x: 0, y: 66, width: width, height: height - 66 }); // header 高度 66
+    newView.setBounds(_getBorserSize());
     newView.setAutoResize({ width: true, height: true });
   }
 
