@@ -14,6 +14,7 @@ const {
   setActiveTab,
   removeTab,
   navigateView,
+  getActiveKey
 } = require("./windowControl");
 const { randomUUID } = require("crypto");
 
@@ -44,6 +45,7 @@ function registerIPC(ipcMain, mainWindow) {
     const { enabled, count } = args || {};
     setAutoHide(enabled, count);
   });
+  ipcMain.handle("get-active-key", () => getActiveKey());
   ipcMain.handle("get-auto-hide", () => getAutoHideState());
 
   ipcMain.handle("set-opacity", (_, val) => setOpacity(val));

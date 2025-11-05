@@ -247,6 +247,7 @@ async function addTab(key, url) {
         nodeIntegration: false,
         contextIsolation: true,
         sandbox: false,
+        preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
         partition: `persist:tab-${key}`,
       },
     });
@@ -324,6 +325,11 @@ async function setActiveTab(key) {
   activeTabKey = key;
 }
 
+function getActiveKey() {
+  console.log(`\n getActiveKey: ${activeTabKey}`);
+  return activeTabKey;
+}
+
 /**
  * 删除标签页
  */
@@ -368,7 +374,7 @@ function navigateView(action) {
       break;
     case "home":
       // TODO: 改成核心页面 不需要header
-      wc.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
+      wc.loadURL(`${MAIN_WINDOW_WEBPACK_ENTRY}?window=home`);
       break;
   }
 }
@@ -391,4 +397,5 @@ module.exports = {
   setActiveTab,
   removeTab,
   navigateView,
+  getActiveKey
 };

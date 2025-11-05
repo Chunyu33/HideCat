@@ -19,13 +19,14 @@ contextBridge.exposeInMainWorld("electronAPI", {
   getOpacity: () => ipcRenderer.invoke("get-opacity"),
   setScale: (val) => ipcRenderer.invoke("set-scale", val),
   getScale: () => ipcRenderer.invoke("get-scale"),
-
+  
   // 自动隐藏功能
   setAutoHide: (enabled, count) =>
     ipcRenderer.invoke("set-auto-hide", { enabled, count }),
   getAutoHide: () => ipcRenderer.invoke("get-auto-hide"),
-
+  
   // tab窗口功能
+  getActiveKey: () => ipcRenderer.invoke("get-active-key"),
   addTab: (key, url) => ipcRenderer.invoke("add-tab", { key, url }),
   removeTab: (key) => ipcRenderer.invoke("remove-tab", key),
   setActiveTab: (key) => ipcRenderer.invoke("set-active-tab", key),
