@@ -313,6 +313,10 @@ async function addTab(key, url) {
       mainWindowRef.setBrowserView(view);
       view.setBounds(_getBorserSize());
       view.setAutoResize({ width: true, height: true });
+      setTimeout(() => {
+        const scale = store.get("scale", 1.0); // 获取全局缩放比例
+        view.webContents.setZoomFactor(scale); // 立即应用缩放
+      }, 1000); 
       console.log(`🔁 refreshed active tab view for key=${key}`);
     } catch (e) {
       console.warn("refresh active tab failed", e);
