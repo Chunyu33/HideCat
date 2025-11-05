@@ -229,7 +229,7 @@ function _getBorserSize() {
     height,
     x: 0,
     y: 66,
-  }
+  };
   return sizeObj;
 }
 
@@ -258,14 +258,17 @@ async function addTab(key, url) {
       return { action: "deny" };
     });
 
-    view.webContents.on("did-fail-load", (e, errorCode, errorDescription, validatedURL) => {
-      mainWindowRef.webContents.send("tab-load-failed", {
-        key,
-        errorCode,
-        errorDescription,
-        url: validatedURL,
-      });
-    });
+    view.webContents.on(
+      "did-fail-load",
+      (e, errorCode, errorDescription, validatedURL) => {
+        mainWindowRef.webContents.send("tab-load-failed", {
+          key,
+          errorCode,
+          errorDescription,
+          url: validatedURL,
+        });
+      }
+    );
 
     view.webContents.on("dom-ready", () => {
       const title = view.webContents.getTitle?.() || "";
@@ -299,7 +302,6 @@ async function addTab(key, url) {
     }
   }
 }
-
 
 /**
  * 激活（切换）标签页
@@ -346,6 +348,31 @@ async function removeTab(key) {
   browserViews.delete(key);
   view.webContents.destroy();
 }
+
+// 导航
+function navigateView(action) {
+  const view = browserViews.get(activeTabKey);
+  if (!view) return;
+
+  const wc = view.webContents;
+  console.log(`\n[navigateView] action=${action}`);
+  switch (action) {
+    case "back":
+      if (wc.canGoBack()) wc.goBack();
+      break;
+    case "forward":
+      if (wc.canGoForward()) wc.goForward();
+      break;
+    case "reload":
+      wc.reload();
+      break;
+    case "home":
+      // TODO: 改成核心页面 不需要header
+      wc.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
+      break;
+  }
+}
+
 module.exports = {
   setMainWindow,
   setMainWindowRef,
@@ -363,4 +390,5 @@ module.exports = {
   addTab,
   setActiveTab,
   removeTab,
+  navigateView,
 };

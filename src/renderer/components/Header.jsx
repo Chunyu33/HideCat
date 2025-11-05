@@ -19,9 +19,14 @@ const IconButton = ({ title, onClick, children }) => (
 );
 
 const Header = ({ onOpenSettings }) => {
-  const navigate = (action) => window.electronAPI?.navigateTab?.(action);
+
+  const navigate = (action) => {
+    console.log('navigate:', action);
+    window.electronAPI?.navigateView?.(action);
+  }
   const handleMinimize = () => window.electronAPI?.minimizeWindow();
   const handleClose = () => window.electronAPI?.closeWindow();
+
 
   return (
     <div className="header-bar">
@@ -41,7 +46,7 @@ const Header = ({ onOpenSettings }) => {
         <IconButton title="主页" onClick={() => navigate("home")}>
           <IconHome />
         </IconButton>
-        <IconButton title="刷新" onClick={() => navigate("refresh")}>
+        <IconButton title="刷新" onClick={() => navigate("reload")}>
           <IconRefresh />
         </IconButton>
         <IconButton title="设置" onClick={onOpenSettings}>

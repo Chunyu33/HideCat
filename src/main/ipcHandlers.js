@@ -13,6 +13,7 @@ const {
   addTab,
   setActiveTab,
   removeTab,
+  navigateView,
 } = require("./windowControl");
 const { randomUUID } = require("crypto");
 
@@ -26,6 +27,7 @@ function registerIPC(ipcMain, mainWindow) {
   // ======================
   ipcMain.handle("open-settings-window", () => openSettingsWindow());
   ipcMain.handle("close-settings-window", () => closeSettingsWindow());
+  ipcMain.on("navigate-view", (_, action) => navigateView(action));
 
   // ======================
   // 主窗口操作
@@ -66,7 +68,7 @@ function registerIPC(ipcMain, mainWindow) {
   ipcMain.handle("set-active-tab", async (_, key) => setActiveTab(key));
   ipcMain.handle("remove-tab", async (_, key) => removeTab(key));
   ipcMain.handle("create-new-tab", () => {
-    return `tab-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    return randomUUID();
   });
 }
 

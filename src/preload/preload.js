@@ -12,6 +12,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
   openSettingsWindow: () => ipcRenderer.invoke("open-settings-window"),
   closeSettingsWindow: () => ipcRenderer.invoke("close-settings-window"),
 
+  navigateView: (action) => ipcRenderer.send("navigate-view", action),
+
   // 窗口样式
   setOpacity: (val) => ipcRenderer.invoke("set-opacity", val),
   getOpacity: () => ipcRenderer.invoke("get-opacity"),
