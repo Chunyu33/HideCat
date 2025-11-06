@@ -9,7 +9,12 @@ module.exports = {
   makers: [
     {
       name: '@electron-forge/maker-squirrel',
-      config: {},
+      config: {
+        setupIcon: 'src/assets/app.ico',
+        // 添加Windows安装包优化
+        noMsi: true, // 不生成MSI安装包
+        remoteReleases: '', // 禁用远程发布检查
+      },
     },
     {
       name: '@electron-forge/maker-zip',
@@ -21,7 +26,9 @@ module.exports = {
     },
     {
       name: '@electron-forge/maker-rpm',
-      config: {},
+      config: {
+        icon: 'src/assets/icons/app.png',
+      },
     },
   ],
   plugins: [

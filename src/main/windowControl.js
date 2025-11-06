@@ -428,7 +428,7 @@ function removeShortcut(sid) {
   const current = store.get("shortcuts", []);
   const updated = current.filter((item) => item.id !== sid);
   store.set("shortcuts", updated);
-  console.log(`✅ Shortcut removed: ${updated.id}-- ${updated.name}`);
+  console.log(`✅ Shortcut removed`);
   return updated;
 }
 // =====================================================

@@ -31,6 +31,7 @@
     "@electron/fuses": "^1.8.0",
     "@vercel/webpack-asset-relocator-loader": "^1.7.3",
     "babel-loader": "^10.0.0",
+    "copy-webpack-plugin": "^13.0.1",
     "css-loader": "^6.11.0",
     "electron": "39.0.0",
     "node-loader": "^2.1.0",

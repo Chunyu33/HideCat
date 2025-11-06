@@ -28,6 +28,7 @@ const createWindow = () => {
     y: height - 620,
     minWidth: 350, // 限制最小宽度
     frame: false,
+    icon: getIconPath(),
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
       nodeIntegration: false,
@@ -42,10 +43,18 @@ const createWindow = () => {
   // initAutoHideWatcher(); // ✅ 初始化自动隐藏检测逻辑
 };
 
+// 获取图标路径
+const getIconPath = () => {
+  // 开发环境和打包环境路径一致，Webpack 会拷贝 assets
+  return path.join(__dirname, 'assets', 'app.ico');
+};
+
+
 const createTray = () => {
-  const iconPath = path.join(__dirname, "assets", "fish.png");
-  const trayIcon = nativeImage.createFromPath(iconPath);
-  tray = new Tray(trayIcon);
+  // const iconPath = path.join(__dirname, "assets", "SlackeFish.png");
+  // const trayIcon = nativeImage.createFromPath(iconPath);
+  // tray = new Tray(trayIcon);
+  tray = new Tray(getIconPath());
 
   const contextMenu = Menu.buildFromTemplate([
     { label: "显示窗口", click: () => windowControl.showWindow() },
@@ -60,7 +69,7 @@ const createTray = () => {
     },
   ]);
 
-  tray.setToolTip("Fish Slacke");
+  tray.setToolTip("SlackeFish");
   tray.setContextMenu(contextMenu);
 
   tray.on("click", () =>

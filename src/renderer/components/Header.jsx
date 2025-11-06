@@ -1,4 +1,3 @@
-// Header.jsx
 import React from "react";
 import "./css/header.css";
 import {
@@ -10,6 +9,7 @@ import {
   IconMinimize,
   IconClose,
 } from "./Icon";
+import AppIcon from "../../assets/app.png";
 
 // 独立 SVG 组件
 const IconButton = ({ title, onClick, children }) => (
@@ -19,20 +19,21 @@ const IconButton = ({ title, onClick, children }) => (
 );
 
 const Header = ({ onOpenSettings }) => {
-
   const navigate = (action) => {
-    console.log('navigate:', action);
+    console.log("navigate:", action);
     window.electronAPI?.navigateView?.(action);
-  }
+  };
   const handleMinimize = () => window.electronAPI?.minimizeWindow();
   const handleClose = () => window.electronAPI?.closeWindow();
-
 
   return (
     <div className="header-bar">
       {/* 左侧 Logo + 导航 */}
       <div className="header-left">
-        <div className="header-title">🐟 SlackeFish</div>
+        <div className="header-title">
+          <img src={AppIcon} alt="" style={{width: "18px", height: "18px"}} />
+          SlackeFish
+        </div>
       </div>
 
       {/* 右侧操作按钮 */}
