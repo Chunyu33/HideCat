@@ -1,9 +1,33 @@
+/* :root {
+  --ant-primary-color: #4caf50;
+  --ant-primary-color-hover: #66bb6a;
+  --ant-primary-color-active: #43a047;
+  --ant-primary-color-outline: rgba(76, 175, 80, 0.2);
+} */
+
+/* 默认亮色主题 */
 :root {
+  --background-color: #ffffff;
+  --text-color: #000000;
+  --primary-color: #4caf50;
   --ant-primary-color: #4caf50;
   --ant-primary-color-hover: #66bb6a;
   --ant-primary-color-active: #43a047;
   --ant-primary-color-outline: rgba(76, 175, 80, 0.2);
 }
+
+/* 暗色主题 */
+[data-theme='dark'] {
+  --background-color: #121212;
+  --text-color: #ffffff;
+  --primary-color: #bb86fc;
+}
+
+/* 自动主题（根据系统） */
+[data-theme='auto'] {
+  /* 由系统决定是否为暗色或亮色 */
+}
+
 
 html,
 body {

@@ -58,4 +58,9 @@ contextBridge.exposeInMainWorld("electronAPI", {
   addShortcut: (item) => ipcRenderer.invoke("add-shortcut", item),
   updateShortcut: (item) => ipcRenderer.invoke("update-shortcut", item),
   removeShortcut: (id) => ipcRenderer.invoke("remove-shortcut", id),
+
+  // 主题切换
+  setTheme: (theme) => ipcRenderer.invoke("set-theme", theme),
+  getTheme: () => ipcRenderer.invoke("get-theme"),
+  onThemeChanged: (callback) => ipcRenderer.on('theme-changed', callback),
 });

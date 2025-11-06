@@ -1,13 +1,23 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Slider, Switch, Tooltip } from "antd";
+import { Slider, Switch, Tooltip, Select } from "antd";
 import QuestionMark from "./QuestionMark";
 import "./css/setting.css";
+import useTheme from "../hooks/useTheme";
+
+// 主题选项
+const themeOptions = [
+  { label: "亮色模式", value: "light" },
+  { label: "暗色模式", value: "dark" },
+  { label: "自动模式", value: "auto" },
+];
 
 const SettingMenu = ({ onClose, onScaleChange }) => {
   const [autoHide, setAutoHide] = useState(false);
   const [opacity, setOpacity] = useState(0.9);
   const [scale, setScale] = useState(1.0);
   const clickTimeout = useRef(null);
+
+  const { theme, updateTheme } = useTheme();
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -40,6 +50,19 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
     setScale(value);
     window.electronAPI?.setScale?.(value);
     if (onScaleChange) onScaleChange(value);
+  };
+  // 主题切换处理
+  const handleThemeChange = (value) => {
+    updateTheme(value); // 更新主题
+    if (value === "auto") {
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
+        .matches
+        ? "dark"
+        : "light";
+      document.documentElement.setAttribute("data-theme", systemTheme);
+    } else {
+      document.documentElement.setAttribute("data-theme", value);
+    }
   };
 
   useEffect(() => {
@@ -142,6 +165,18 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
             onChange={handleScale}
             style={{ width: "100%" }}
             tipFormatter={formatTip}
+          />
+        </div>
+      </div>
+      {/* 主题选择 */}
+      <div className="setting-item">
+        <span className="setting-label row-center">主题设置</span>
+        <div className="range-input">
+          <Select
+            value={theme}
+            onChange={handleThemeChange}
+            options={themeOptions}
+            style={{ width: "100%" }}
           />
         </div>
       </div>

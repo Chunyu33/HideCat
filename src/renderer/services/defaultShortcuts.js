@@ -1,8 +1,38 @@
 export default [
-  { id: "id-slack-001", name: "SlackeFish", url: "https://www.evanspace.icu" },
-  { id: "id-redbook-001", name: "小红书", url: "https://www.xiaohongshu.com" },
-  { id: "id-douyin-001", name: "抖音", url: "https://www.douyin.com/" },
-  { id: "id-zhihu-001", name: "知乎", url: "https://www.zhihu.com" },
-  { id: "id-bilibili-001", name: "Bilibili", url: "https://www.bilibili.com" },
-  { id: "id-fanqiexs-001", name: "番茄小说", url: "https://fanqienovel.com/" },
+  {
+    id: "id-slack-001",
+    name: "SlackeFish",
+    url: "https://www.evanspace.icu",
+    system: true,
+  },
+  {
+    id: "id-redbook-001",
+    name: "小红书",
+    url: "https://www.xiaohongshu.com",
+    system: true,
+  },
+  {
+    id: "id-douyin-001",
+    name: "抖音",
+    url: "https://www.douyin.com/",
+    system: true,
+  },
+  {
+    id: "id-zhihu-001",
+    name: "知乎",
+    url: "https://www.zhihu.com",
+    system: true,
+  },
+  {
+    id: "id-bilibili-001",
+    name: "Bilibili",
+    url: "https://www.bilibili.com",
+    system: true,
+  },
+  {
+    id: "id-fanqiexs-001",
+    name: "番茄小说",
+    url: "https://fanqienovel.com/",
+    system: true,
+  },
 ];

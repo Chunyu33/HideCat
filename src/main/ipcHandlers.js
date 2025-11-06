@@ -19,6 +19,8 @@ const {
   addShortcut,
   updateShortcut,
   removeShortcut,
+  setTheme,
+  getTheme
 } = require("./windowControl");
 const { randomUUID } = require("crypto");
 
@@ -84,6 +86,12 @@ function registerIPC(ipcMain, mainWindow) {
   ipcMain.handle("add-shortcut", (_, item) => addShortcut(item));
   ipcMain.handle("update-shortcut", (_, item) => updateShortcut(item));
   ipcMain.handle("remove-shortcut", (_, id) => removeShortcut(id));
+
+  // ======================
+  // 主题管理
+  // ======================
+  ipcMain.handle("get-theme", () => getTheme());
+  ipcMain.handle("set-theme", (_, theme) => setTheme(theme));
 }
 
 module.exports = registerIPC;

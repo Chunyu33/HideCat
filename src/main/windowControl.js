@@ -347,7 +347,6 @@ async function setActiveTab(key) {
 }
 
 function getActiveKey() {
-  console.log(`\n getActiveKey: ${activeTabKey}`);
   return activeTabKey;
 }
 
@@ -433,6 +432,19 @@ function removeShortcut(sid) {
 }
 // =====================================================
 
+// 设置主题
+function setTheme(theme) {
+  store.set("theme", theme);
+  console.log(`\n [setTheme] theme=${theme}`);
+  if (!mainWindowRef) return;
+  mainWindowRef.setBackgroundColor(theme === "dark" ? "#1E1E1E" : "#FFFFFF");
+  mainWindowRef.webContents.send("theme-changed", theme);
+}
+// 获取当前主题
+function getTheme() {
+  return store.get("theme", "light");
+}
+
 module.exports = {
   setMainWindow,
   setMainWindowRef,
@@ -456,4 +468,6 @@ module.exports = {
   addShortcut,
   updateShortcut,
   removeShortcut,
+  setTheme,
+  getTheme
 };
