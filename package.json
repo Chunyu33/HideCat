@@ -1,8 +1,8 @@
 {
   "name": "fish-slacke",
-  "productName": "fish-Slacke",
+  "productName": "SlackeFish",
   "version": "1.0.0",
-  "description": "My Electron application description",
+  "description": "上班族摸鱼神器。",
   "main": ".webpack/main",
   "scripts": {
     "start": "electron-forge start",

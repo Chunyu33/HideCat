@@ -1,19 +1,20 @@
+const path = require('path');
 const { FusesPlugin } = require('@electron-forge/plugin-fuses');
 const { FuseV1Options, FuseVersion } = require('@electron/fuses');
 
 module.exports = {
   packagerConfig: {
     asar: true,
+    icon: path.resolve(__dirname, 'src/assets/app'), // ⚠️ 不要加 .ico 后缀
   },
   rebuildConfig: {},
   makers: [
     {
       name: '@electron-forge/maker-squirrel',
       config: {
-        setupIcon: 'src/assets/app.ico',
-        // 添加Windows安装包优化
-        noMsi: true, // 不生成MSI安装包
-        remoteReleases: '', // 禁用远程发布检查
+        setupIcon: path.resolve(__dirname, 'src/assets/app.ico'), // 安装包图标
+        noMsi: true,
+        remoteReleases: '',
       },
     },
     {
@@ -27,7 +28,7 @@ module.exports = {
     {
       name: '@electron-forge/maker-rpm',
       config: {
-        icon: 'src/assets/icons/app.png',
+        icon: path.resolve(__dirname, 'src/assets/app.png'),
       },
     },
   ],
@@ -55,8 +56,6 @@ module.exports = {
         },
       },
     },
-    // Fuses are used to enable/disable various Electron functionality
-    // at package time, before code signing the application
     new FusesPlugin({
       version: FuseVersion.V1,
       [FuseV1Options.RunAsNode]: false,
