@@ -14,7 +14,11 @@ const {
   setActiveTab,
   removeTab,
   navigateView,
-  getActiveKey
+  getActiveKey,
+  getShortcuts,
+  addShortcut,
+  updateShortcut,
+  removeShortcut,
 } = require("./windowControl");
 const { randomUUID } = require("crypto");
 
@@ -72,6 +76,14 @@ function registerIPC(ipcMain, mainWindow) {
   ipcMain.handle("create-new-tab", () => {
     return randomUUID();
   });
+
+  // ======================
+  // 快捷入口管理
+  // ======================
+  ipcMain.handle("get-shortcuts", () => getShortcuts());
+  ipcMain.handle("add-shortcut", (_, item) => addShortcut(item));
+  ipcMain.handle("update-shortcut", (_, item) => updateShortcut(item));
+  ipcMain.handle("remove-shortcut", (_, id) => removeShortcut(id));
 }
 
 module.exports = registerIPC;

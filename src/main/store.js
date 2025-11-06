@@ -7,6 +7,7 @@ const store = new Store({
     autoHide: true,
     opacity: 0.9,
     scale: 1.0,
+    shortcuts: [], // 用户快捷入口列表
   },
 });
 

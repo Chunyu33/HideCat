@@ -18,18 +18,18 @@ contextBridge.exposeInMainWorld("electronAPI", {
   getOpacity: () => ipcRenderer.invoke("get-opacity"),
   setScale: (val) => ipcRenderer.invoke("set-scale", val),
   getScale: () => ipcRenderer.invoke("get-scale"),
-  
+
   // 自动隐藏功能
   setAutoHide: (enabled, count) =>
     ipcRenderer.invoke("set-auto-hide", { enabled, count }),
   getAutoHide: () => ipcRenderer.invoke("get-auto-hide"),
-  
+
   // tab窗口功能
   getActiveKey: () => ipcRenderer.invoke("get-active-key"),
   addTab: (key, url) => ipcRenderer.invoke("add-tab", { key, url }),
   removeTab: (key) => ipcRenderer.invoke("remove-tab", key),
   setActiveTab: (key) => ipcRenderer.invoke("set-active-tab", key),
-  createNewTab: () => ipcRenderer.invoke('create-new-tab'),
+  createNewTab: () => ipcRenderer.invoke("create-new-tab"),
 
   // 窗口加载状态事件监听
   onTabLoading: (cb) => {
@@ -52,4 +52,10 @@ contextBridge.exposeInMainWorld("electronAPI", {
     ipcRenderer.on("tab-finish", listener);
     return () => ipcRenderer.removeListener("tab-finish", listener);
   },
+
+  // 快捷入口
+  getShortcuts: () => ipcRenderer.invoke("get-shortcuts"),
+  addShortcut: (item) => ipcRenderer.invoke("add-shortcut", item),
+  updateShortcut: (item) => ipcRenderer.invoke("update-shortcut", item),
+  removeShortcut: (id) => ipcRenderer.invoke("remove-shortcut", id),
 });

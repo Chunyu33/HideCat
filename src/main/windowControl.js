@@ -1,4 +1,5 @@
 const { BrowserWindow, BrowserView, screen, session } = require("electron");
+const { randomUUID } = require("crypto");
 const store = require("./store"); // 使用持久化 store
 
 let mainWindow = null;
@@ -159,7 +160,7 @@ function setScale(scale) {
 }
 
 // -----------------------------
-// ✅ 核心逻辑部分：鼠标检测自动隐藏
+// ✅ 最核心逻辑部分：鼠标检测自动隐藏
 // -----------------------------
 function startMouseWatcher() {
   clearInterval(checkTimer);
@@ -316,7 +317,7 @@ async function addTab(key, url) {
       setTimeout(() => {
         const scale = store.get("scale", 1.0); // 获取全局缩放比例
         view.webContents.setZoomFactor(scale); // 立即应用缩放
-      }, 1000); 
+      }, 1000);
       console.log(`🔁 refreshed active tab view for key=${key}`);
     } catch (e) {
       console.warn("refresh active tab failed", e);
@@ -398,6 +399,40 @@ function navigateView(action) {
   }
 }
 
+// =====================================================
+// 快捷入口逻辑
+function getShortcuts() {
+  return store.get("shortcuts", []);
+}
+function addShortcut(newShortcut) {
+  newShortcut.id = randomUUID();
+  const current = store.get("shortcuts", []);
+  const updated = [...current, newShortcut];
+  store.set("shortcuts", updated);
+  console.log(`✅ Shortcut added: ${newShortcut.id}-- ${newShortcut.name}`);
+  return updated;
+}
+function updateShortcut(updatedItem) {
+  const current = store.get("shortcuts", []);
+  const index = current.findIndex((item) => item.name === updatedItem.name);
+  if (index !== -1) {
+    current[index] = { ...current[index], ...updatedItem };
+  } else {
+    current.push(updatedItem);
+  }
+  console.log(`✅ Shortcut update: ${current[index].id}-- ${current[index].name}`);
+  store.set("shortcuts", current);
+  return current;
+}
+function removeShortcut(sid) {
+  const current = store.get("shortcuts", []);
+  const updated = current.filter((item) => item.id !== sid);
+  store.set("shortcuts", updated);
+  console.log(`✅ Shortcut removed: ${updated.id}-- ${updated.name}`);
+  return updated;
+}
+// =====================================================
+
 module.exports = {
   setMainWindow,
   setMainWindowRef,
@@ -417,4 +452,8 @@ module.exports = {
   removeTab,
   navigateView,
   getActiveKey,
+  getShortcuts,
+  addShortcut,
+  updateShortcut,
+  removeShortcut,
 };

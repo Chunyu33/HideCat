@@ -1,25 +1,31 @@
-import React, { useState } from "react";
-import { Input, Typography, Button, Space, message } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
+import React, { useState, useEffect } from "react";
+import { Input, Typography, Space, message } from "antd";
+import { SearchOutlined, PlusOutlined, MoreOutlined } from "@ant-design/icons";
 import BrowserMark from "../components/BrowserMark";
+import defaultShortcuts from "../services/defaultShortcuts";
+import ShortcutListModal from "../components/ShortcutListModal";
+import AddShortcutModal from "../components/AddShortcutModal";
 import "./css/homepage.css";
 
 const { Title, Text } = Typography;
 const { Search } = Input;
 
-const shortcuts = [
-  { name: "SlackeFish", url: "https://www.evanspace.icu" },
-  { name: "小红书", url: "https://www.xiaohongshu.com" },
-  { name: "抖音", url: "https://www.douyin.com/" },
-  { name: "知乎", url: "https://www.zhihu.com" },
-  { name: "Bilibili", url: "https://www.bilibili.com" },
-  { name: "番茄小说", url: "https://fanqienovel.com/" },
-];
-
 const BING_SEARCH_URL = "https://www.bing.com/search?q=";
 
 const HomePage = ({ onNewTab, onUpdateTab, currentKey }) => {
   const [searchValue, setSearchValue] = useState("");
+  const [userShortcuts, setUserShortcuts] = useState([]);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showMoreModal, setShowMoreModal] = useState(false);
+
+  // 初始加载 store 数据
+  useEffect(() => {
+    window.electronAPI.getShortcuts().then((res) => {
+      setUserShortcuts(res || []);
+    });
+  }, []);
+
+  const allShortcuts = [...defaultShortcuts, ...userShortcuts];
 
   const handleSearch = (value) => {
     if (!value) {
@@ -51,6 +57,35 @@ const HomePage = ({ onNewTab, onUpdateTab, currentKey }) => {
     } else {
       onUpdateTab(currentKey, item.url, item.name);
     }
+  };
+
+  const displayedShortcuts = [
+    ...allShortcuts.slice(0, 10),
+    { name: "更多", url: "more", icon: <MoreOutlined /> },
+    { name: "添加", url: "add", icon: <PlusOutlined /> },
+  ];
+
+  const handleSpecialClick = (item) => {
+    if (item.url === "add") {
+      setShowAddModal(true);
+    } else if (item.url === "more") {
+      setShowMoreModal(true);
+    } else {
+      handleShortcutClick(item);
+    }
+  };
+
+  // 添加快捷方式
+  const handleAddShortcut = async (newItem) => {
+    const updated = await window.electronAPI.addShortcut(newItem);
+    console.log("\n--------更新完毕===", updated);
+    setUserShortcuts(updated);
+  };
+  // 删除快捷方式
+  const handleDeleteShortcut = async (id) => {
+    const updated = await window.electronAPI.removeShortcut(id);
+    console.log("\n--------删除完毕===", updated);
+    setUserShortcuts(updated);
   };
 
   return (
@@ -99,19 +134,41 @@ const HomePage = ({ onNewTab, onUpdateTab, currentKey }) => {
           maxWidth: 600,
         }}
       >
-        {shortcuts.map((item, index) => (
+        {displayedShortcuts.map((item, index) => (
           <div
             key={index}
             className="shortcut-item"
-            onClick={() => handleShortcutClick(item)}
+            onClick={() => handleSpecialClick(item)}
+            style={{ cursor: "pointer" }}
           >
             <div className="shortcut-icon">
-              <BrowserMark size={22} />
+              {item.icon || <BrowserMark size={22} />}
             </div>
             <Text className="shortcut-text">{item.name}</Text>
           </div>
         ))}
       </Space>
+
+      {/* 更多模态框 */}
+      <ShortcutListModal
+        open={showMoreModal}
+        shortcuts={allShortcuts}
+        onSelect={(item) => {
+          setShowMoreModal(false);
+          handleShortcutClick(item);
+        }}
+        onDelete={(item) => {
+          handleDeleteShortcut(item.id);
+        }}
+        onClose={() => setShowMoreModal(false)}
+      />
+
+      {/* 添加模态框 */}
+      <AddShortcutModal
+        open={showAddModal}
+        onAdd={handleAddShortcut}
+        onClose={() => setShowAddModal(false)}
+      />
     </div>
   );
 };
