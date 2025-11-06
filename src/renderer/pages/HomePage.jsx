@@ -5,6 +5,7 @@ import BrowserMark from "../components/BrowserMark";
 import defaultShortcuts from "../services/defaultShortcuts";
 import ShortcutListModal from "../components/ShortcutListModal";
 import AddShortcutModal from "../components/AddShortcutModal";
+import { useShortcutStore } from "../store/useShortcutStore";
 import "./css/homepage.css";
 
 const { Title, Text } = Typography;
@@ -14,19 +15,29 @@ const BING_SEARCH_URL = "https://www.bing.com/search?q=";
 
 const HomePage = ({ onNewTab, onUpdateTab, currentKey }) => {
   const [searchValue, setSearchValue] = useState("");
-  const [userShortcuts, setUserShortcuts] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showMoreModal, setShowMoreModal] = useState(false);
 
-  // 初始加载 store 数据
+  // ✅ 从全局 zustand store 读取状态和方法
+  const {
+    shortcuts,
+    initialized,
+    initShortcuts,
+    addShortcut,
+    deleteShortcut,
+  } = useShortcutStore();
+
+  // ✅ 初始化加载（仅首次执行一次）
   useEffect(() => {
-    window.electronAPI.getShortcuts().then((res) => {
-      setUserShortcuts(res || []);
-    });
-  }, []);
+    if (!initialized) {
+      initShortcuts();
+    }
+  }, [initialized, initShortcuts]);
 
-  const allShortcuts = [...defaultShortcuts, ...userShortcuts];
+  // 合并默认和用户快捷方式
+  const allShortcuts = [...defaultShortcuts, ...shortcuts];
 
+  // 搜索功能
   const handleSearch = (value) => {
     if (!value) {
       message.warning("请输入搜索关键词或网址");
@@ -51,6 +62,7 @@ const HomePage = ({ onNewTab, onUpdateTab, currentKey }) => {
     setSearchValue("");
   };
 
+  // 点击快捷方式打开
   const handleShortcutClick = (item) => {
     if (currentKey === "tab-home") {
       onNewTab(item.url, item.name);
@@ -59,6 +71,7 @@ const HomePage = ({ onNewTab, onUpdateTab, currentKey }) => {
     }
   };
 
+  // 特殊按钮（添加、更多）
   const displayedShortcuts = [
     ...allShortcuts.slice(0, 10),
     { name: "更多", url: "more", icon: <MoreOutlined /> },
@@ -75,17 +88,15 @@ const HomePage = ({ onNewTab, onUpdateTab, currentKey }) => {
     }
   };
 
-  // 添加快捷方式
+  // ✅ 使用全局 store 操作（替代 setUserShortcuts）
   const handleAddShortcut = async (newItem) => {
-    const updated = await window.electronAPI.addShortcut(newItem);
-    console.log("\n--------更新完毕===", updated);
-    setUserShortcuts(updated);
+    await addShortcut(newItem);
+    message.success("已添加快捷方式");
   };
-  // 删除快捷方式
+
   const handleDeleteShortcut = async (id) => {
-    const updated = await window.electronAPI.removeShortcut(id);
-    console.log("\n--------删除完毕===", updated);
-    setUserShortcuts(updated);
+    await deleteShortcut(id);
+    message.success("已删除快捷方式");
   };
 
   return (
@@ -157,9 +168,7 @@ const HomePage = ({ onNewTab, onUpdateTab, currentKey }) => {
           setShowMoreModal(false);
           handleShortcutClick(item);
         }}
-        onDelete={(item) => {
-          handleDeleteShortcut(item.id);
-        }}
+        onDelete={(item) => handleDeleteShortcut(item.id)}
         onClose={() => setShowMoreModal(false)}
       />
 

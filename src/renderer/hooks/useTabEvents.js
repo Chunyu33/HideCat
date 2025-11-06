@@ -34,7 +34,7 @@ export default function useTabEvents(applyUpdater) {
       applyUpdater((k, item) =>
         k === key ? { ...item, status: "loaded", url, isLoaded: true } : item
       );
-      console.log("preload.js 监听网页完全加载完成 --- finish", key, url);
+      // console.log("preload.js 监听网页完全加载完成 --- finish", key, url);
     });
 
     // 加载失败
