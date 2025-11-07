@@ -1,4 +1,4 @@
-const { BrowserWindow, BrowserView, screen, session } = require("electron");
+const { BrowserWindow, BrowserView, screen, app } = require("electron");
 const { randomUUID } = require("crypto");
 const store = require("./store"); // 使用持久化 store
 
@@ -17,6 +17,19 @@ const COUNTDOWN = 3500; // 倒计时
 // -----------------------------
 function setMainWindow(win) {
   mainWindow = win;
+}
+
+function quit() {
+  const allWindows = BrowserWindow.getAllWindows();
+  for (const win of allWindows) {
+    try {
+      win.destroy(); // 直接销毁，不触发渲染进程事件
+    } catch (e) {}
+  }
+
+  setTimeout(() => {
+    app.exit(0); // 代替 process.exit()
+  }, 100);
 }
 
 // -----------------------------
@@ -463,6 +476,7 @@ function getTheme() {
 }
 
 module.exports = {
+  quit,
   setMainWindow,
   setMainWindowRef,
   openSettingsWindow,
