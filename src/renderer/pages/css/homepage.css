@@ -3,8 +3,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: var(--background-color); /* 背景颜色 */
-  color: var(--text-color); /* 主文本颜色 */
+  height: 100%;
+  /* background-color: var(--background-color); */
+  color: var(--text-color);
 }
 
 /* 快捷方式项 */

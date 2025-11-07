@@ -24,17 +24,45 @@ body[data-theme="light"] {
 }
 
 .app-container {
-  overflow: hidden;
-  background: var(--background-color);
+  /* background: var(--background-color); */
   color: var(--text-color);
   height: 100%;
   display: flex;
+  overflow: hidden;
   flex-direction: column;
+  position: relative;
+  z-index: 2;
+}
+/* 添加背景图的遮罩层 */
+.app-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  opacity: 0.3; 
+  transition: background-color 0.3s ease, opacity 0.3s ease;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* 根据主题切换遮罩层 */
+[data-theme='dark'] .app-container::before {
+  background-color: rgba(0, 0, 0, 0.7); /* 暗色模式下更深的遮罩层 */
+  opacity: 0.5; /* 深色主题时提高透明度 */
+}
+
+[data-theme='light'] .app-container::before {
+  background-color: rgba(255, 255, 255, 0.1); /* 亮色模式下更浅的遮罩层 */
+  opacity: 0.1; /* 亮色主题时减少透明度 */
 }
 
 .content-container {
   flex: 1;
   position: relative;
+  z-index: 3;
   overflow: hidden; /* 防止内容区域出现滚动条 */
 }
 

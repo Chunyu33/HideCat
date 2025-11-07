@@ -7,6 +7,14 @@ import HomePageOnly from "./pages/HomePageOnly";
 import { handleUpdateTab } from "./services/browserViewService";
 import useTheme from "./hooks/useTheme"; // 引入自定义 Hook
 
+import bgImage from "../assets/bg1.png"; // 背景图
+
+const bgStyles = {
+  backgroundImage: `url(${bgImage})`,
+  backgroundSize: "cover",
+  backgroundPosition: "center",
+};
+
 // 判断当前窗口类型
 const query = new URLSearchParams(window.location.search);
 const isSettingsWindow = query.get("window") === "settings";
@@ -85,10 +93,7 @@ const App = () => {
     if (isSettingsWindow) return <SettingMenu />;
     if (isHome)
       return (
-        <HomePageOnly
-          onUpdateTab={handleUpdateTab}
-          currentKey={currentKey}
-        />
+        <HomePageOnly onUpdateTab={handleUpdateTab} currentKey={currentKey} />
       );
     return (
       <>
@@ -115,7 +120,9 @@ const App = () => {
             },
           }}
         >
-          <div className="app-container">{getDom()}</div>
+          <div className="app-container" style={bgStyles}>
+            {getDom()}
+          </div>
         </ConfigProvider>
       );
     }
