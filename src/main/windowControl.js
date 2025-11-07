@@ -8,6 +8,7 @@ let isWindowVisible = true;
 let checkTimer = null;
 let startupTimer = null;
 let lastCursorInside = true;
+let autoShowPaused = false; // 新增: 是否暂停自动显示
 
 const COUNTDOWN = 3500; // 倒计时
 
@@ -24,7 +25,7 @@ function setMainWindow(win) {
 function openSettingsWindow() {
   // 获取主窗口当前尺寸
   const [parentWidth, parentHeight] = mainWindow.getSize();
-  
+
   // 按比例计算子窗口尺寸
   const width = Math.floor(parentWidth * 0.6);
   const height = Math.floor(parentHeight * 0.4);
@@ -48,7 +49,7 @@ function openSettingsWindow() {
       contextIsolation: true,
     },
   });
-  
+
   // 关键点：带上 query 参数告诉 React “我是设置窗口”
   settingsWin.loadURL(`${MAIN_WINDOW_WEBPACK_ENTRY}?window=settings`);
   // let isDev = process.env.NODE_ENV === "development";
@@ -111,7 +112,7 @@ function showWindow(customCountDown = undefined) {
     clearTimeout(startupTimer);
     startupTimer = setTimeout(() => {
       console.log(
-        `\n ⏳ Mouse status monitoring will begin ${COUNTDOWN} seconds after startup.`
+        `\n ⏳ Mouse status monitoring will begin ${customCountDown ?? COUNTDOWN} seconds after startup.`
       );
       startMouseWatcher();
     }, customCountDown ?? COUNTDOWN);
@@ -183,10 +184,15 @@ function startMouseWatcher() {
 
     if (isInside && !lastCursorInside) {
       lastCursorInside = true;
+      // 检查是否暂停自动显示
+      if (autoShowPaused) {
+        console.log("⏸ autoShowPaused=true -> skip show");
+        return;
+      }
       // 鼠标进入窗口范围
       if (!isWindowVisible) {
-        // mainWindow.showInactive(); // 保留原来的注释
-        // isWindowVisible = true;
+        mainWindow.showInactive(); // 保留原来的注释
+        isWindowVisible = true;
         console.log("🟢 in -> show");
       }
     } else if (!isInside && lastCursorInside) {
@@ -200,6 +206,11 @@ function startMouseWatcher() {
       }
     }
   }, 200);
+}
+
+// 暂停/继续 鼠标移入自动显示
+function setAutoShow(paused) {
+  autoShowPaused = paused;
 }
 
 // 清除定时器
@@ -423,7 +434,9 @@ function updateShortcut(updatedItem) {
   } else {
     current.push(updatedItem);
   }
-  console.log(`✅ Shortcut update: ${current[index].id}-- ${current[index].name}`);
+  console.log(
+    `✅ Shortcut update: ${current[index].id}-- ${current[index].name}`
+  );
   store.set("shortcuts", current);
   return current;
 }
@@ -473,5 +486,6 @@ module.exports = {
   updateShortcut,
   removeShortcut,
   setTheme,
-  getTheme
+  getTheme,
+  setAutoShow,
 };

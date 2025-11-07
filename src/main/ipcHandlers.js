@@ -64,9 +64,10 @@ function registerIPC(ipcMain, mainWindow) {
   // 主窗口关闭
   // ======================
   ipcMain.handle("close-window", (_, args) => {
-    if (args?.force) process.exit(0);
-    else hideWindow();
-    // process.exit(0);
+    // if (args?.force) process.exit(0);
+    // else hideWindow();
+    // 直接关闭应用
+    process.exit(0);
   });
 
   // ======================

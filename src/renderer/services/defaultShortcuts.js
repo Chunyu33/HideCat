@@ -6,6 +6,12 @@ export default [
     system: true,
   },
   {
+    id: "id-weread-001",
+    name: "微信读书",
+    url: "https://weread.qq.com/",
+    system: true,
+  },
+  {
     id: "id-redbook-001",
     name: "小红书",
     url: "https://www.xiaohongshu.com",

@@ -48,9 +48,8 @@ const createWindow = () => {
 // 获取图标路径
 const getIconPath = () => {
   // 开发环境和打包环境路径一致，Webpack 会拷贝 assets
-  return path.join(__dirname, 'assets', 'app.ico');
+  return path.join(__dirname, "assets", "app.ico");
 };
-
 
 const createTray = () => {
   // const iconPath = path.join(__dirname, "assets", "SlackeFish.png");
@@ -59,7 +58,13 @@ const createTray = () => {
   tray = new Tray(getIconPath());
 
   const contextMenu = Menu.buildFromTemplate([
-    { label: "显示窗口", click: () => windowControl.showWindow() },
+    {
+      label: "显示窗口",
+      click: () => {
+        windowControl.showWindow();
+        windowControl.setAutoShow(false);
+      },
+    },
     { label: "隐藏窗口", click: () => windowControl.hideWindow() },
     { type: "separator" },
     {
