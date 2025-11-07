@@ -196,23 +196,15 @@ const MainPage = () => {
 
   // 新建按钮
   const operations = (
-    <Tooltip
-      title="点击新建标签页"
-      placement="left"
-      color="#4caf50"
-      styles={{
-        body: { color: "#fff" },
-      }}
-    >
-      <Button
-        type="text"
-        icon={<PlusOutlined />}
-        onClick={() => handleNewTab("about:blank", "新标签页")}
-        disabled={items.length >= MAX_TABS}
-        style={{ marginRight: 8, opacity: items.length >= MAX_TABS ? 0.5 : 1 }}
-        aria-label="Add Tab"
-      />
-    </Tooltip>
+    <Button
+      title="新增标签页"
+      type="text"
+      icon={<PlusOutlined />}
+      onClick={() => handleNewTab("about:blank", "新标签页")}
+      disabled={items.length >= MAX_TABS}
+      style={{ marginRight: 8, opacity: items.length >= MAX_TABS ? 0.5 : 1 }}
+      aria-label="Add Tab"
+    />
   );
 
   // 渲染逻辑

@@ -5,14 +5,6 @@ import BrowserMark from "./BrowserMark";
 
 const { Text } = Typography;
 
-/**
- * props:
- * - open: 是否显示
- * - shortcuts: 快捷方式数组 [{name, url}]
- * - onSelect: 点击快捷方式时回调(item)
- * - onDelete: 删除回调(item)
- * - onClose: 关闭回调
- */
 const ShortcutListModal = ({ open, shortcuts = [], onSelect, onDelete, onClose }) => {
   const handleDelete = async (item) => {
     await onDelete?.(item);
@@ -25,6 +17,16 @@ const ShortcutListModal = ({ open, shortcuts = [], onSelect, onDelete, onClose }
       open={open}
       footer={null}
       onCancel={onClose}
+      styles={{
+        header: {
+          background: "var(--background-secondary)",
+          color: "var(--text-color)",
+        },
+        content: {
+          background: "var(--background-secondary)",
+          color: "var(--text-color)",
+        },
+      }}
     >
       <List
         style={{
@@ -32,7 +34,7 @@ const ShortcutListModal = ({ open, shortcuts = [], onSelect, onDelete, onClose }
           overflowY: "auto",
           borderRadius: 8,
           padding: "6px 8px",
-          background: "#fff",
+          background: "var(--background-secondary)",
         }}
         dataSource={shortcuts}
         renderItem={(item) => (
@@ -45,10 +47,11 @@ const ShortcutListModal = ({ open, shortcuts = [], onSelect, onDelete, onClose }
               borderRadius: 6,
               transition: "background 0.2s, box-shadow 0.2s",
               cursor: "pointer",
+              color: "var(--text-color)",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = "#fafafa";
-              e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.08)";
+              e.currentTarget.style.background = "var(--hover-bg-color)";
+              e.currentTarget.style.boxShadow = "0 1px 3px var(--shadow-color)";
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.background = "none";
@@ -61,10 +64,26 @@ const ShortcutListModal = ({ open, shortcuts = [], onSelect, onDelete, onClose }
             >
               <BrowserMark size={20} />
               <div style={{ overflow: "hidden" }}>
-                <Text strong ellipsis style={{ display: "block", maxWidth: 260 }}>
+                <Text
+                  strong
+                  ellipsis
+                  style={{
+                    display: "block",
+                    maxWidth: 260,
+                    color: "var(--text-color)",
+                  }}
+                >
                   {item.name}
                 </Text>
-                <Text type="secondary" ellipsis style={{ display: "block", maxWidth: 260 }}>
+                <Text
+                  type="secondary"
+                  ellipsis
+                  style={{
+                    display: "block",
+                    maxWidth: 260,
+                    color: "var(--text-color-secondary)",
+                  }}
+                >
                   {item.url}
                 </Text>
               </div>
@@ -80,8 +99,11 @@ const ShortcutListModal = ({ open, shortcuts = [], onSelect, onDelete, onClose }
               <Button
                 type="text"
                 icon={<DeleteOutlined />}
-                onClick={(e) => e.stopPropagation()} // 防止触发 onSelect
+                onClick={(e) => e.stopPropagation()}
                 danger
+                style={{
+                  color: "var(--text-color-secondary)",
+                }}
               />
             </Popconfirm>
           </List.Item>

@@ -37,6 +37,8 @@ function openSettingsWindow() {
     minHeight: 240,
     resizable: false,
     frame: false,
+    hasShadow: false,
+    transparent: true,
     parent: mainWindow,
     modal: true, // 模态，阻止主窗口交互
     show: false,
@@ -49,8 +51,8 @@ function openSettingsWindow() {
   
   // 关键点：带上 query 参数告诉 React “我是设置窗口”
   settingsWin.loadURL(`${MAIN_WINDOW_WEBPACK_ENTRY}?window=settings`);
-  let isDev = process.env.NODE_ENV === "development";
-  if (isDev) settingsWin.webContents.openDevTools();
+  // let isDev = process.env.NODE_ENV === "development";
+  // if (isDev) settingsWin.webContents.openDevTools();
 
   settingsWin.once("ready-to-show", () => {
     settingsWin.show();

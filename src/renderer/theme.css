@@ -34,6 +34,9 @@
   --error-color: #f44336;
   --warning-color: #ff9800;
   --info-color: #2196f3;
+
+  --hover-bg-color: #f2f2f2;         /* 亮色模式下的 hover 背景色 */
+  --active-bg-color: #e6e6e6;        /* 亮色模式下的 active 背景色 */
 }
 
 /* 暗色主题 */
@@ -66,6 +69,9 @@
   --error-color: #f44336;
   --warning-color: #ff9800;
   --info-color: #29b6f6;
+
+  --hover-bg-color: #333333;
+  --active-bg-color: #222222;
 }
 
 

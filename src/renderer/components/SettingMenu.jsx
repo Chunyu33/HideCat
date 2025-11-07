@@ -14,7 +14,7 @@ import "./css/setting.css";
 const themeOptions = [
   { label: "亮色模式", value: "light" },
   { label: "暗色模式", value: "dark" },
-  { label: "跟随系统", value: "auto" },
+  // { label: "跟随系统", value: "auto" },
 ];
 
 const SettingMenu = ({ onClose, onScaleChange }) => {

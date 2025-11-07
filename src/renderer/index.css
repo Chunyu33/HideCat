@@ -4,7 +4,16 @@ body {
   padding: 0;
   height: 100%;
   font-family: Arial, sans-serif;
+  border-radius: 8px;
   overflow: hidden; /* 防止页面级滚动条 */
+}
+/* 切换到 dark 主题 */
+body[data-theme="dark"] {
+  border-radius: 20px; /* 确保dark主题下也有圆角 */
+}
+/* 切换到 dark 主题 */
+body[data-theme="light"] {
+  border-radius: 20px; /* 确保dark主题下也有圆角 */
 }
 
 #root {
