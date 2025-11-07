@@ -1,7 +1,7 @@
 export default [
   {
     id: "id-slack-001",
-    name: "SlackeFish",
+    name: "关于作者",
     url: "https://www.evanspace.icu",
     system: true,
   },
