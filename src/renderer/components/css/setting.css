@@ -1,59 +1,62 @@
+#root {
+  height: 100%;
+}
 .setting-menu {
   width: 100%;
   height: 100%;
   border-radius: 8px;
   padding: 10px 16px;
-  background-color: rgba(255, 255, 255, 0.5);
+  background-color: var(--background-secondary);
+  color: var(--text-color);
   gap: 10px;
   user-select: none;
+  box-shadow: 0 2px 8px var(--shadow-color);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    backdrop-filter 0.3s ease;
 }
 
 .setting-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 6px 0;
+}
+
+.setting-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
 }
 
 .setting-label {
   font-size: 14px;
-  color: #333;
+  color: var(--text-color-secondary);
   font-weight: 500;
   white-space: nowrap;
   flex-shrink: 0;
-  margin-right: 20px; /* 增加标签和控件之间的固定间隙 */
+  margin-right: 20px;
 }
 
-.setting-item:last-child {
-  margin-bottom: 0;
-}
-
-.mt-8 {
-  margin-top: 8px;
-}
-.row-center {
-  display: flex;
-  align-items: center;
-  /* background-color: #666; */
-}
-
-/* Range input styles */
 .range-input {
   display: flex;
   align-items: center;
-  flex-grow: 1; 
-  /* 让内部的 Slider/Switch 靠右对齐 */
-  justify-content: flex-end; 
+  flex-grow: 1;
+  justify-content: flex-end;
   gap: 8px;
 }
 
 .range-value {
   font-size: 12px;
-  color: #666;
+  color: var(--text-color-secondary);
   min-width: 30px;
   text-align: right;
   white-space: nowrap;
   flex-shrink: 0;
 }
+
 .setting-header {
   display: flex;
   justify-content: space-between;
@@ -64,21 +67,45 @@
 .setting-title {
   font-size: 16px;
   font-weight: 600;
-  color: #333;
+  color: var(--text-color);
 }
 
 .close-btn {
   background: transparent;
   border: none;
-  color: #888;
+  color: var(--text-color-secondary);
   font-size: 18px;
   cursor: pointer;
   transition: color 0.2s ease;
 }
 
 .close-btn:hover {
-  color: #f44336;
+  color: var(--error-color);
 }
-:where(.css-dev-only-do-not-override-1hp2dlu).ant-tabs-top >.ant-tabs-nav::before, :where(.css-dev-only-do-not-override-1hp2dlu).ant-tabs-bottom >.ant-tabs-nav::before, :where(.css-dev-only-do-not-override-1hp2dlu).ant-tabs-top >div>.ant-tabs-nav::before, :where(.css-dev-only-do-not-override-1hp2dlu).ant-tabs-bottom >div>.ant-tabs-nav::before {
+
+.mt-8 {
+  margin-top: 8px;
+}
+
+.row-center {
+  display: flex;
+  align-items: center;
+}
+
+/* 去除 Ant Tabs 默认边线 */
+:where(.ant-tabs-top > .ant-tabs-nav)::before,
+:where(.ant-tabs-bottom > .ant-tabs-nav)::before {
   border-bottom: none;
+}
+
+/* 调整滚动条样式，适配亮/暗主题 */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
 }

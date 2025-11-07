@@ -63,6 +63,23 @@ const App = () => {
     window.electronAPI.openSettingsWindow();
   };
 
+  // 动态控制 antd 主题：根据当前主题切换 light/dark algorithm
+  const antdConfig = useMemo(() => {
+    if (theme === "auto") {
+      // 检测系统主题
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
+        .matches
+        ? "dark"
+        : "light";
+      return systemTheme === "dark"
+        ? { algorithm: antdTheme.darkAlgorithm }
+        : { algorithm: antdTheme.defaultAlgorithm };
+    }
+    return theme === "dark"
+      ? { algorithm: antdTheme.darkAlgorithm }
+      : { algorithm: antdTheme.defaultAlgorithm };
+  }, [theme]);
+
   // 根据窗口类型渲染
   const getDom = () => {
     if (isSettingsWindow) return <SettingMenu />;
@@ -84,27 +101,28 @@ const App = () => {
     );
   };
 
-  // 动态控制 antd 主题：根据当前主题切换 light/dark algorithm
-  const antdConfig = useMemo(() => {
-    console.log('\n\ntheme', theme)
-    return theme === 'dark'
-      ? { algorithm: antdTheme.darkAlgorithm }
-      : { algorithm: antdTheme.defaultAlgorithm };
-  }, [theme]);
+  const appDom = () => {
+    if (isSettingsWindow) {
+      // 设置页面有自己的ConfigProvider
+      return <SettingMenu />;
+    } else {
+      return (
+        <ConfigProvider
+          theme={{
+            ...antdConfig,
+            token: {
+              colorPrimary: "#4caf50",
+              colorBgBase: theme === "dark" ? "#000" : "#fff",
+            },
+          }}
+        >
+          <div className="app-container">{getDom()}</div>
+        </ConfigProvider>
+      );
+    }
+  };
 
-  return (
-    <ConfigProvider
-      theme={{
-        ...antdConfig,
-        token: {
-          colorPrimary: "#4caf50",
-          colorBgBase: theme === "dark" ? "#000" : "#fff",
-        },
-      }}
-    >
-      <div className="app-container">{getDom()}</div>
-    </ConfigProvider>
-  );
+  return appDom();
 };
 
 export default App;

@@ -1,34 +1,3 @@
-/* :root {
-  --ant-primary-color: #4caf50;
-  --ant-primary-color-hover: #66bb6a;
-  --ant-primary-color-active: #43a047;
-  --ant-primary-color-outline: rgba(76, 175, 80, 0.2);
-} */
-
-/* 默认亮色主题 */
-:root {
-  --background-color: #ffffff;
-  --text-color: #000000;
-  --primary-color: #4caf50;
-  --ant-primary-color: #4caf50;
-  --ant-primary-color-hover: #66bb6a;
-  --ant-primary-color-active: #43a047;
-  --ant-primary-color-outline: rgba(76, 175, 80, 0.2);
-}
-
-/* 暗色主题 */
-[data-theme='dark'] {
-  --background-color: #121212;
-  --text-color: #ffffff;
-  --primary-color: #bb86fc;
-}
-
-/* 自动主题（根据系统） */
-[data-theme='auto'] {
-  /* 由系统决定是否为暗色或亮色 */
-}
-
-
 html,
 body {
   margin: 0;
@@ -38,16 +7,14 @@ body {
   overflow: hidden; /* 防止页面级滚动条 */
 }
 
+#root {
+  height: 100%;
+}
+
 .app-container {
   overflow: hidden;
-  background:
-    linear-gradient(238.72deg, #ffb864 0%, #006c4c 100%),
-    radial-gradient(100% 224.43% at 0% 0%, #fcc482 0%, #002e74 100%),
-    linear-gradient(121.28deg, #ffd464 0%, #00553b 100%),
-    linear-gradient(229.79deg, #7534ff 0%, #248900 94.19%),
-    radial-gradient(56.26% 101.79% at 50% 0%, #8f00ff 0%, #493500 100%),
-    linear-gradient(96.19deg, #500052 3.37%, #d5b300 96.63%);
-  background-blend-mode: overlay, screen, lighten, hard-light, screen, normal;
+  background: var(--background-color);
+  color: var(--text-color);
   height: 100vh;
   display: flex;
   flex-direction: column;
