@@ -44,6 +44,12 @@
 .header-btn:hover {
   background: var(--hover-bg-color); /* 可以使用自定义的 hover 背景色 */
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  transform: translateY(-1px); 
+}
+
+.header-btn:last-child:hover {
+  background-color: #e84118;
+  color: #f2f2f2;
 }
 
 .header-btn:active {

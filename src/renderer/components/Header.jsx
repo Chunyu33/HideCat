@@ -20,7 +20,6 @@ const IconButton = ({ title, onClick, children }) => (
 
 const Header = ({ onOpenSettings }) => {
   const navigate = (action) => {
-    console.log("navigate:", action);
     window.electronAPI?.navigateView?.(action);
   };
   const handleMinimize = () => window.electronAPI?.minimizeWindow();
@@ -31,7 +30,7 @@ const Header = ({ onOpenSettings }) => {
       {/* 左侧 Logo + 导航 */}
       <div className="header-left">
         <div className="header-title">
-          <img src={AppIcon} alt="" style={{width: "18px", height: "18px"}} />
+          <img src={AppIcon} alt="" style={{width: "18px", height: "18px", borderRadius: "2px"}} />
           SlackeFish
         </div>
       </div>
