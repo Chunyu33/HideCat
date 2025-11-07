@@ -1,11 +1,7 @@
-export const handleNewTab = async (url, tabName) => {
-  const currentKey = await window.electronAPI.getActiveKey();
-  await window.electronAPI.setActiveTab(currentKey);
-  await window.electronAPI.addTab(currentKey, url);
-};
-
-export const handleUpdateTab = async (key, url, tabName) => {
+export const handleUpdateTab = async (key, url, tabName, cb) => {
   await window.electronAPI.setActiveTab(key);
   await window.electronAPI.addTab(key, url);
+  if (cb && typeof cb === "function") {
+    cb();
+  }
 };
-

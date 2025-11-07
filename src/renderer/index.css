@@ -5,6 +5,9 @@ body {
   height: 100%;
   font-family: Arial, sans-serif;
   border-radius: 8px;
+  transition:
+    border-radius 0.3s ease,
+    background-color 0.3s ease;
   overflow: hidden; /* 防止页面级滚动条 */
 }
 /* 切换到 dark 主题 */
@@ -24,7 +27,7 @@ body[data-theme="light"] {
   overflow: hidden;
   background: var(--background-color);
   color: var(--text-color);
-  height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
 }

@@ -3,8 +3,8 @@ import { ConfigProvider, theme as antdTheme } from "antd";
 import Header from "./components/Header";
 import SettingMenu from "./components/SettingMenu";
 import MainPage from "./pages/main";
-import HomePage from "./pages/HomePage";
-import { handleNewTab, handleUpdateTab } from "./services/browserViewService";
+import HomePageOnly from "./pages/HomePageOnly";
+import { handleUpdateTab } from "./services/browserViewService";
 import useTheme from "./hooks/useTheme"; // 引入自定义 Hook
 
 // 判断当前窗口类型
@@ -85,8 +85,7 @@ const App = () => {
     if (isSettingsWindow) return <SettingMenu />;
     if (isHome)
       return (
-        <HomePage
-          onNewTab={handleNewTab}
+        <HomePageOnly
           onUpdateTab={handleUpdateTab}
           currentKey={currentKey}
         />

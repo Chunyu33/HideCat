@@ -5,7 +5,13 @@ import BrowserMark from "./BrowserMark";
 
 const { Text } = Typography;
 
-const ShortcutListModal = ({ open, shortcuts = [], onSelect, onDelete, onClose }) => {
+const ShortcutListModal = ({
+  open,
+  shortcuts = [],
+  onSelect,
+  onDelete,
+  onClose,
+}) => {
   const handleDelete = async (item) => {
     await onDelete?.(item);
     message.success("已删除快捷方式");
@@ -60,7 +66,12 @@ const ShortcutListModal = ({ open, shortcuts = [], onSelect, onDelete, onClose }
           >
             <div
               onClick={() => onSelect?.(item)}
-              style={{ flex: 1, display: "flex", alignItems: "center", gap: 10 }}
+              style={{
+                flex: 1,
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+              }}
             >
               <BrowserMark size={20} />
               <div style={{ overflow: "hidden" }}>
@@ -88,24 +99,26 @@ const ShortcutListModal = ({ open, shortcuts = [], onSelect, onDelete, onClose }
                 </Text>
               </div>
             </div>
-
-            <Popconfirm
-              title="确认删除？"
-              okText="删除"
-              cancelText="取消"
-              onConfirm={() => handleDelete(item)}
-              placement="left"
-            >
-              <Button
-                type="text"
-                icon={<DeleteOutlined />}
-                onClick={(e) => e.stopPropagation()}
-                danger
-                style={{
-                  color: "var(--text-color-secondary)",
-                }}
-              />
-            </Popconfirm>
+            {/* 删除按钮 系统内置的不可删除 */}
+            {!item.system ? (
+              <Popconfirm
+                title="确认删除？"
+                okText="删除"
+                cancelText="取消"
+                onConfirm={() => handleDelete(item)}
+                placement="left"
+              >
+                <Button
+                  type="text"
+                  icon={<DeleteOutlined />}
+                  onClick={(e) => e.stopPropagation()}
+                  danger
+                  style={{
+                    color: "var(--text-color-secondary)",
+                  }}
+                />
+              </Popconfirm>
+            ) : null}
           </List.Item>
         )}
       />

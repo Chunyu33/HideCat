@@ -38,7 +38,7 @@ function openSettingsWindow() {
     resizable: false,
     frame: false,
     hasShadow: false,
-    transparent: true,
+    // transparent: true,
     parent: mainWindow,
     modal: true, // 模态，阻止主窗口交互
     show: false,
