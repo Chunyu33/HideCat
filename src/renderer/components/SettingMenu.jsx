@@ -2,37 +2,42 @@ import React, { useState, useEffect, useRef } from "react";
 import { Slider, Switch, Tooltip, Select } from "antd";
 import QuestionMark from "./QuestionMark";
 import "./css/setting.css";
-import useTheme from "../hooks/useTheme";
 
 // 主题选项
 const themeOptions = [
   { label: "亮色模式", value: "light" },
   { label: "暗色模式", value: "dark" },
-  { label: "自动模式", value: "auto" },
+  { label: "跟随系统", value: "auto" },
 ];
 
 const SettingMenu = ({ onClose, onScaleChange }) => {
   const [autoHide, setAutoHide] = useState(false);
   const [opacity, setOpacity] = useState(0.9);
   const [scale, setScale] = useState(1.0);
+  const [theme, setTheme] = useState("auto"); // 本地状态
   const clickTimeout = useRef(null);
 
-  const { theme, updateTheme } = useTheme();
-
   useEffect(() => {
+    // 初始化时读取设置
     const fetchSettings = async () => {
-      const [auto, op, sc] = await Promise.all([
+      const [auto, op, sc, th] = await Promise.all([
         window.electronAPI.getAutoHide?.(),
         window.electronAPI.getOpacity?.(),
         window.electronAPI.getScale?.(),
+        window.electronAPI.getTheme?.(),
       ]);
       if (auto !== undefined) setAutoHide(auto);
       if (op !== undefined) setOpacity(op);
       if (sc !== undefined) setScale(sc);
+      if (th !== undefined) {
+        setTheme(th);
+        applyThemeToDOM(th);
+      }
     };
     fetchSettings();
   }, []);
 
+  // 处理自动隐藏
   const handleAutoHide = (checked) => {
     if (clickTimeout.current) clearTimeout(clickTimeout.current);
     clickTimeout.current = setTimeout(() => {
@@ -41,28 +46,34 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
     }, 100);
   };
 
+  // 处理透明度
   const handleOpacity = (value) => {
     setOpacity(value);
     window.electronAPI?.setOpacity?.(value);
   };
 
+  // 处理缩放
   const handleScale = (value) => {
     setScale(value);
     window.electronAPI?.setScale?.(value);
     if (onScaleChange) onScaleChange(value);
   };
-  // 主题切换处理
-  const handleThemeChange = (value) => {
-    updateTheme(value); // 更新主题
+
+  // 将主题应用到当前页面
+  const applyThemeToDOM = (value) => {
     if (value === "auto") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
-        ? "dark"
-        : "light";
-      document.documentElement.setAttribute("data-theme", systemTheme);
+      const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
     } else {
       document.documentElement.setAttribute("data-theme", value);
     }
+  };
+
+  // 切换主题
+  const handleThemeChange = async (value) => {
+    setTheme(value);
+    applyThemeToDOM(value);
+    await window.electronAPI?.setTheme?.(value); // 通知主进程
   };
 
   useEffect(() => {
@@ -71,10 +82,9 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
     };
   }, []);
 
+  // 关闭窗口
   const handleClose = () => {
-    // 优先触发 React 传入的关闭逻辑
     if (onClose) onClose();
-    // 如果这是独立弹窗（即 settingsWindow），调用主进程关闭
     if (window.electronAPI?.closeSettingsWindow) {
       window.electronAPI.closeSettingsWindow();
     }
@@ -103,9 +113,7 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
             title="开启后，鼠标离开窗口后自动隐藏在任务栏中。"
             placement="bottomRight"
             color="#4caf50"
-            styles={{
-              body: { color: "#fff" },
-            }}
+            styles={{ body: { color: "#fff" } }}
           >
             <QuestionMark size="13" />
           </Tooltip>
@@ -122,9 +130,7 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
             title="窗口的透明度，范围0.2~1.0。"
             placement="bottomRight"
             color="#4caf50"
-            styles={{
-              body: { color: "#fff" },
-            }}
+            styles={{ body: { color: "#fff" } }}
           >
             <QuestionMark size="13" />
           </Tooltip>
@@ -149,9 +155,7 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
             title="网页缩放，范围50%~150%。首页不会进行缩放。"
             placement="topRight"
             color="#4caf50"
-            styles={{
-              body: { color: "#fff" },
-            }}
+            styles={{ body: { color: "#fff" } }}
           >
             <QuestionMark size="13" />
           </Tooltip>
@@ -168,6 +172,7 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
           />
         </div>
       </div>
+
       {/* 主题选择 */}
       <div className="setting-item">
         <span className="setting-label row-center">主题设置</span>

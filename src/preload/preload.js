@@ -62,5 +62,9 @@ contextBridge.exposeInMainWorld("electronAPI", {
   // 主题切换
   setTheme: (theme) => ipcRenderer.invoke("set-theme", theme),
   getTheme: () => ipcRenderer.invoke("get-theme"),
-  onThemeChanged: (callback) => ipcRenderer.on('theme-changed', callback),
+  onThemeChanged: (callback) => {
+    const handler = (_, theme) => callback(theme); // 只传递 theme
+    ipcRenderer.on("theme-changed", handler);
+    return () => ipcRenderer.removeListener("theme-changed", handler); // 返回取消函数
+  },
 });

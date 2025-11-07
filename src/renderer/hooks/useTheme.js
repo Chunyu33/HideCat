@@ -1,52 +1,60 @@
-import { useEffect } from 'react';
-import { useThemeStore } from '../store/useThemeStore';  // 引入zustand store
-
-// 获取当前系统的主题
-const getSystemTheme = () => {
-  const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
-  return darkModeQuery.matches ? 'dark' : 'light';
-};
+import { useEffect } from "react";
+import { useThemeStore } from "../store/useThemeStore";
 
 const useTheme = () => {
-  const { theme, setTheme } = useThemeStore(); // 从zustand获取和设置theme
+  const { theme, setTheme } = useThemeStore();
 
   useEffect(() => {
-    // 如果选择了 'auto'，根据系统的主题设置
-    if (theme === 'auto') {
-      const systemTheme = getSystemTheme();
-      document.documentElement.setAttribute('data-theme', systemTheme);
-    } else {
-      document.documentElement.setAttribute('data-theme', theme);
-    }
+    // 初始化时从主进程读取一次主题
+    window.electronAPI.getTheme().then((savedTheme) => {
+      if (savedTheme) setTheme(savedTheme);
+    });
 
-    // 监听系统主题变化，如果是 auto，实时切换
-    const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const onThemeChange = (e) => {
-      if (theme === 'auto') {
-        const newTheme = e.matches ? 'dark' : 'light';
-        document.documentElement.setAttribute('data-theme', newTheme);
-        setTheme(newTheme);  // 更新zustand store的theme
+    // 监听主进程发来的主题变更事件
+    const offThemeChanged = window.electronAPI.onThemeChanged((newTheme) => {
+      // 防止 undefined 或空值
+      if (newTheme && newTheme !== theme) {
+        console.log("[Renderer] Theme changed from main:", newTheme);
+        setTheme(newTheme);
       }
-    };
-    darkModeQuery.addEventListener('change', onThemeChange);
+    });
 
-    // 清理监听器
     return () => {
-      darkModeQuery.removeEventListener('change', onThemeChange);
+      if (typeof offThemeChanged === "function") offThemeChanged();
     };
-  }, [theme, setTheme]);
+  }, [setTheme, theme]);
 
-  const updateTheme = (newTheme) => {
-    setTheme(newTheme); // 更新zustand store的主题
-    if (newTheme === 'auto') {
-      const systemTheme = getSystemTheme();
-      document.documentElement.setAttribute('data-theme', systemTheme);
+  // 根据主题设置 DOM 属性
+  useEffect(() => {
+    if (!theme) return;
+
+    const darkModeQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
+    const applyTheme = (targetTheme) => {
+      document.documentElement.setAttribute("data-theme", targetTheme);
+      console.log("[Renderer] Set theme:", targetTheme);
+    };
+
+    if (theme === "auto") {
+      // 初始化时根据系统主题设置
+      applyTheme(darkModeQuery.matches ? "dark" : "light");
+
+      // 监听系统主题变化（仅 auto 时）
+      const handleSystemThemeChange = (e) => {
+        applyTheme(e.matches ? "dark" : "light");
+      };
+      darkModeQuery.addEventListener("change", handleSystemThemeChange);
+
+      return () => {
+        darkModeQuery.removeEventListener("change", handleSystemThemeChange);
+      };
     } else {
-      document.documentElement.setAttribute('data-theme', newTheme);
+      // 用户指定 light/dark
+      applyTheme(theme);
     }
-  };
+  }, [theme]);
 
-  return { theme, updateTheme };
+  return { theme };
 };
 
 export default useTheme;

@@ -24,7 +24,7 @@ function setMainWindow(win) {
 function openSettingsWindow() {
   // 获取主窗口当前尺寸
   const [parentWidth, parentHeight] = mainWindow.getSize();
-
+  
   // 按比例计算子窗口尺寸
   const width = Math.floor(parentWidth * 0.6);
   const height = Math.floor(parentHeight * 0.4);
@@ -46,9 +46,11 @@ function openSettingsWindow() {
       contextIsolation: true,
     },
   });
-
+  
   // 关键点：带上 query 参数告诉 React “我是设置窗口”
   settingsWin.loadURL(`${MAIN_WINDOW_WEBPACK_ENTRY}?window=settings`);
+  let isDev = process.env.NODE_ENV === "development";
+  if (isDev) settingsWin.webContents.openDevTools();
 
   settingsWin.once("ready-to-show", () => {
     settingsWin.show();

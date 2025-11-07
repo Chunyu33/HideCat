@@ -10,7 +10,6 @@ export const useThemeStore = create((set) => ({
   },
 
   setTheme: async (newTheme) => {
-    const updatedTheme = await window.electronAPI.setTheme(newTheme);
-    set({ theme: updatedTheme }); // 更新 Zustand 状态
+    set({ theme: newTheme }); // 更新 Zustand 状态
   },
 }));
