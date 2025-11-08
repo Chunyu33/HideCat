@@ -9,6 +9,7 @@ const {
 } = require("electron");
 const path = require("node:path");
 const windowControl = require("./windowControl");
+const autoUpdate = require("./autoUpdate");
 const registerIpcHandlers = require("./ipcHandlers");
 const { registerShortcuts, unregisterShortcuts } = require("./shortcuts");
 
@@ -42,9 +43,10 @@ const createWindow = () => {
 
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
   if (isDev) mainWindow.webContents.openDevTools();
-
+  // 加载核心功能
   windowControl.setMainWindow(mainWindow);
-  // initAutoHideWatcher(); // ✅ 初始化自动隐藏检测逻辑
+  // 加载自动更新功能
+  autoUpdate.checkUpdate(mainWindow);
 };
 
 // 获取图标路径

@@ -9,12 +9,24 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
+    "build": "dotenv -e .env electron-builder",
     "lint": "echo \"No linting configured\""
   },
   "keywords": [],
   "author": {
     "name": "liuchunyu",
     "email": "1378813463@qq.com"
+  },
+  "build": {
+    "appId": "2254741",
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "Chunyu33",
+        "repo": "slacke-fish",
+        "token": ""
+      }
+    ]
   },
   "license": "MIT",
   "devDependencies": {
@@ -33,7 +45,9 @@
     "babel-loader": "^10.0.0",
     "copy-webpack-plugin": "^13.0.1",
     "css-loader": "^6.11.0",
+    "dotenv-cli": "^11.0.0",
     "electron": "39.0.0",
+    "electron-builder": "^26.0.12",
     "node-loader": "^2.1.0",
     "style-loader": "^3.3.4"
   },
@@ -41,6 +55,7 @@
     "antd": "^5.27.6",
     "electron-squirrel-startup": "^1.0.1",
     "electron-store": "^11.0.2",
+    "electron-updater": "^6.6.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "zustand": "^5.0.8"
