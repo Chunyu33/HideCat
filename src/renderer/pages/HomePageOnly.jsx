@@ -178,6 +178,10 @@ const HomePageOnly = ({ onUpdateTab, currentKey }) => {
         onAdd={handleAddShortcut}
         onClose={() => setShowAddModal(false)}
       />
+
+      <footer className="copyright">
+        Copyright © {new Date().getFullYear()} SlackeFish. All rights reserved.
+      </footer>
     </div>
   );
 };

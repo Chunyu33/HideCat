@@ -10,6 +10,7 @@ function registerShortcuts() {
   globalShortcut.register('Alt+F', () => showWindow());
   // 备用快捷键
   globalShortcut.register('Ctrl+E', () => showWindow());
+  globalShortcut.register('Ctrl+Q', () => windowControl.quit());
 
   globalShortcut.register('Esc', () => {
     // 按下 Esc 键时，关闭鼠标移入窗口显示状态，并隐藏窗口

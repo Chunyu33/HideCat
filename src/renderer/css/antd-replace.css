@@ -23,3 +23,7 @@
   > .ant-tabs-nav::before {
   border: none;
 }
+
+.ant-tabs-nav::before {
+  border: none !important;
+}

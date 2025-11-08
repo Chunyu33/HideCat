@@ -6,6 +6,7 @@ import defaultShortcuts from "../services/defaultShortcuts";
 import ShortcutListModal from "../components/ShortcutListModal";
 import AddShortcutModal from "../components/AddShortcutModal";
 import { useShortcutStore } from "../store/useShortcutStore";
+import UserManual from "./UserManual";
 import "./css/homepage.css";
 
 const { Title, Text } = Typography;
@@ -17,15 +18,11 @@ const HomePage = ({ onNewTab, onUpdateTab, currentKey }) => {
   const [searchValue, setSearchValue] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [showMoreModal, setShowMoreModal] = useState(false);
+  const [showManualModal, setShowManualModal] = useState(false);
 
   // ✅ 从全局 zustand store 读取状态和方法
-  const {
-    shortcuts,
-    initialized,
-    initShortcuts,
-    addShortcut,
-    deleteShortcut,
-  } = useShortcutStore();
+  const { shortcuts, initialized, initShortcuts, addShortcut, deleteShortcut } =
+    useShortcutStore();
 
   // ✅ 初始化加载（仅首次执行一次）
   useEffect(() => {
@@ -88,15 +85,17 @@ const HomePage = ({ onNewTab, onUpdateTab, currentKey }) => {
     }
   };
 
-  // ✅ 使用全局 store 操作（替代 setUserShortcuts）
+  // 使用全局 store 操作（替代 setUserShortcuts）
   const handleAddShortcut = async (newItem) => {
     await addShortcut(newItem);
-    message.success("已添加快捷方式");
   };
 
   const handleDeleteShortcut = async (id) => {
     await deleteShortcut(id);
-    message.success("已删除快捷方式");
+  };
+
+  const handleShowManual = () => {
+    setShowManualModal(true);
   };
 
   return (
@@ -111,12 +110,14 @@ const HomePage = ({ onNewTab, onUpdateTab, currentKey }) => {
       <Title
         level={1}
         style={{
-          color: "#6A7D8F",
+          color: "var(--ant-primary-color)",
           fontSize: "2.6rem",
           fontWeight: 300,
           marginBottom: 36,
           userSelect: "none",
+          cursor: "pointer",
         }}
+        onClick={handleShowManual}
       >
         SlackeFish
       </Title>
@@ -178,6 +179,15 @@ const HomePage = ({ onNewTab, onUpdateTab, currentKey }) => {
         onAdd={handleAddShortcut}
         onClose={() => setShowAddModal(false)}
       />
+      {/* 用户手册模态框 */}
+      <UserManual
+        visible={showManualModal}
+        onClose={() => setShowManualModal(false)}
+      />
+
+      <footer className="copyright">
+        Copyright © {new Date().getFullYear()} SlackeFish. All rights reserved.
+      </footer>
     </div>
   );
 };

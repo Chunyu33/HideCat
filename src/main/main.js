@@ -32,9 +32,11 @@ const createWindow = () => {
     transparent: false,
     icon: getIconPath(),
     webPreferences: {
-      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
-      nodeIntegration: false,
+      sandbox: true,  // 启用沙盒模式
+      webSecurity: true,
       contextIsolation: true,
+      nodeIntegration: false,
+      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
     },
   });
 

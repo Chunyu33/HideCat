@@ -8,7 +8,7 @@ let isWindowVisible = true;
 let checkTimer = null;
 let startupTimer = null;
 let lastCursorInside = true;
-let autoShowPaused = false; // 新增: 是否暂停自动显示
+let autoShowPaused = false; // 是否暂停自动显示
 
 const COUNTDOWN = 3500; // 倒计时
 
@@ -28,6 +28,7 @@ function quit() {
   }
 
   setTimeout(() => {
+    store.set("autoHide", false); // 取消自动隐藏
     app.exit(0); // 代替 process.exit()
   }, 100);
 }
@@ -57,6 +58,7 @@ function openSettingsWindow() {
     modal: true, // 模态，阻止主窗口交互
     show: false,
     webPreferences: {
+      sandbox: true,
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
       nodeIntegration: false,
       contextIsolation: true,
@@ -390,7 +392,7 @@ async function removeTab(key) {
     activeTabKey = null;
   }
 
-  // 清理缓存和会话数据
+  // 清理缓存和会话数据（如果不想清除登录信息，可以注释掉下面两行）
   const viewSession = view.webContents.session;
   if (viewSession) {
     try {
