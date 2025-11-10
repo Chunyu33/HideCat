@@ -18,13 +18,11 @@
     "email": "1378813463@qq.com"
   },
   "build": {
-    "appId": "2254741",
     "publish": [
       {
         "provider": "github",
         "owner": "Chunyu33",
-        "repo": "slacke-fish",
-        "token": ""
+        "repo": "SlackeFish"
       }
     ]
   },
