@@ -1,4 +1,5 @@
 const { BrowserWindow, BrowserView, screen, app } = require("electron");
+const path = require("path");
 const { randomUUID } = require("crypto");
 const store = require("./store"); // 使用持久化 store
 
@@ -37,15 +38,27 @@ function quit() {
 // 设置窗口逻辑
 // -----------------------------
 function openSettingsWindow() {
-  // 获取主窗口当前尺寸
+  if (!mainWindow) return false;
+
   const [parentWidth, parentHeight] = mainWindow.getSize();
 
-  // 按比例计算子窗口尺寸
   const width = Math.floor(parentWidth * 0.6);
   const height = Math.floor(parentHeight * 0.4);
+
+  const isDev = process.env.NODE_ENV === "development";
+
+  // 子窗口 preload 路径
+  // const preloadPath = isDev
+  //   ? path.join(__dirname, "../preload/preload.js")  // 开发模式
+  //   : path.join(__dirname, "preload.js");           // 打包模式，确保 preload 拷贝到 dist/main/
+  const preloadPath = path.join(__dirname, "../preload/preload.js");
+  // 子窗口 URL
+  // const url = isDev
+  //   ? `http://localhost:5173/?window=settings`
+  //   : `file://${path.join(__dirname, "../dist/renderer/index.html")}?window=settings`;
+  const url = `http://localhost:5173/?window=settings`;
+
   settingsWin = new BrowserWindow({
-    // width: 420,
-    // height: 360,
     width,
     height,
     minWidth: 340,
@@ -53,26 +66,21 @@ function openSettingsWindow() {
     resizable: false,
     frame: false,
     hasShadow: false,
-    // transparent: true,
     parent: mainWindow,
-    modal: true, // 模态，阻止主窗口交互
+    modal: true,
     show: false,
     webPreferences: {
-      sandbox: true,
-      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
-      nodeIntegration: false,
+      preload: preloadPath,
+      sandbox: false,
+      nodeIntegration: true,
       contextIsolation: true,
     },
   });
 
-  // 关键点：带上 query 参数告诉 React “我是设置窗口”
-  settingsWin.loadURL(`${MAIN_WINDOW_WEBPACK_ENTRY}?window=settings`);
-  // let isDev = process.env.NODE_ENV === "development";
-  // if (isDev) settingsWin.webContents.openDevTools();
+  settingsWin.loadURL(url);
+  settingsWin.webContents.openDevTools();
 
-  settingsWin.once("ready-to-show", () => {
-    settingsWin.show();
-  });
+  settingsWin.once("ready-to-show", () => settingsWin.show());
 
   settingsWin.on("closed", () => {
     settingsWin = null;
@@ -80,6 +88,7 @@ function openSettingsWindow() {
 
   return true;
 }
+
 
 function closeSettingsWindow() {
   if (settingsWin) {
@@ -283,14 +292,14 @@ async function addTab(key, url) {
   if (!mainWindowRef) return;
 
   let view = browserViews.get(key);
-
+  const preloadPath = path.join(__dirname, "../preload/preload.js");
   if (!view) {
     view = new BrowserView({
       webPreferences: {
         nodeIntegration: false,
         contextIsolation: true,
         sandbox: false,
-        preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
+        preload: preloadPath,
         partition: `persist:tab-${key}`,
       },
     });

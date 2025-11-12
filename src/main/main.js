@@ -4,10 +4,9 @@ const {
   ipcMain,
   Tray,
   Menu,
-  nativeImage,
   screen,
 } = require("electron");
-const path = require("node:path");
+const path = require("path");
 const windowControl = require("./windowControl");
 const autoUpdate = require("./autoUpdate");
 const registerIpcHandlers = require("./ipcHandlers");
@@ -19,6 +18,7 @@ let mainWindow;
 let tray;
 let isDev = process.env.NODE_ENV === "development";
 
+// Electron 窗口创建
 const createWindow = () => {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
 
@@ -27,77 +27,78 @@ const createWindow = () => {
     height: 600,
     x: width - 820,
     y: height - 620,
-    minWidth: 350, // 限制最小宽度
+    minWidth: 350,
     frame: false,
     hasShadow: false,
     transparent: false,
     icon: getIconPath(),
     webPreferences: {
-      sandbox: true,  // 启用沙盒模式
-      webSecurity: true,
+      preload: path.join(__dirname, "../preload/preload.js"),
       contextIsolation: true,
       nodeIntegration: false,
-      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
+      sandbox: false,
     },
   });
-
-  mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
-  if (isDev) mainWindow.webContents.openDevTools();
-  // 加载核心功能
+  console.log('\n is dev ==========', isDev)
+  // if (isDev) {
+  //   // 开发模式加载 Vite dev server
+  //   mainWindow.loadURL("http://localhost:5173");
+  // } else {
+  //   // 打包模式加载 Vite build 输出
+  //   mainWindow.loadFile(path.join(__dirname, "dist/renderer/index.html"));
+  // }
+  mainWindow.loadURL("http://localhost:5173");
+  mainWindow.webContents.openDevTools();
+  // 核心功能
   windowControl.setMainWindow(mainWindow);
-  // 加载自动更新功能
   autoUpdate.checkUpdate(mainWindow);
 };
 
-// 获取图标路径
+// 跨平台获取图标路径
 const getIconPath = () => {
-  // 开发环境和打包环境路径一致，Webpack 会拷贝 assets
-  return path.join(__dirname, "assets", "app.ico");
+  return process.platform === "darwin"
+    ? path.join(__dirname, "assets/app.png")
+    : path.join(__dirname, "assets/app.ico");
 };
 
+// 托盘
 const createTray = () => {
-  // const iconPath = path.join(__dirname, "assets", "SlackeFish.png");
-  // const trayIcon = nativeImage.createFromPath(iconPath);
-  // tray = new Tray(trayIcon);
-  tray = new Tray(getIconPath());
-
-  const contextMenu = Menu.buildFromTemplate([
-    {
-      label: "显示窗口",
-      click: () => {
-        windowControl.showWindow();
-        windowControl.setAutoShow(false);
+  const iconPath = getIconPath();
+  try {
+    tray = new Tray(iconPath);
+    const contextMenu = Menu.buildFromTemplate([
+      {
+        label: "显示窗口",
+        click: () => {
+          windowControl.showWindow();
+          windowControl.setAutoShow(false);
+        },
       },
-    },
-    { label: "隐藏窗口", click: () => windowControl.hideWindow() },
-    { type: "separator" },
-    {
-      label: "退出",
-      click: () => {
-        windowControl.clearAllTimer();
-        app.quit();
-      },
-    },
-  ]);
+      { label: "隐藏窗口", click: () => windowControl.hideWindow() },
+      { type: "separator" },
+      { label: "退出", click: () => app.quit() },
+    ]);
+    tray.setContextMenu(contextMenu);
+    tray.setToolTip("SlackeFish");
 
-  tray.setToolTip("SlackeFish");
-  tray.setContextMenu(contextMenu);
-
-  tray.on("click", () =>
-    mainWindow.isVisible()
-      ? windowControl.hideWindow()
-      : windowControl.showWindow()
-  );
+    tray.on("click", () =>
+      mainWindow.isVisible()
+        ? windowControl.hideWindow()
+        : windowControl.showWindow()
+    );
+  } catch (err) {
+    console.warn("Tray icon not found:", err);
+  }
 };
 
 app.whenReady().then(() => {
   createWindow();
-  createTray();
+  // createTray();
 
-  // 注册IPC事件
+  // 注册 IPC
   registerIpcHandlers(ipcMain, mainWindow);
-  // 注册快捷键
   registerShortcuts();
+
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
@@ -110,4 +111,9 @@ app.on("will-quit", () => {
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") app.quit();
+});
+
+// 全局 unhandledRejection
+process.on("unhandledRejection", (reason, promise) => {
+  console.warn("Unhandled Rejection at:", promise, "reason:", reason);
 });

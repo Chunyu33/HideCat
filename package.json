@@ -3,21 +3,31 @@
   "productName": "SlackeFish",
   "version": "1.0.0",
   "description": "上班族摸鱼神器。",
-  "main": ".webpack/main",
+  "main": "src/main/main.js",
   "scripts": {
-    "start": "electron-forge start",
-    "package": "electron-forge package",
-    "make": "electron-forge make",
-    "publish": "electron-forge publish",
-    "build": "dotenv -e .env electron-builder",
-    "lint": "echo \"No linting configured\""
-  },
-  "keywords": [],
-  "author": {
-    "name": "liuchunyu",
-    "email": "1378813463@qq.com"
+    "dev": "vite --config src/renderer/vite.config.js",
+    "build-renderer": "vite build --config src/renderer/vite.config.js",
+    "start": "electron .",
+    "dist": "electron-builder"
   },
   "build": {
+    "appId": "com.liuchunyu.slackefish",
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "zip"
+      ]
+    },
     "publish": [
       {
         "provider": "github",
@@ -26,28 +36,27 @@
       }
     ]
   },
+  "keywords": [],
+  "author": {
+    "name": "liuchunyu",
+    "email": "1378813463@qq.com"
+  },
   "license": "MIT",
   "devDependencies": {
     "@babel/core": "^7.28.5",
     "@babel/preset-react": "^7.28.5",
-    "@electron-forge/cli": "^7.10.2",
-    "@electron-forge/maker-deb": "^7.10.2",
-    "@electron-forge/maker-rpm": "^7.10.2",
-    "@electron-forge/maker-squirrel": "^7.10.2",
-    "@electron-forge/maker-zip": "^7.10.2",
-    "@electron-forge/plugin-auto-unpack-natives": "^7.10.2",
-    "@electron-forge/plugin-fuses": "^7.10.2",
-    "@electron-forge/plugin-webpack": "^7.10.2",
-    "@electron/fuses": "^1.8.0",
     "@vercel/webpack-asset-relocator-loader": "^1.7.3",
+    "@vitejs/plugin-react": "^5.1.1",
     "babel-loader": "^10.0.0",
     "copy-webpack-plugin": "^13.0.1",
+    "cross-env": "^10.1.0",
     "css-loader": "^6.11.0",
     "dotenv-cli": "^11.0.0",
     "electron": "39.0.0",
     "electron-builder": "^26.0.12",
     "node-loader": "^2.1.0",
-    "style-loader": "^3.3.4"
+    "style-loader": "^3.3.4",
+    "vite": "^7.2.2"
   },
   "dependencies": {
     "antd": "^5.27.6",
