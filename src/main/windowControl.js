@@ -49,12 +49,15 @@ function openSettingsWindow() {
 
   // 子窗口 preload 路径
   const preloadPath = isDev
-    ? path.join(__dirname, "../preload/preload.js")  // 开发模式
-    : path.join(__dirname, "preload.js");           // 打包模式
+    ? path.join(__dirname, "../preload/preload.js") // 开发模式
+    : path.join(__dirname, "../preload/preload.js"); // 打包模式
   // 子窗口 URL
   const url = isDev
     ? `http://localhost:5173/?window=settings`
-    : `file://${path.join(__dirname, "../renderer/dist/index.html")}?window=settings`;
+    : `file://${path.join(
+        __dirname,
+        "../renderer/dist/index.html"
+      )}?window=settings`;
 
   settingsWin = new BrowserWindow({
     width,
@@ -76,7 +79,9 @@ function openSettingsWindow() {
   });
 
   settingsWin.loadURL(url);
-  settingsWin.webContents.openDevTools();
+  if (isDev) {
+    settingsWin.webContents.openDevTools();
+  }
 
   settingsWin.once("ready-to-show", () => settingsWin.show());
 
@@ -86,7 +91,6 @@ function openSettingsWindow() {
 
   return true;
 }
-
 
 function closeSettingsWindow() {
   if (settingsWin) {
@@ -134,7 +138,9 @@ function showWindow(customCountDown = undefined) {
     clearTimeout(startupTimer);
     startupTimer = setTimeout(() => {
       console.log(
-        `\n ⏳ Mouse status monitoring will begin ${customCountDown ?? COUNTDOWN} seconds after startup.`
+        `\n ⏳ Mouse status monitoring will begin ${
+          customCountDown ?? COUNTDOWN
+        } seconds after startup.`
       );
       startMouseWatcher();
     }, customCountDown ?? COUNTDOWN);

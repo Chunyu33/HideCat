@@ -44,11 +44,11 @@ const createWindow = () => {
   if (isDev) {
     // 开发模式加载 Vite dev server
     mainWindow.loadURL("http://localhost:5173");
+    mainWindow.webContents.openDevTools();
   } else {
     // 打包模式加载 Vite build 输出
     mainWindow.loadFile(path.join(__dirname, "../renderer/dist/index.html"));
   }
-  mainWindow.webContents.openDevTools();
   // 核心功能
   windowControl.setMainWindow(mainWindow);
   autoUpdate.checkUpdate(mainWindow);
