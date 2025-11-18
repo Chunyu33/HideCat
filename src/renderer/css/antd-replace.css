@@ -27,3 +27,7 @@
 .ant-tabs-nav::before {
   border: none !important;
 }
+
+:where(.css-dev-only-do-not-override-1hp2dlu).ant-tabs {
+  line-height: 0 !important;
+}
