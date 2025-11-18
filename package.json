@@ -34,7 +34,8 @@
       "target": [
         "nsis",
         "zip"
-      ]
+      ],
+      "icon": "src/assets/app.ico"
     },
     "publish": [
       {
