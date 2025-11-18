@@ -16,7 +16,8 @@ if (require("electron-squirrel-startup")) app.quit();
 
 let mainWindow;
 let tray;
-let isDev = process.env.NODE_ENV === "development";
+// 更可靠的开发环境检测
+let isDev = process.env.NODE_ENV === "development" || !app.isPackaged;
 
 // Electron 窗口创建
 const createWindow = () => {
@@ -40,14 +41,13 @@ const createWindow = () => {
     },
   });
   console.log('\n is dev ==========', isDev)
-  // if (isDev) {
-  //   // 开发模式加载 Vite dev server
-  //   mainWindow.loadURL("http://localhost:5173");
-  // } else {
-  //   // 打包模式加载 Vite build 输出
-  //   mainWindow.loadFile(path.join(__dirname, "dist/renderer/index.html"));
-  // }
-  mainWindow.loadURL("http://localhost:5173");
+  if (isDev) {
+    // 开发模式加载 Vite dev server
+    mainWindow.loadURL("http://localhost:5173");
+  } else {
+    // 打包模式加载 Vite build 输出
+    mainWindow.loadFile(path.join(__dirname, "../dist/renderer/index.html"));
+  }
   mainWindow.webContents.openDevTools();
   // 核心功能
   windowControl.setMainWindow(mainWindow);
@@ -57,8 +57,8 @@ const createWindow = () => {
 // 跨平台获取图标路径
 const getIconPath = () => {
   return process.platform === "darwin"
-    ? path.join(__dirname, "assets/app.png")
-    : path.join(__dirname, "assets/app.ico");
+    ? path.join(__dirname, "../assets/app.png")
+    : path.join(__dirname, "../assets/app.ico");
 };
 
 // 托盘
@@ -93,7 +93,7 @@ const createTray = () => {
 
 app.whenReady().then(() => {
   createWindow();
-  // createTray();
+  createTray();
 
   // 注册 IPC
   registerIpcHandlers(ipcMain, mainWindow);

@@ -6,16 +6,24 @@
   "main": "src/main/main.js",
   "scripts": {
     "dev": "vite --config src/renderer/vite.config.js",
-    "build-renderer": "vite build --config src/renderer/vite.config.js",
-    "start": "electron .",
-    "dist": "electron-builder"
+    "build:renderer": "vite build --config src/renderer/vite.config.js",
+    "start": "cross-env NODE_ENV=development electron .",
+    "start:prod": "cross-env NODE_ENV=production electron .",
+    "dist": "npm run build:renderer && electron-builder"
   },
   "build": {
     "appId": "com.liuchunyu.slackefish",
     "files": [
-      "src/**/*",
+      "src/main/**/*",
+      "src/preload/**/*",
+      "src/assets/**/*",
+      "src/renderer/dist/**/*",
+      "node_modules/**/*",
       "package.json"
     ],
+    "extraMetadata": {
+      "main": "src/main/main.js"
+    },
     "mac": {
       "target": [
         "dmg",
@@ -63,8 +71,8 @@
     "electron-squirrel-startup": "^1.0.1",
     "electron-store": "^11.0.2",
     "electron-updater": "^6.6.2",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "zustand": "^5.0.8"
   }
 }

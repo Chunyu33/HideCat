@@ -45,18 +45,16 @@ function openSettingsWindow() {
   const width = Math.floor(parentWidth * 0.6);
   const height = Math.floor(parentHeight * 0.4);
 
-  const isDev = process.env.NODE_ENV === "development";
+  const isDev = process.env.NODE_ENV === "development" || !app.isPackaged;
 
   // 子窗口 preload 路径
-  // const preloadPath = isDev
-  //   ? path.join(__dirname, "../preload/preload.js")  // 开发模式
-  //   : path.join(__dirname, "preload.js");           // 打包模式，确保 preload 拷贝到 dist/main/
-  const preloadPath = path.join(__dirname, "../preload/preload.js");
+  const preloadPath = isDev
+    ? path.join(__dirname, "../preload/preload.js")  // 开发模式
+    : path.join(__dirname, "preload.js");           // 打包模式
   // 子窗口 URL
-  // const url = isDev
-  //   ? `http://localhost:5173/?window=settings`
-  //   : `file://${path.join(__dirname, "../dist/renderer/index.html")}?window=settings`;
-  const url = `http://localhost:5173/?window=settings`;
+  const url = isDev
+    ? `http://localhost:5173/?window=settings`
+    : `file://${path.join(__dirname, "../dist/renderer/index.html")}?window=settings`;
 
   settingsWin = new BrowserWindow({
     width,
