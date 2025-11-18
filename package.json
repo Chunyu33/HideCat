@@ -9,7 +9,7 @@
     "build:renderer": "vite build --config src/renderer/vite.config.js",
     "start": "cross-env NODE_ENV=development electron .",
     "start:prod": "cross-env NODE_ENV=production electron .",
-    "dist": "npm run build:renderer && electron-builder"
+    "make": "npm run build:renderer && electron-builder"
   },
   "build": {
     "appId": "com.liuchunyu.slackefish",

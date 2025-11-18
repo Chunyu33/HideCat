@@ -54,7 +54,7 @@ function openSettingsWindow() {
   // 子窗口 URL
   const url = isDev
     ? `http://localhost:5173/?window=settings`
-    : `file://${path.join(__dirname, "../dist/renderer/index.html")}?window=settings`;
+    : `file://${path.join(__dirname, "../renderer/dist/index.html")}?window=settings`;
 
   settingsWin = new BrowserWindow({
     width,

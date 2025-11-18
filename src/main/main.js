@@ -46,7 +46,7 @@ const createWindow = () => {
     mainWindow.loadURL("http://localhost:5173");
   } else {
     // 打包模式加载 Vite build 输出
-    mainWindow.loadFile(path.join(__dirname, "../dist/renderer/index.html"));
+    mainWindow.loadFile(path.join(__dirname, "../renderer/dist/index.html"));
   }
   mainWindow.webContents.openDevTools();
   // 核心功能
