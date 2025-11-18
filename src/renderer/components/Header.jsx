@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import "./css/header.css";
 import {
   IconBack,
@@ -9,7 +9,9 @@ import {
   IconMinimize,
   IconClose,
 } from "./Icon";
+import useTheme from "../hooks/useTheme";
 import AppIcon from "../../assets/app.png";
+import AppIconWhite from "../../assets/app-white.png";
 
 // 独立 SVG 组件
 const IconButton = ({ title, onClick, children }) => (
@@ -24,13 +26,29 @@ const Header = ({ onOpenSettings }) => {
   };
   const handleMinimize = () => window.electronAPI?.minimizeWindow();
   const handleClose = () => window.electronAPI?.closeWindow();
+  const { theme } = useTheme();
+
+  const iconSrc = useMemo(() => {
+    if (theme === "auto") {
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
+        .matches
+        ? "dark"
+        : "light";
+      return systemTheme === "dark" ? AppIconWhite : AppIcon;
+    }
+    return theme === "dark" ? AppIconWhite : AppIcon;
+  }, [theme]);
 
   return (
     <div className="header-bar">
       {/* 左侧 Logo + 导航 */}
       <div className="header-left">
         <div className="header-title">
-          <img src={AppIcon} alt="" style={{width: "18px", height: "18px", borderRadius: "2px"}} />
+          <img
+            src={iconSrc}
+            alt=""
+            style={{ width: "18px", height: "18px", borderRadius: "2px" }}
+          />
           SlackeFish
         </div>
       </div>
