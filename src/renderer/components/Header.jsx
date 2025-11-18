@@ -11,7 +11,6 @@ import {
 } from "./Icon";
 import useTheme from "../hooks/useTheme";
 import AppIcon from "../../assets/app.png";
-import AppIconWhite from "../../assets/app-white.png";
 
 // 独立 SVG 组件
 const IconButton = ({ title, onClick, children }) => (
@@ -28,15 +27,25 @@ const Header = ({ onOpenSettings }) => {
   const handleClose = () => window.electronAPI?.closeWindow();
   const { theme } = useTheme();
 
-  const iconSrc = useMemo(() => {
+  const baseStyle = {
+    width: "18px",
+    height: "18px",
+    borderRadius: "2px",
+  }
+
+  const iconStyle = useMemo(() => {
     if (theme === "auto") {
       const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
         .matches
         ? "dark"
         : "light";
-      return systemTheme === "dark" ? AppIconWhite : AppIcon;
+      return systemTheme === "dark"
+        ? {...baseStyle, filter: "invert(100%)"}
+        : {...baseStyle, filter: "invert(0%)"};
     }
-    return theme === "dark" ? AppIconWhite : AppIcon;
+    return theme === "dark"
+      ? {...baseStyle, filter: "invert(100%)"}
+      : {...baseStyle, filter: "invert(0%)"};
   }, [theme]);
 
   return (
@@ -45,9 +54,9 @@ const Header = ({ onOpenSettings }) => {
       <div className="header-left">
         <div className="header-title">
           <img
-            src={iconSrc}
+            src={AppIcon}
             alt=""
-            style={{ width: "18px", height: "18px", borderRadius: "2px" }}
+            style={iconStyle}
           />
           SlackeFish
         </div>
