@@ -1,7 +1,7 @@
 const {
   quit,
+  minimizeWindow,
   setMainWindow,
-  setMainWindowRef,
   openSettingsWindow,
   closeSettingsWindow,
   showWindow,
@@ -28,7 +28,6 @@ const { randomUUID } = require("crypto");
 function registerIPC(ipcMain, mainWindow) {
   // 初始化主窗口引用
   setMainWindow(mainWindow);
-  setMainWindowRef(mainWindow);
 
   // ======================
   // 设置窗口控制
@@ -40,7 +39,7 @@ function registerIPC(ipcMain, mainWindow) {
   // ======================
   // 主窗口操作
   // ======================
-  ipcMain.handle("minimize-window", () => hideWindow());
+  ipcMain.handle("minimize-window", () => minimizeWindow());
   ipcMain.handle("show-window", () => showWindow());
   ipcMain.handle("hide-window", (_, ms) => hideWindow(ms));
   ipcMain.handle("hide-immediately", () => hideImmediately());

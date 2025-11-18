@@ -64,6 +64,7 @@ const getIconPath = () => {
 // 托盘
 const createTray = () => {
   const iconPath = getIconPath();
+  console.log('\niconPath ==========', iconPath)
   try {
     tray = new Tray(iconPath);
     const contextMenu = Menu.buildFromTemplate([

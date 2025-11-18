@@ -34,6 +34,12 @@ function quit() {
   }, 100);
 }
 
+// 最小化窗口
+function minimizeWindow() {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+  mainWindow.minimize();
+}
+
 // -----------------------------
 // 设置窗口逻辑
 // -----------------------------
@@ -79,9 +85,9 @@ function openSettingsWindow() {
   });
 
   settingsWin.loadURL(url);
-  if (isDev) {
-    settingsWin.webContents.openDevTools();
-  }
+  // if (isDev) {
+  //   settingsWin.webContents.openDevTools();
+  // }
 
   settingsWin.once("ready-to-show", () => settingsWin.show());
 
@@ -267,19 +273,14 @@ function initAutoHideWatcher(customCountDown = undefined) {
 // -----------------------------
 // BrowserView 标签管理逻辑
 // -----------------------------
-let mainWindowRef = null;
 const browserViews = new Map();
 let activeTabKey = null;
 
-// 提供外部初始化方法
-function setMainWindowRef(win) {
-  mainWindowRef = win;
-}
 
 function _getBorserSize() {
-  // if(!mainWindowRef) return;
-  // let [x, y] = mainWindowRef.getPosition();
-  const [width, height] = mainWindowRef.getContentSize();
+  // if(!mainWindow) return;
+  // let [x, y] = mainWindow.getPosition();
+  const [width, height] = mainWindow.getContentSize();
   let sizeObj = {
     width,
     height,
@@ -293,7 +294,7 @@ function _getBorserSize() {
  * 创建新标签页并加载 URL
  */
 async function addTab(key, url) {
-  if (!mainWindowRef) return;
+  if (!mainWindow) return;
 
   let view = browserViews.get(key);
   const preloadPath = path.join(__dirname, "../preload/preload.js");
@@ -318,7 +319,7 @@ async function addTab(key, url) {
     view.webContents.on(
       "did-fail-load",
       (e, errorCode, errorDescription, validatedURL) => {
-        mainWindowRef.webContents.send("tab-load-failed", {
+        mainWindow.webContents.send("tab-load-failed", {
           key,
           errorCode,
           errorDescription,
@@ -329,12 +330,12 @@ async function addTab(key, url) {
 
     view.webContents.on("dom-ready", () => {
       const title = view.webContents.getTitle?.() || "";
-      mainWindowRef.webContents.send("tab-loaded", { key, url, title });
+      mainWindow.webContents.send("tab-loaded", { key, url, title });
       console.log(`DOM ready...Tab ${key} loaded: ${url}`);
     });
 
     view.webContents.on("did-finish-load", () => {
-      mainWindowRef.webContents.send("tab-finish", { key, url });
+      mainWindow.webContents.send("tab-finish", { key, url });
       // 加载完成后 确保缩放比例立即生效
       const scale = store.get("scale", 1.0); // 获取全局缩放比例
       view.webContents.setZoomFactor(scale); // 立即应用缩放
@@ -344,7 +345,7 @@ async function addTab(key, url) {
   }
 
   try {
-    mainWindowRef.webContents.send("tab-loading", { key, url });
+    mainWindow.webContents.send("tab-loading", { key, url });
     console.log(`[addTab] load url for key=${key}, url=${url}`);
     view.webContents.loadURL(url);
   } catch (e) {
@@ -354,7 +355,7 @@ async function addTab(key, url) {
   // 如果当前激活 tab 就是这个 key，则刷新 BrowserView 显示
   if (activeTabKey === key) {
     try {
-      mainWindowRef.setBrowserView(view);
+      mainWindow.setBrowserView(view);
       view.setBounds(_getBorserSize());
       view.setAutoResize({ width: true, height: true });
       setTimeout(() => {
@@ -372,16 +373,16 @@ async function addTab(key, url) {
  * 激活（切换）标签页
  */
 async function setActiveTab(key) {
-  if (!mainWindowRef) return;
+  if (!mainWindow) return;
   if (activeTabKey === key) return;
 
   const currentView = browserViews.get(activeTabKey);
   const newView = browserViews.get(key);
 
-  if (currentView) mainWindowRef.removeBrowserView(currentView);
+  if (currentView) mainWindow.removeBrowserView(currentView);
 
   if (newView) {
-    mainWindowRef.setBrowserView(newView);
+    mainWindow.setBrowserView(newView);
     newView.setBounds(_getBorserSize());
     newView.setAutoResize({ width: true, height: true });
   }
@@ -400,8 +401,8 @@ async function removeTab(key) {
   const view = browserViews.get(key);
   if (!view) return;
 
-  if (activeTabKey === key && mainWindowRef) {
-    mainWindowRef.removeBrowserView(view);
+  if (activeTabKey === key && mainWindow) {
+    mainWindow.removeBrowserView(view);
     activeTabKey = null;
   }
 
@@ -481,9 +482,9 @@ function removeShortcut(sid) {
 function setTheme(theme) {
   store.set("theme", theme);
   console.log(`\n [setTheme] theme=${theme}`);
-  if (!mainWindowRef) return;
-  mainWindowRef.setBackgroundColor(theme === "dark" ? "#1E1E1E" : "#FFFFFF");
-  mainWindowRef.webContents.send("theme-changed", theme);
+  if (!mainWindow) return;
+  mainWindow.setBackgroundColor(theme === "dark" ? "#1E1E1E" : "#FFFFFF");
+  mainWindow.webContents.send("theme-changed", theme);
 }
 // 获取当前主题
 function getTheme() {
@@ -493,7 +494,7 @@ function getTheme() {
 module.exports = {
   quit,
   setMainWindow,
-  setMainWindowRef,
+  minimizeWindow,
   openSettingsWindow,
   closeSettingsWindow,
   showWindow,

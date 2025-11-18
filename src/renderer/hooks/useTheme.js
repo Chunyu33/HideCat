@@ -24,7 +24,7 @@ const useTheme = () => {
     };
   }, [setTheme, theme]);
 
-  // 根据主题设置 DOM 属性
+  // 根据外观设置 DOM 属性
   useEffect(() => {
     if (!theme) return;
 
@@ -36,7 +36,7 @@ const useTheme = () => {
     };
 
     if (theme === "auto") {
-      // 初始化时根据系统主题设置
+      // 初始化时根据系统外观设置
       applyTheme(darkModeQuery.matches ? "dark" : "light");
 
       // 监听系统主题变化（仅 auto 时）

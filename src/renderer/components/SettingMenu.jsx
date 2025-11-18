@@ -210,7 +210,7 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
 
         {/* 主题选择 */}
         <div className="setting-item">
-          <span className="setting-label row-center">主题设置</span>
+          <span className="setting-label row-center">外观设置</span>
           <div className="range-input">
             <Select
               value={theme}
