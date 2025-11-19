@@ -437,7 +437,11 @@ function navigateView(action) {
       wc.reload();
       break;
     case "home":
-      wc.loadURL(`${MAIN_WINDOW_WEBPACK_ENTRY}?window=home`);
+      const isDev = process.env.NODE_ENV === "development" || !app.isPackaged;
+      const homeUrl = isDev
+        ? "http://localhost:5173/?window=home"
+        : `file://${path.join(__dirname, "../renderer/dist/index.html")}?window=home`;
+      wc.loadURL(homeUrl);
       break;
   }
 }
