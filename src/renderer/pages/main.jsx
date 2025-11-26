@@ -17,7 +17,7 @@ const initialItems = [
     // status: undefined 默认
   },
 ];
-const MAX_TABS = 8;
+const MAX_TABS = 12;
 
 const MainPage = () => {
   const [activeKey, setActiveKey] = useState(HOME_TAB_KEY);
