@@ -225,7 +225,7 @@ function startMouseWatcher() {
       }
       // 鼠标进入窗口范围
       if (!isWindowVisible) {
-        mainWindow.showInactive(); // 保留原来的注释
+        mainWindow.show();
         isWindowVisible = true;
         console.log("🟢 in -> show");
       }
