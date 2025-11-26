@@ -4,7 +4,6 @@ const {
   ipcMain,
   Tray,
   Menu,
-  screen,
 } = require("electron");
 const path = require("path");
 const windowControl = require("./windowControl");
@@ -19,20 +18,24 @@ let tray;
 // 更可靠的开发环境检测
 let isDev = process.env.NODE_ENV === "development" || !app.isPackaged;
 
-// Electron 窗口创建
 const createWindow = () => {
-  const { width, height } = screen.getPrimaryDisplay().workAreaSize;
 
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
-    x: width - 820,
-    y: height - 620,
+    center: true,
     minWidth: 350,
     frame: false,
     hasShadow: false,
-    transparent: false,
+    resizable: true,
+    transparent: true, // 开启透明
+    // 关键一行！！！开启拉伸热区
+    thickFrame: false,               // Windows 专属：关闭厚边框（否则有白边）
+    // backgroundColor: '#00000000',
     icon: getIconPath(),
+    // 下面这几行才是控制阴影样式的关键（不同平台写法略有区别）
+    // titleBarStyle: 'hidden',        // macOS 需要这行才能彻底去掉标题栏残影
+    visualEffectState: 'active',    // macOS 毛玻璃振动特效（可选）
     webPreferences: {
       preload: path.join(__dirname, "../preload/preload.js"),
       contextIsolation: true,

@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import "./css/header.css";
 import {
   IconBack,
@@ -20,12 +20,41 @@ const IconButton = ({ title, onClick, children }) => (
 );
 
 const Header = ({ onOpenSettings }) => {
+  const [isMouseOver, setIsMouseOver] = useState(false);
+  const [hideTimeout, setHideTimeout] = useState(null);
+  
   const navigate = (action) => {
     window.electronAPI?.navigateView?.(action);
   };
   const handleMinimize = () => window.electronAPI?.minimizeWindow();
   const handleClose = () => window.electronAPI?.closeWindow();
   const { theme } = useTheme();
+
+  // 鼠标进入组件
+  const handleMouseEnter = () => {
+    setIsMouseOver(true);
+    if (hideTimeout) {
+      clearTimeout(hideTimeout);
+      setHideTimeout(null);
+    }
+  };
+
+  // 鼠标离开组件
+  const handleMouseLeave = () => {
+    // 设置延迟隐藏，给用户时间移动鼠标回来
+    const timeout = setTimeout(() => {
+      setIsMouseOver(false);
+    }, 500); // 500ms延迟
+    setHideTimeout(timeout);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (hideTimeout) {
+        clearTimeout(hideTimeout);
+      }
+    };
+  }, [hideTimeout]);
 
   const baseStyle = {
     width: "18px",
@@ -48,8 +77,19 @@ const Header = ({ onOpenSettings }) => {
       : {...baseStyle, filter: "invert(0%)"};
   }, [theme]);
 
+  // 透明效果样式
+  const headerStyle = {
+    opacity: isMouseOver ? 1 : 0,
+    transition: "opacity 0.3s ease-in-out",
+  };
+
   return (
-    <div className="header-bar">
+    <div 
+      className="header-bar" 
+      style={headerStyle}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       {/* 左侧 Logo + 导航 */}
       <div className="header-left">
         <div className="header-title">

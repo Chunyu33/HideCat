@@ -98,7 +98,7 @@ const App = () => {
     return (
       <>
         <Header onOpenSettings={toggleSettings} showSettings={showSettings} />
-        <div className="content-container">
+        <div className="content-container" style={bgStyles}>
           <MainPage />
         </div>
       </>
@@ -120,7 +120,7 @@ const App = () => {
             },
           }}
         >
-          <div className="app-container" style={bgStyles}>
+          <div className="app-container">
             {getDom()}
           </div>
         </ConfigProvider>
