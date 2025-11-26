@@ -57,3 +57,11 @@
   transform: scale(0.9);
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.25);
 }
+
+.no-drag {
+  -webkit-app-region: no-drag;
+}
+.drag {
+  -webkit-app-region: drag;
+}
+

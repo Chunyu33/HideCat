@@ -28,14 +28,10 @@ const createWindow = () => {
     frame: false,
     hasShadow: false,
     resizable: true,
-    transparent: true, // 开启透明
+    transparent: false, // 开启透明
     // 关键一行！！！开启拉伸热区
-    thickFrame: false,               // Windows 专属：关闭厚边框（否则有白边）
-    // backgroundColor: '#00000000',
     icon: getIconPath(),
     // 下面这几行才是控制阴影样式的关键（不同平台写法略有区别）
-    // titleBarStyle: 'hidden',        // macOS 需要这行才能彻底去掉标题栏残影
-    visualEffectState: 'active',    // macOS 毛玻璃振动特效（可选）
     webPreferences: {
       preload: path.join(__dirname, "../preload/preload.js"),
       contextIsolation: true,
@@ -51,6 +47,7 @@ const createWindow = () => {
   } else {
     // 打包模式加载 Vite build 输出
     mainWindow.loadFile(path.join(__dirname, "../renderer/dist/index.html"));
+    mainWindow.webContents.openDevTools();
   }
   // 核心功能
   windowControl.setMainWindow(mainWindow);

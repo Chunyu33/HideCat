@@ -21,10 +21,24 @@ const isSettingsWindow = query.get("window") === "settings";
 const isHome = query.get("window") === "home";
 
 const App = () => {
-  const [showSettings, setShowSettings] = useState(false);
   const [scale, setScale] = useState(1.0);
-  const settingsRef = useRef(null);
   const [currentKey, setCurrentKey] = useState(false);
+
+  const [headerVisible, setHeaderVisible] = useState(false);
+
+  // 控制header显示
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      console.log('----', e.clientY)
+      if (e.clientY <= 10) {
+        // 鼠标在顶部xpx范围内
+        setHeaderVisible(true);
+        console.log("显示");
+      }
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
 
   // 🎨 从 Hook 获取主题状态和更新逻辑
   const { theme } = useTheme();
@@ -49,23 +63,6 @@ const App = () => {
   useEffect(() => {
     initSettings();
   }, []);
-
-  // 点击外部关闭设置菜单
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        showSettings &&
-        settingsRef.current &&
-        !settingsRef.current.contains(event.target)
-      ) {
-        setShowSettings(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [showSettings]);
 
   const toggleSettings = () => {
     window.electronAPI.openSettingsWindow();
@@ -97,7 +94,11 @@ const App = () => {
       );
     return (
       <>
-        <Header onOpenSettings={toggleSettings} showSettings={showSettings} />
+        <Header
+          onOpenSettings={toggleSettings}
+          headerVisible={headerVisible}
+          onRequestHide={() => setHeaderVisible(false)}
+        />
         <div className="content-container" style={bgStyles}>
           <MainPage />
         </div>
@@ -120,9 +121,7 @@ const App = () => {
             },
           }}
         >
-          <div className="app-container">
-            {getDom()}
-          </div>
+          <div className="app-container">{getDom()}</div>
         </ConfigProvider>
       );
     }
