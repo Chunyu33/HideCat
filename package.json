@@ -1,7 +1,7 @@
 {
   "name": "fish-slacke",
   "productName": "SlackeFish",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "上班族摸鱼神器。",
   "main": "src/main/main.js",
   "scripts": {
