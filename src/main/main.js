@@ -39,14 +39,17 @@ const createWindow = () => {
       sandbox: false,
     },
   });
-  console.log('\n is dev ==========', isDev)
+  // console.log('\n is dev ==========', isDev)
   if (isDev) {
     // 开发模式加载 Vite dev server
     mainWindow.loadURL("http://localhost:5173");
     mainWindow.webContents.openDevTools();
   } else {
     // 打包模式加载 Vite build 输出
-    mainWindow.loadFile(path.join(__dirname, "../../dist/index.html"));
+    // 使用正确的路径：在打包后，dist 目录位于 app.asar 中
+    const indexPath = path.join(__dirname, "../../h5/index.html");
+    mainWindow.loadFile(indexPath);
+    // 生产环境不自动打开开发者工具
     // mainWindow.webContents.openDevTools();
   }
   // 核心功能
