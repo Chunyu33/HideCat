@@ -29,11 +29,10 @@ const App = () => {
   // 控制header显示
   useEffect(() => {
     const handleMouseMove = (e) => {
-      console.log('----', e.clientY)
       if (e.clientY <= 10) {
         // 鼠标在顶部xpx范围内
         setHeaderVisible(true);
-        console.log("显示");
+        // console.log("显示");
       }
     };
     window.addEventListener("mousemove", handleMouseMove);

@@ -61,10 +61,7 @@ function openSettingsWindow() {
   // 子窗口 URL
   const url = isDev
     ? `http://localhost:5173/?window=settings`
-    : `file://${path.join(
-        __dirname,
-        "../../dist/index.html"
-      )}?window=settings`;
+    : `file://${path.join(__dirname, "../../dist/index.html")}?window=settings`;
 
   settingsWin = new BrowserWindow({
     width,
@@ -277,6 +274,30 @@ function initAutoHideWatcher(customCountDown = undefined) {
 const browserViews = new Map();
 let activeTabKey = null;
 
+/**
+ * 基于URL生成稳定的key，确保同一网站的标签页共享会话
+ */
+function generateStableKey(url, originalKey) {
+  // 如果是主页或空白页，使用原始key
+  if (url === "about:blank" || url.includes("?window=home")) {
+    return originalKey;
+  }
+  
+  try {
+    // 提取域名作为稳定的key基础
+    const urlObj = new URL(url);
+    const domain = urlObj.hostname.replace(/^www\./, ''); // 移除www前缀
+    
+    // 生成基于域名的稳定key
+    const stableKey = `tab-${domain}`;
+    console.log(`URL: ${url} -> 稳定key: ${stableKey}`);
+    return stableKey;
+  } catch (e) {
+    // 如果URL解析失败，使用原始key
+    console.warn(`URL解析失败，使用原始key: ${originalKey}`);
+    return originalKey;
+  }
+}
 
 function _getBorserSize() {
   // if(!mainWindow) return;
@@ -284,9 +305,9 @@ function _getBorserSize() {
   const [width, height] = mainWindow.getContentSize();
   let sizeObj = {
     width,
-    height,
+    height: height - 33,
     x: 0,
-    y: 66,
+    y: 33,
   };
   return sizeObj;
 }
@@ -297,18 +318,57 @@ function _getBorserSize() {
 async function addTab(key, url) {
   if (!mainWindow) return;
 
-  let view = browserViews.get(key);
+  // 基于URL生成稳定的key，确保同一网站的标签页共享会话
+  const stableKey = generateStableKey(url, key);
+  
+  let view = browserViews.get(stableKey);
   const preloadPath = path.join(__dirname, "../preload/preload.js");
   if (!view) {
+    // 使用基于URL的稳定会话分区名称，确保同一网站的登录信息可以共享
+    const sessionName = `persist:tab-${stableKey}`;
+    const session = require("electron").session.fromPartition(sessionName, {
+      cache: true,
+      persistent: true
+    });
+
+    // 配置会话以支持 Cookie 持久化
+    // 持久化会话会自动启用 Cookie 存储，无需手动调用 enableCookies
+    // 测试 Cookie 存储是否正常工作
+    // session.cookies.set({
+    //   url: url,
+    //   name: `test_${key}`,
+    //   value: "test_value",
+    //   expirationDate: Math.floor(Date.now() / 1000) + 604800, // 7 天
+    // }).then(() => {
+    //   console.log(`\ntest Cookie success === for tab ${key}`);
+    // }).catch((err) => {
+    //   console.warn(`\ntest Cookie fail: ${err}`);
+    // });
+
+    // 强制开启所有存储
+    session.setPermissionCheckHandler(() => true);
+    session.setPermissionRequestHandler((wc, perm, cb) => cb(true));
+
     view = new BrowserView({
       webPreferences: {
+        preload: preloadPath,
         nodeIntegration: false,
         contextIsolation: true,
         sandbox: false,
-        preload: preloadPath,
-        partition: `persist:tab-${key}`,
+        session: session, // 关键！用自定义 session
+        webSecurity: false, // 允许跨域请求
+        allowRunningInsecureContent: true, // 允许不安全内容
       },
     });
+
+    // 调试：看看 Cookie 到底存没存
+    view.webContents.session.cookies
+      .get({})
+      .then((cookies) => {
+        console.log(`\nTab ${key} 当前有 ${cookies.length} --- Cookie`);
+        console.log(`\nsessionName: ${sessionName}`);
+      })
+      .catch(() => {});
 
     browserViews.set(key, view);
 
@@ -407,14 +467,9 @@ async function removeTab(key) {
     activeTabKey = null;
   }
 
-  // 清理缓存和会话数据（如果不想清除登录信息，可以注释掉下面两行）
-  const viewSession = view.webContents.session;
-  if (viewSession) {
-    try {
-      await viewSession.clearCache();
-      await viewSession.clearStorageData();
-    } catch {}
-  }
+  // 重要：不清理缓存和会话数据，以保留登录信息
+  // 会话数据会随着应用关闭而自动清理，但标签页切换时保持登录状态
+  console.log(`删除标签页 ${key}，但保留会话数据`);
 
   browserViews.delete(key);
   view.webContents.destroy();
@@ -499,22 +554,22 @@ function getTheme() {
 // 拖动窗口
 function dragWindow() {
   if (!mainWindow || mainWindow.isDestroyed()) return;
-  
+
   // 先停止之前的拖动（如果存在）
   if (dragInterval) {
     clearInterval(dragInterval);
     dragInterval = null;
   }
-  
+
   // 对于无边框窗口，需要手动实现拖动
-  const { screen } = require('electron');
+  const { screen } = require("electron");
   const mousePos = screen.getCursorScreenPoint();
   const windowBounds = mainWindow.getBounds();
-  
+
   // 计算鼠标在窗口内的相对位置
   const offsetX = mousePos.x - windowBounds.x;
   const offsetY = mousePos.y - windowBounds.y;
-  
+
   // 开始拖动循环
   dragInterval = setInterval(() => {
     if (!mainWindow || mainWindow.isDestroyed()) {
@@ -522,9 +577,9 @@ function dragWindow() {
       dragInterval = null;
       return;
     }
-    
+
     const currentMousePos = screen.getCursorScreenPoint();
-    
+
     // 移动窗口到新的位置
     mainWindow.setPosition(
       currentMousePos.x - offsetX,
@@ -538,7 +593,7 @@ function stopDragging() {
   if (dragInterval) {
     clearInterval(dragInterval);
     dragInterval = null;
-    console.log('拖动已停止');
+    console.log("拖动已停止");
   }
 }
 

@@ -47,7 +47,7 @@ const createWindow = () => {
   } else {
     // 打包模式加载 Vite build 输出
     mainWindow.loadFile(path.join(__dirname, "../../dist/index.html"));
-    mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
   }
   // 核心功能
   windowControl.setMainWindow(mainWindow);

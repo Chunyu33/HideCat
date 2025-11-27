@@ -30,7 +30,6 @@ const Header = ({ onOpenSettings, headerVisible, onRequestHide }) => {
   
   // 处理拖动窗口
   const handleDragStart = (e) => {
-    console.log('拖动----')
     // 阻止事件冒泡，避免影响按钮点击
     e.stopPropagation();
     window.electronAPI?.dragWindow?.();
@@ -50,7 +49,6 @@ const Header = ({ onOpenSettings, headerVisible, onRequestHide }) => {
   const handleMouseLeave = () => {
     if (hideTimeout) clearTimeout(hideTimeout);
     const timeout = setTimeout(() => {
-      console.warn("隐藏---");
       onRequestHide?.();
     }, 300); // 延迟隐藏，避免鼠标滑出瞬间关闭
     setHideTimeout(timeout);
