@@ -27,6 +27,25 @@ const Header = ({ onOpenSettings, headerVisible, onRequestHide }) => {
   };
   const handleMinimize = () => window.electronAPI?.minimizeWindow();
   const handleClose = () => window.electronAPI?.closeWindow();
+  
+  // 处理拖动窗口
+  const handleDragStart = (e) => {
+    console.log('拖动----')
+    // 阻止事件冒泡，避免影响按钮点击
+    e.stopPropagation();
+    window.electronAPI?.dragWindow?.();
+    
+    // 添加鼠标释放事件监听器
+    const handleMouseUp = () => {
+      window.electronAPI?.stopDragging?.();
+      document.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('blur', handleMouseUp);
+    };
+    
+    document.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('blur', handleMouseUp);
+  };
+  
 
   const handleMouseLeave = () => {
     if (hideTimeout) clearTimeout(hideTimeout);
@@ -71,13 +90,13 @@ const Header = ({ onOpenSettings, headerVisible, onRequestHide }) => {
         zIndex: 9999,
         transform: headerVisible ? "translateY(0)" : "translateY(-100%)",
         transition: "transform 0.3s ease",
-        WebkitAppRegion: "drag",
       }}
       onMouseEnter={handleMouseEnter}
     >
       <div
         className="header-bar"
         onMouseLeave={handleMouseLeave}
+        onMouseDown={handleDragStart}
       >
         {/* 左侧 Logo + 导航 */}
         <div className="header-left">

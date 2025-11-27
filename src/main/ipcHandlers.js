@@ -22,6 +22,8 @@ const {
   removeShortcut,
   setTheme,
   getTheme,
+  dragWindow,
+  stopDragging,
 } = require("./windowControl");
 const { randomUUID } = require("crypto");
 
@@ -43,7 +45,13 @@ function registerIPC(ipcMain, mainWindow) {
   ipcMain.handle("show-window", () => showWindow());
   ipcMain.handle("hide-window", (_, ms) => hideWindow(ms));
   ipcMain.handle("hide-immediately", () => hideImmediately());
-
+  ipcMain.handle("drag-window", () => dragWindow());
+  
+  // 停止拖动（通过 IPC 消息）
+  ipcMain.on("stop-dragging", () => {
+    stopDragging();
+  });
+  
   // ======================
   // 自动隐藏 / 透明度 / 缩放
   // ======================

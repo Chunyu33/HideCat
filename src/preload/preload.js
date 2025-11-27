@@ -6,6 +6,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
   closeWindow: () => ipcRenderer.invoke("close-window"),
   hideWindow: (ms = 0) => ipcRenderer.invoke("hide-window", ms),
   showWindow: () => ipcRenderer.invoke("show-window"),
+  dragWindow: () => ipcRenderer.invoke("drag-window"),
+  stopDragging: () => ipcRenderer.send("stop-dragging"),
 
   // 设置窗口
   openSettingsWindow: () => ipcRenderer.invoke("open-settings-window"),

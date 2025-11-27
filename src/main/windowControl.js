@@ -10,6 +10,7 @@ let checkTimer = null;
 let startupTimer = null;
 let lastCursorInside = true;
 let autoShowPaused = false; // 是否暂停自动显示
+let dragInterval = null; // 拖动定时器
 
 const COUNTDOWN = 3500; // 倒计时
 
@@ -495,6 +496,52 @@ function getTheme() {
   return store.get("theme", "light");
 }
 
+// 拖动窗口
+function dragWindow() {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+  
+  // 先停止之前的拖动（如果存在）
+  if (dragInterval) {
+    clearInterval(dragInterval);
+    dragInterval = null;
+  }
+  
+  // 对于无边框窗口，需要手动实现拖动
+  const { screen } = require('electron');
+  const mousePos = screen.getCursorScreenPoint();
+  const windowBounds = mainWindow.getBounds();
+  
+  // 计算鼠标在窗口内的相对位置
+  const offsetX = mousePos.x - windowBounds.x;
+  const offsetY = mousePos.y - windowBounds.y;
+  
+  // 开始拖动循环
+  dragInterval = setInterval(() => {
+    if (!mainWindow || mainWindow.isDestroyed()) {
+      clearInterval(dragInterval);
+      dragInterval = null;
+      return;
+    }
+    
+    const currentMousePos = screen.getCursorScreenPoint();
+    
+    // 移动窗口到新的位置
+    mainWindow.setPosition(
+      currentMousePos.x - offsetX,
+      currentMousePos.y - offsetY
+    );
+  }, 16); // 约60fps
+}
+
+// 停止拖动窗口
+function stopDragging() {
+  if (dragInterval) {
+    clearInterval(dragInterval);
+    dragInterval = null;
+    console.log('拖动已停止');
+  }
+}
+
 module.exports = {
   quit,
   setMainWindow,
@@ -522,4 +569,6 @@ module.exports = {
   setTheme,
   getTheme,
   setAutoShow,
+  dragWindow,
+  stopDragging,
 };
