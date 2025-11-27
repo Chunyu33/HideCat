@@ -63,7 +63,7 @@ function openSettingsWindow() {
     ? `http://localhost:5173/?window=settings`
     : `file://${path.join(
         __dirname,
-        "../renderer/dist/index.html"
+        "../../dist/index.html"
       )}?window=settings`;
 
   settingsWin = new BrowserWindow({
@@ -441,7 +441,7 @@ function navigateView(action) {
       const isDev = process.env.NODE_ENV === "development" || !app.isPackaged;
       const homeUrl = isDev
         ? "http://localhost:5173/?window=home"
-        : `file://${path.join(__dirname, "../renderer/dist/index.html")}?window=home`;
+        : `file://${path.join(__dirname, "../../dist/index.html")}?window=home`;
       wc.loadURL(homeUrl);
       break;
   }

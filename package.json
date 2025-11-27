@@ -17,7 +17,7 @@
       "src/main/**/*",
       "src/preload/**/*",
       "src/assets/**/*",
-      "src/renderer/dist/**/*",
+      "dist/**/*",
       "node_modules/**/*",
       "package.json"
     ],
