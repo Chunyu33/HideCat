@@ -30,8 +30,12 @@ const HomePageOnly = ({ onUpdateTab, currentKey }) => {
     }
   }, [initialized, initShortcuts]);
 
-  // 合并默认和用户快捷方式
-  const allShortcuts = [...defaultShortcuts, ...shortcuts];
+  // 合并默认和用户快捷方式并按排序字段排序（数字越小越靠前）
+  const allShortcuts = [...defaultShortcuts, ...shortcuts].sort((a, b) => {
+    const sortA = a.sort || 0;
+    const sortB = b.sort || 0;
+    return sortA - sortB;
+  });
 
   // 搜索功能
   const handleSearch = (value) => {
