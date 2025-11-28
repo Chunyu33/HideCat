@@ -29,7 +29,9 @@ const createWindow = () => {
     hasShadow: false,
     resizable: true,
     transparent: false, // 开启透明
-    // 关键一行！！！开启拉伸热区
+    fullscreenable: false,        // 禁止系统级全屏（绿色按钮 / 双击标题栏）
+    simpleFullscreen: false,      // 禁止 macOS 独立空间全屏
+    titleBarStyle: "hiddenInset", // 隐藏标题栏不会影响此行为
     icon: getIconPath(),
     // 下面这几行才是控制阴影样式的关键（不同平台写法略有区别）
     webPreferences: {
