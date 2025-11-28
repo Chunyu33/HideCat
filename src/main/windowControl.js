@@ -305,9 +305,9 @@ function _getBorserSize() {
   const [width, height] = mainWindow.getContentSize();
   let sizeObj = {
     width,
-    height: height - 33,
+    height: height - 31,
     x: 0,
-    y: 33,
+    y: 31,
   };
   return sizeObj;
 }

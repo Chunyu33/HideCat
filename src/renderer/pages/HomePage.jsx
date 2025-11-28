@@ -114,7 +114,7 @@ const HomePage = ({ onNewTab, onUpdateTab, currentKey }) => {
       <Title
         level={1}
         style={{
-          color: "var(--ant-primary-color)",
+          color: "var(--text-color-title)",
           fontSize: "2.6rem",
           fontWeight: 300,
           marginBottom: 36,

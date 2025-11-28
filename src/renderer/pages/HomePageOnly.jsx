@@ -115,7 +115,7 @@ const HomePageOnly = ({ onUpdateTab, currentKey }) => {
       <Title
         level={1}
         style={{
-          color: "#6A7D8F",
+          color: "var(--text-color-title)",
           fontSize: "2.6rem",
           fontWeight: 300,
           marginBottom: 36,

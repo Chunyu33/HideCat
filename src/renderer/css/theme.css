@@ -5,6 +5,7 @@
   --background-secondary: #ffffff;    /* 卡片、容器背景 */
   --text-color: #000000;              /* 主文本 */
   --text-color-secondary: #555555;    /* 次级文本 */
+  --text-color-title: #43a047;
 
   /* 绿色主色调（亮背景下稍深一点） */
   --primary-color: #4caf50;
@@ -45,6 +46,7 @@
   --background-secondary: #1e1e1e;
   --text-color: #ffffff;
   --text-color-secondary: #a0a0a0;
+  --text-color-title: #f5f5f5;
 
   --primary-color: #5dd39e;
   --ant-primary-color: #81c784;
