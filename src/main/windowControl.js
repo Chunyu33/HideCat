@@ -364,7 +364,7 @@ async function addTab(key, url) {
     view.webContents.session.cookies
       .get({})
       .then((cookies) => {
-        console.log(`\nTab ${key} 当前有 ${cookies.length} --- Cookie`);
+        console.log(`\nTab ${key} current has ${cookies.length} --- Cookies`);
         console.log(`\nsessionName: ${sessionName}`);
       })
       .catch(() => {});

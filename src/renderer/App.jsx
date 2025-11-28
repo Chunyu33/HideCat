@@ -98,7 +98,7 @@ const App = () => {
           headerVisible={headerVisible}
           onRequestHide={() => setHeaderVisible(false)}
         />
-        <div className="content-container" style={bgStyles}>
+        <div className="content-container">
           <MainPage />
         </div>
       </>
@@ -120,7 +120,7 @@ const App = () => {
             },
           }}
         >
-          <div className="app-container">{getDom()}</div>
+          <div className="app-container"  style={bgStyles}>{getDom()}</div>
         </ConfigProvider>
       );
     }
