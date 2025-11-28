@@ -331,23 +331,22 @@ async function addTab(key, url) {
       persistent: true
     });
 
-    // 配置会话以支持 Cookie 持久化
-    // 持久化会话会自动启用 Cookie 存储，无需手动调用 enableCookies
-    // 测试 Cookie 存储是否正常工作
-    // session.cookies.set({
-    //   url: url,
-    //   name: `test_${key}`,
-    //   value: "test_value",
-    //   expirationDate: Math.floor(Date.now() / 1000) + 604800, // 7 天
-    // }).then(() => {
-    //   console.log(`\ntest Cookie success === for tab ${key}`);
-    // }).catch((err) => {
-    //   console.warn(`\ntest Cookie fail: ${err}`);
-    // });
 
-    // 强制开启所有存储
-    session.setPermissionCheckHandler(() => true);
-    session.setPermissionRequestHandler((wc, perm, cb) => cb(true));
+    // 安全的权限检查，拒绝危险权限
+    session.setPermissionCheckHandler((webContents, permission, requestingOrigin, details) => {
+      // 只允许基本的权限，拒绝危险权限
+      const safePermissions = [
+        'clipboard-read', 'clipboard-sanitized-write', 'notifications',
+        'pointerLock', 'fullscreen', 'openExternal'
+      ];
+      
+      if (safePermissions.includes(permission)) {
+        return true;
+      }
+      
+      console.warn(`权限请求被拒绝: ${permission} from ${requestingOrigin}`);
+      return false;
+    });
 
     view = new BrowserView({
       webPreferences: {

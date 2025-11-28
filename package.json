@@ -1,8 +1,8 @@
 {
-  "name": "fish-slacke",
+  "name": "slacke-fish",
   "productName": "SlackeFish",
   "version": "1.0.1",
-  "description": "上班族摸鱼神器。",
+  "description": "SlackeFish",
   "main": "src/main/main.js",
   "scripts": {
     "dev": "vite --config src/renderer/vite.config.js",
