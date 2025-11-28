@@ -57,7 +57,7 @@ function openSettingsWindow() {
   // 子窗口 preload 路径
   const preloadPath = path.join(__dirname, "../preload/preload.js");
 
-  console.log('\nprocess.resourcesPath===', process.resourcesPath)
+  console.log("\nprocess.resourcesPath===", process.resourcesPath);
   // 子窗口 URL
   const url = isDev
     ? `http://localhost:5173/?window=settings`
@@ -282,12 +282,12 @@ function generateStableKey(url, originalKey) {
   if (url === "about:blank" || url.includes("?window=home")) {
     return originalKey;
   }
-  
+
   try {
     // 提取域名作为稳定的key基础
     const urlObj = new URL(url);
-    const domain = urlObj.hostname.replace(/^www\./, ''); // 移除www前缀
-    
+    const domain = urlObj.hostname.replace(/^www\./, ""); // 移除www前缀
+
     // 生成基于域名的稳定key
     const stableKey = `tab-${domain}`;
     console.log(`URL: ${url} -> 稳定key: ${stableKey}`);
@@ -305,9 +305,9 @@ function _getBorserSize() {
   const [width, height] = mainWindow.getContentSize();
   let sizeObj = {
     width,
-    height: height - 31,
+    height: height - 32,
     x: 0,
-    y: 31,
+    y: 32,
   };
   return sizeObj;
 }
@@ -320,7 +320,7 @@ async function addTab(key, url) {
 
   // 基于URL生成稳定的key，确保同一网站的标签页共享会话
   const stableKey = generateStableKey(url, key);
-  
+
   let view = browserViews.get(stableKey);
   const preloadPath = path.join(__dirname, "../preload/preload.js");
   if (!view) {
@@ -328,24 +328,7 @@ async function addTab(key, url) {
     const sessionName = `persist:tab-${stableKey}`;
     const session = require("electron").session.fromPartition(sessionName, {
       cache: true,
-      persistent: true
-    });
-
-
-    // 安全的权限检查，拒绝危险权限
-    session.setPermissionCheckHandler((webContents, permission, requestingOrigin, details) => {
-      // 只允许基本的权限，拒绝危险权限
-      const safePermissions = [
-        'clipboard-read', 'clipboard-sanitized-write', 'notifications',
-        'pointerLock', 'fullscreen', 'openExternal'
-      ];
-      
-      if (safePermissions.includes(permission)) {
-        return true;
-      }
-      
-      console.warn(`权限请求被拒绝: ${permission} from ${requestingOrigin}`);
-      return false;
+      persistent: true,
     });
 
     view = new BrowserView({
@@ -402,6 +385,19 @@ async function addTab(key, url) {
       console.log(`\n setZoomFactor for scale=${scale}`);
       console.log(`✅ Tab ${key} finished loading: ${url}`);
     });
+
+    view.webContents.on("did-navigate", (event, url) => {
+      console.log("\njump new URL:", url);
+      updateAllTheme();
+    });
+
+    view.webContents.on(
+      "did-navigate-in-page",
+      (event, url, isMainFrame, frameProcessId, frameRoutingId) => {
+        console.log("\n inner router:", url);
+        updateAllTheme();
+      }
+    );
   }
 
   try {
@@ -536,6 +532,43 @@ function removeShortcut(sid) {
   return updated;
 }
 // =====================================================
+// 用来存储每个 BrowserView 的暗色样式 key
+const browserViewCssKeys = new Map();
+
+function updateBrowserViewsTheme(isDark) {
+  const css1 = `html::before {
+        content: '';
+        pointer-events: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.35);
+        mix-blend-mode: multiply;
+        z-index: 999999999;
+      }`;
+
+  browserViews.forEach((view) => {
+    if (isDark) {
+      // 注入 CSS 并记录 key
+      view.webContents.insertCSS(css1).then((key) => {
+        browserViewCssKeys.set(view, key);
+      });
+    } else {
+      // 移除之前注入的 CSS
+      const key = browserViewCssKeys.get(view);
+      console.log('\n del css key', key)
+      if (key) {
+        view.webContents.removeInsertedCSS(key);
+        browserViewCssKeys.delete(view);
+        console.log('\n del ing.. css key', key);
+      }
+    }
+  });
+}
+
+function updateAllTheme() {
+  const theme = getTheme();
+  updateBrowserViewsTheme(theme === "dark");
+}
 
 // 设置主题
 function setTheme(theme) {
@@ -544,6 +577,7 @@ function setTheme(theme) {
   if (!mainWindow) return;
   mainWindow.setBackgroundColor(theme === "dark" ? "#1E1E1E" : "#FFFFFF");
   mainWindow.webContents.send("theme-changed", theme);
+  updateAllTheme();
 }
 // 获取当前主题
 function getTheme() {
