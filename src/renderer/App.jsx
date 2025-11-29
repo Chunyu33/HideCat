@@ -7,13 +7,8 @@ import HomePageOnly from "./pages/HomePageOnly";
 import { handleUpdateTab } from "./services/browserViewService";
 import useTheme from "./hooks/useTheme"; // 引入自定义 Hook
 
-import bgImage from "../assets/bg1.png"; // 背景图
-
-const bgStyles = {
-  backgroundImage: `url(${bgImage})`,
-  backgroundSize: "cover",
-  backgroundPosition: "center",
-};
+import bgLightImage from "../assets/bg-light.png"; // 背景图
+import bgDarkImage from "../assets/bg-dark.png"; // 背景图
 
 // 判断当前窗口类型
 const query = new URLSearchParams(window.location.search);
@@ -41,6 +36,27 @@ const App = () => {
 
   // 🎨 从 Hook 获取主题状态和更新逻辑
   const { theme } = useTheme();
+
+  const bgImg = useMemo(() => {
+    if (theme === "auto") {
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
+        .matches
+        ? "dark"
+        : "light";
+      return systemTheme === "dark"
+        ? bgDarkImage
+        : bgLightImage;
+    }
+    return theme === "dark"
+      ? bgDarkImage
+      : bgLightImage;
+  }, [theme]);
+
+  const bgStyles = {
+    backgroundImage: `url(${bgImg})`,
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+  };
 
   // 初始化设置
   const initSettings = async () => {
@@ -120,7 +136,9 @@ const App = () => {
             },
           }}
         >
-          <div className="app-container"  style={bgStyles}>{getDom()}</div>
+          <div className="app-container" style={bgStyles}>
+            {getDom()}
+          </div>
         </ConfigProvider>
       );
     }
