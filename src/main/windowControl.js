@@ -14,9 +14,7 @@ let dragInterval = null; // 拖动定时器
 
 const COUNTDOWN = 3500; // 倒计时
 
-// -----------------------------
 // 设置主窗口引用
-// -----------------------------
 function setMainWindow(win) {
   mainWindow = win;
 }
@@ -41,9 +39,7 @@ function minimizeWindow() {
   mainWindow.minimize();
 }
 
-// -----------------------------
-// 设置窗口逻辑
-// -----------------------------
+// =================== 功能设置窗口逻辑 ===================
 function openSettingsWindow() {
   if (!mainWindow) return false;
 
@@ -83,9 +79,6 @@ function openSettingsWindow() {
   });
 
   settingsWin.loadURL(url);
-  // if (isDev) {
-  //   settingsWin.webContents.openDevTools();
-  // }
 
   settingsWin.once("ready-to-show", () => settingsWin.show());
 
@@ -103,9 +96,7 @@ function closeSettingsWindow() {
   }
 }
 
-// -----------------------------
-// 自动隐藏逻辑
-// -----------------------------
+// ============== 窗口控制基本功能 ==============
 function setAutoHide(enabled, count) {
   // console.log('\n config----', enabled, '===count===', count);
 
@@ -197,7 +188,7 @@ function setScale(scale) {
 }
 
 // -----------------------------
-// ✅ 最核心逻辑部分：鼠标检测自动隐藏
+// ============== 最核心逻辑部分：鼠标检测自动隐藏 ==============
 // -----------------------------
 function startMouseWatcher() {
   clearInterval(checkTimer);
@@ -268,9 +259,7 @@ function initAutoHideWatcher(customCountDown = undefined) {
   }, customCountDown ?? COUNTDOWN);
 }
 
-// -----------------------------
-// BrowserView 标签管理逻辑
-// -----------------------------
+// ======================== BrowserView 标签管理逻辑 ========================
 const browserViews = new Map();
 let activeTabKey = null;
 
@@ -299,15 +288,16 @@ function generateStableKey(url, originalKey) {
   }
 }
 
+// 获取浏览器窗口大小
 function _getBorserSize() {
   // if(!mainWindow) return;
   // let [x, y] = mainWindow.getPosition();
   const [width, height] = mainWindow.getContentSize();
   let sizeObj = {
     width,
-    height: height - 32,
+    height: height - 32.4,
     x: 0,
-    y: 32,
+    y: 32.4,
   };
   return sizeObj;
 }
@@ -337,20 +327,11 @@ async function addTab(key, url) {
         nodeIntegration: false,
         contextIsolation: true,
         sandbox: false,
-        session: session, // 关键！用自定义 session
+        session: session, // 用自定义 session
         webSecurity: false, // 允许跨域请求
         allowRunningInsecureContent: true, // 允许不安全内容
       },
     });
-
-    // 调试：看看 Cookie 到底存没存
-    view.webContents.session.cookies
-      .get({})
-      .then((cookies) => {
-        console.log(`\nTab ${key} current has ${cookies.length} --- Cookies`);
-        console.log(`\nsessionName: ${sessionName}`);
-      })
-      .catch(() => {});
 
     browserViews.set(key, view);
 
@@ -470,7 +451,7 @@ async function removeTab(key) {
   view.webContents.destroy();
 }
 
-// 导航
+// ================= 网页导航 ========================
 function navigateView(action) {
   const view = browserViews.get(activeTabKey);
   if (!view) return;
@@ -497,8 +478,7 @@ function navigateView(action) {
   }
 }
 
-// =====================================================
-// 快捷入口逻辑
+// =================== 快捷入口逻辑====================
 function getShortcuts() {
   return store.get("shortcuts", []);
 }
@@ -531,25 +511,64 @@ function removeShortcut(sid) {
   console.log(`✅ Shortcut removed`);
   return updated;
 }
-// =====================================================
+
+// ===========================主题设置逻辑==========================
 // 用来存储每个 BrowserView 的暗色样式 key
 const browserViewCssKeys = new Map();
-
+ 
 function updateBrowserViewsTheme(isDark) {
-  const css1 = `html::before {
+  const css = `html::before {
         content: '';
         pointer-events: none;
         position: fixed;
         inset: 0;
         background: rgba(0,0,0,0.35);
         mix-blend-mode: multiply;
-        z-index: 999999999;
-      }`;
+        z-index: 99999;
+      }
+    `;
+
+  const scrollCss = `
+    /* === 精细化滚动条（Chromium） === */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #4caf50 !important;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #66bb6a !important;
+    }
+
+    /* === Firefox 风格滚动条提示（非强制、兼容） === */
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: #4caf50 !important;
+    }
+
+    /* === 对一些自定义滚动区强化（避免被高优先级样式覆盖） === */
+    ::-webkit-scrollbar-thumb:window-inactive {
+      background: #66bb6a !important;
+    }
+    /* 去掉顶部和底部的三角按钮 */
+    ::-webkit-scrollbar-button {
+      display: none;
+      width: 0;
+      height: 0;
+    }
+
+  `
 
   browserViews.forEach((view) => {
+    view.webContents.insertCSS(scrollCss);
     if (isDark) {
       // 注入 CSS 并记录 key
-      view.webContents.insertCSS(css1).then((key) => {
+      view.webContents.insertCSS(css).then((key) => {
         browserViewCssKeys.set(view, key);
       });
     } else {
@@ -584,7 +603,7 @@ function getTheme() {
   return store.get("theme", "light");
 }
 
-// 拖动窗口
+// ========================== 拖动窗口 ==========================
 function dragWindow() {
   if (!mainWindow || mainWindow.isDestroyed()) return;
 
@@ -626,7 +645,6 @@ function stopDragging() {
   if (dragInterval) {
     clearInterval(dragInterval);
     dragInterval = null;
-    console.log("拖动已停止");
   }
 }
 

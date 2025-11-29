@@ -2,12 +2,13 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 35px;
-  background: linear-gradient(to right, var(--background-secondary), var(--background-secondary));
+  height: 33px;
+  background: linear-gradient(to right, var(--background-secondary), var(--background-color));
   padding: 0 10px;
   -webkit-app-region: drag;
   user-select: none;
-  border-bottom: 1px solid var(--divider-color); /* 使用 divider-color 变量 */
+  border-bottom: 1px solid var(--border-color); /* 使用 divider-color 变量 */
+  box-shadow: 0 2px 6px var(--shadow-color); /* 底部阴影 */
 }
 
 .header-title {

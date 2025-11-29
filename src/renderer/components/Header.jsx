@@ -84,7 +84,6 @@ const Header = ({ onOpenSettings, headerVisible, onRequestHide }) => {
         top: 0,
         left: 0,
         right: 0,
-        height: "35px",
         zIndex: 9999,
         transform: headerVisible ? "translateY(0)" : "translateY(-100%)",
         transition: "transform 0.3s ease",
