@@ -33,7 +33,6 @@ const Header = ({ onOpenSettings, headerVisible, onRequestHide }) => {
   // 处理置顶窗口
   const handlePinToggle = async () => {
     const newPinnedState = await window.electronAPI?.togglePinWindow();
-    console.warn("置顶---", newPinnedState);
     if (newPinnedState !== undefined) {
       setIsPinned(newPinnedState);
     }
