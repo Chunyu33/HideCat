@@ -648,6 +648,18 @@ function stopDragging() {
   }
 }
 
+// ========================== 置顶窗口 ==========================
+function pinWindow() {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+  
+  const isAlwaysOnTop = mainWindow.isAlwaysOnTop();
+  mainWindow.setAlwaysOnTop(!isAlwaysOnTop);
+  
+  // 发送置顶状态变化事件到渲染进程
+  mainWindow.webContents.send("pin-state-changed", !isAlwaysOnTop);
+  return !isAlwaysOnTop;
+}
+
 module.exports = {
   quit,
   setMainWindow,
@@ -677,4 +689,5 @@ module.exports = {
   setAutoShow,
   dragWindow,
   stopDragging,
+  pinWindow,
 };

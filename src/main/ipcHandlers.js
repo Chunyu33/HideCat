@@ -24,6 +24,7 @@ const {
   getTheme,
   dragWindow,
   stopDragging,
+  pinWindow
 } = require("./windowControl");
 const { randomUUID } = require("crypto");
 
@@ -46,6 +47,7 @@ function registerIPC(ipcMain, mainWindow) {
   ipcMain.handle("hide-window", (_, ms) => hideWindow(ms));
   ipcMain.handle("hide-immediately", () => hideImmediately());
   ipcMain.handle("drag-window", () => dragWindow());
+  ipcMain.handle("pinned-window", () => pinWindow());
   
   // 停止拖动（通过 IPC 消息）
   ipcMain.on("stop-dragging", () => {

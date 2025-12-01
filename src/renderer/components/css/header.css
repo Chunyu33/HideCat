@@ -10,6 +10,16 @@
   border-bottom: 1px solid var(--border-color); /* 使用 divider-color 变量 */
   box-shadow: 0 2px 6px var(--shadow-color); /* 底部阴影 */
 }
+.pinned-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+.pinned{
+  color: var(--primary-color);
+  font-weight: bold;
+}
 
 .header-title {
   font-size: 13px;

@@ -8,9 +8,10 @@ import {
   IconSetting,
   IconMinimize,
   IconClose,
+  IconPin,
 } from "./Icon";
 import useTheme from "../hooks/useTheme";
-import AppIcon from "../../assets/app.png";
+// import AppIcon from "../../assets/app.png";
 
 const IconButton = ({ title, onClick, children }) => (
   <button className="header-btn" onClick={onClick} title={title}>
@@ -21,30 +22,39 @@ const IconButton = ({ title, onClick, children }) => (
 const Header = ({ onOpenSettings, headerVisible, onRequestHide }) => {
   const { theme } = useTheme();
   const [hideTimeout, setHideTimeout] = useState(null);
+  const [isPinned, setIsPinned] = useState(false);
 
   const navigate = (action) => {
     window.electronAPI?.navigateView?.(action);
   };
   const handleMinimize = () => window.electronAPI?.minimizeWindow();
   const handleClose = () => window.electronAPI?.closeWindow();
-  
+
+  // 处理置顶窗口
+  const handlePinToggle = async () => {
+    const newPinnedState = await window.electronAPI?.togglePinWindow();
+    console.warn("置顶---", newPinnedState);
+    if (newPinnedState !== undefined) {
+      setIsPinned(newPinnedState);
+    }
+  };
+
   // 处理拖动窗口
   const handleDragStart = (e) => {
     // 阻止事件冒泡，避免影响按钮点击
     e.stopPropagation();
     window.electronAPI?.dragWindow?.();
-    
+
     // 添加鼠标释放事件监听器
     const handleMouseUp = () => {
       window.electronAPI?.stopDragging?.();
-      document.removeEventListener('mouseup', handleMouseUp);
-      window.removeEventListener('blur', handleMouseUp);
+      document.removeEventListener("mouseup", handleMouseUp);
+      window.removeEventListener("blur", handleMouseUp);
     };
-    
-    document.addEventListener('mouseup', handleMouseUp);
-    window.addEventListener('blur', handleMouseUp);
+
+    document.addEventListener("mouseup", handleMouseUp);
+    window.addEventListener("blur", handleMouseUp);
   };
-  
 
   const handleMouseLeave = () => {
     if (hideTimeout) clearTimeout(hideTimeout);
@@ -97,9 +107,17 @@ const Header = ({ onOpenSettings, headerVisible, onRequestHide }) => {
       >
         {/* 左侧 Logo + 导航 */}
         <div className="header-left">
-          <div className="header-title">
+          {/* <div className="header-title">
             <img src={AppIcon} alt="" style={iconStyle} />
             SlackeFish
+          </div> */}
+          {/* 生成一个置顶的图标 */}
+          <div
+            className="pinned-box"
+            title={isPinned ? "取消置顶" : "置顶窗口"}
+            onClick={handlePinToggle}
+          >
+            <IconPin className={isPinned ? "pinned" : ""} />
           </div>
         </div>
 
