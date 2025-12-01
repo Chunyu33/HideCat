@@ -13,8 +13,14 @@
 .pinned-box {
   display: flex;
   align-items: center;
-  gap: 6px;
+  padding: 2px;
   cursor: pointer;
+  transition: transform 0.15s cubic-bezier(0.3, 0.7, 0.4, 1.4);
+}
+.pinned-box:hover{
+  background: var(--hover-bg-color); /* 可以使用自定义的 hover 背景色 */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  transform: scale(110%); 
 }
 .pinned{
   color: var(--primary-color);
@@ -39,7 +45,7 @@
 .header-btn {
   background: none;
   border: none;
-  color: var(--text-color); /* 使用 text-color 变量 */
+  color: var(--text-color);
   cursor: pointer;
   padding: 4px 6px;
   border-radius: 6px;
@@ -52,8 +58,8 @@
     box-shadow 0.2s ease;
 }
 
-.header-btn:hover {
-  background: var(--hover-bg-color); /* 可以使用自定义的 hover 背景色 */
+.header-btn:hover{
+  background: var(--hover-bg-color);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
   transform: translateY(-1px); 
 }
@@ -64,7 +70,7 @@
 }
 
 .header-btn:active {
-  background: var(--active-bg-color); /* 可以使用自定义的 active 背景色 */
+  background: var(--active-bg-color);
   transform: scale(0.9);
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.25);
 }
