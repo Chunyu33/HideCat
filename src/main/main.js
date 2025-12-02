@@ -31,8 +31,12 @@ const createWindow = () => {
     transparent: false, // 开启透明
     fullscreenable: false,        // 禁止系统级全屏（绿色按钮 / 双击标题栏）
     simpleFullscreen: false,      // 禁止 macOS 独立空间全屏
-    titleBarStyle: "hiddenInset", // 隐藏标题栏不会影响此行为
+    maximizable: false, // 禁止最大化
+    titleBarStyle: "hidden", // 隐藏标题栏不会影响此行为
+    customButtonsOnHover: true, // macOS红绿灯按钮悬浮时才显示
+    hiddenInset: true,
     icon: getIconPath(),
+    title: "SlackeFish",
     // 下面这几行才是控制阴影样式的关键（不同平台写法略有区别）
     webPreferences: {
       preload: path.join(__dirname, "../preload/preload.js"),
@@ -61,9 +65,7 @@ const createWindow = () => {
 
 // 跨平台获取图标路径
 const getIconPath = () => {
-  return process.platform === "darwin"
-    ? path.join(__dirname, "../assets/app.png")
-    : path.join(__dirname, "../assets/app.ico");
+  return path.join(__dirname, "../assets/app.png");
 };
 
 // 托盘

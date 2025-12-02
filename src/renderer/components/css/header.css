@@ -65,10 +65,10 @@
   transform: translateY(-1px); 
 }
 
-.header-btn:last-child:hover {
+/* .header-btn:last-child:hover {
   background-color: #e84118;
   color: #f2f2f2;
-}
+} */
 
 .header-btn:active {
   background: var(--active-bg-color);
