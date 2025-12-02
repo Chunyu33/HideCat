@@ -16,7 +16,7 @@ if (require("electron-squirrel-startup")) app.quit();
 let mainWindow;
 let tray;
 // 更可靠的开发环境检测
-let isDev = process.env.NODE_ENV === "development" || !app.isPackaged;
+let isDev = process.env.NODE_ENV === "development" && !app.isPackaged;
 
 const createWindow = () => {
 
@@ -35,7 +35,7 @@ const createWindow = () => {
     titleBarStyle: "hidden", // 隐藏标题栏不会影响此行为
     customButtonsOnHover: true, // macOS红绿灯按钮悬浮时才显示
     hiddenInset: true,
-    icon: getIconPath(),
+    icon: getAppIconPath(),
     title: "SlackeFish",
     // 下面这几行才是控制阴影样式的关键（不同平台写法略有区别）
     webPreferences: {
@@ -63,9 +63,14 @@ const createWindow = () => {
   autoUpdate.checkUpdate(mainWindow);
 };
 
-// 跨平台获取图标路径
+// 获取托盘图标路径
 const getIconPath = () => {
   return path.join(__dirname, "../assets/app.png");
+};
+
+// 获取应用图标路径（用于窗口图标）
+const getAppIconPath = () => {
+  return path.join(__dirname, "../assets/app.icns");
 };
 
 // 托盘
@@ -100,6 +105,15 @@ const createTray = () => {
 };
 
 app.whenReady().then(() => {
+  // 设置开发环境的 Dock 图标
+  if (isDev) {
+    const dockIconPath = path.join(__dirname, "../assets/app.png");
+    if (require("fs").existsSync(dockIconPath)) {
+      app.dock.setIcon(dockIconPath);
+      console.log("Dock icon set to:", dockIconPath);
+    }
+  }
+
   createWindow();
   createTray();
 
@@ -118,7 +132,9 @@ app.on("will-quit", () => {
 });
 
 app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") app.quit();
+  // macOS 应用通常在所有窗口关闭后保持运行
+  // 用户可以通过 Dock 图标重新激活应用
+  // app.quit();
 });
 
 // 全局 unhandledRejection

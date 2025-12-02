@@ -46,7 +46,7 @@ function openSettingsWindow() {
   const [parentWidth, parentHeight] = mainWindow.getSize();
 
   const width = Math.floor(parentWidth * 0.6);
-  const height = Math.floor(parentHeight * 0.4);
+  const height = Math.floor(parentHeight * 0.45);
 
   const isDev = process.env.NODE_ENV === "development" || !app.isPackaged;
 
