@@ -1,7 +1,7 @@
 {
   "name": "slacke-fish",
   "productName": "SlackeFish",
-  "version": "1.0.2",
+  "version": "1.2.0",
   "description": "SlackeFish",
   "main": "src/main/main.js",
   "scripts": {
