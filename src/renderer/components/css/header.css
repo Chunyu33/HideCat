@@ -13,7 +13,8 @@
 .pinned-box {
   display: flex;
   align-items: center;
-  padding: 2px;
+  padding: 2px 4px;
+  border-radius: 6px;
   cursor: pointer;
   transition: transform 0.15s cubic-bezier(0.3, 0.7, 0.4, 1.4);
 }

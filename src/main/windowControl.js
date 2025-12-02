@@ -367,18 +367,18 @@ async function addTab(key, url) {
       console.log(`✅ Tab ${key} finished loading: ${url}`);
     });
 
-    view.webContents.on("did-navigate", (event, url) => {
-      console.log("\njump new URL:", url);
-      updateAllTheme();
-    });
+    // view.webContents.on("did-navigate", (event, url) => {
+    //   console.log("\njump new URL:", url);
+    //   updateAllTheme();
+    // });
 
-    view.webContents.on(
-      "did-navigate-in-page",
-      (event, url, isMainFrame, frameProcessId, frameRoutingId) => {
-        console.log("\n inner router:", url);
-        updateAllTheme();
-      }
-    );
+    // view.webContents.on(
+    //   "did-navigate-in-page",
+    //   (event, url, isMainFrame, frameProcessId, frameRoutingId) => {
+    //     console.log("\n inner router:", url);
+    //     updateAllTheme();
+    //   }
+    // );
   }
 
   try {
@@ -596,7 +596,7 @@ function setTheme(theme) {
   if (!mainWindow) return;
   mainWindow.setBackgroundColor(theme === "dark" ? "#1E1E1E" : "#FFFFFF");
   mainWindow.webContents.send("theme-changed", theme);
-  updateAllTheme();
+  // updateAllTheme();
 }
 // 获取当前主题
 function getTheme() {
