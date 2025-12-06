@@ -15,3 +15,9 @@
   color: #747d8c;
 }
 
+/* 禁用tabs更多按钮 */
+.no-more-tabs .ant-tabs-nav-more {
+  display: none !important;
+  pointer-events: none !important;
+}
+  

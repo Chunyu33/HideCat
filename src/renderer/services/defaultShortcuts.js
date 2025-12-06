@@ -1,7 +1,7 @@
 export default [
   {
     id: "id-slack-001",
-    name: "关于作者",
+    name: "作者简介",
     url: "https://www.evanspace.icu",
     system: true,
     sort: 0

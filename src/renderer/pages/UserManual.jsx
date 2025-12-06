@@ -23,28 +23,23 @@ const userManualData = [
     img: ""
   },
   { 
-    q: "遇到其他问题怎么办？", 
-    a: "如果遇到其他问题，可以通过加入QQ群：735521320 ，或者发送邮件到 1378813463@qq.com 联系技术支持。",
+    q: "标签栏过多时怎么切换？", 
+    a: "可以把鼠标移动到标签栏位置，然后滚动滚轮进行切换。",
     img: ""
   },
   { 
     q: "软件支持哪些操作系统？", 
-    a: "该软件支持 Windows、macOS（正在开发中）操作系统。",
-    img: ""
-  },
-  { 
-    q: "为什么使用这些常用平台，每次都要登录？", 
-    a: "目前软件的策略是关闭Tab会清除相关的Cookie等缓存信息，并且Tab之间不共享会话数据。",
-    img: ""
-  },
-  { 
-    q: "如何退出应用？", 
-    a: "您可以点击右上角的关闭按钮，或者使用快捷键 `Ctrl+Q` 退出应用，或者在折叠菜单栏用右键-退出。",
+    a: "该软件支持 Windows、macOS操作系统。",
     img: ""
   },
   { 
     q: "如何反馈建议或报告问题？", 
     a: "你可以加入QQ群：735521320 直接@群主提出问题或建议。必要的话后续会增加其他反馈渠道。",
+    img: ""
+  },
+  { 
+    q: "遇到其他问题怎么办？", 
+    a: "如果遇到其他问题，可以通过添加作者微信 B_HH6050 联系技术支持。",
     img: ""
   },
   // { 
@@ -64,7 +59,7 @@ const UserManual = ({ visible, onClose }) => {
     <Modal
       title="用户手册"
       open={visible}
-      onCancel={onClose}  // 关闭模态框时触发 onClose 回调
+      onCancel={onClose}
       footer={null}
       width={800}
       style={{ top: 30 }}
@@ -81,7 +76,7 @@ const UserManual = ({ visible, onClose }) => {
               boxShadow: 'var(--shadow-color)',
             }}
           >
-            <h3 style={{ color: 'var(--primary-color)' }}>Q: {item.q}</h3>
+            <h3 style={{ color: 'var(--primary-color)' }}>Q{index + 1}: {item.q}</h3>
             <p style={{ color: 'var(--text-color-secondary)' }}>A: {item.a}</p>
             {/* 条件渲染图片 */}
             {item.img && (
