@@ -47,6 +47,7 @@ function openSettingsWindow() {
 
   const width = Math.floor(parentWidth * 0.6);
   const height = Math.floor(parentHeight * 0.4);
+  // const height = Math.floor(parentHeight * 0.8);
 
   const isDev = process.env.NODE_ENV === "development" || !app.isPackaged;
 
@@ -64,7 +65,7 @@ function openSettingsWindow() {
     height,
     minWidth: 340,
     minHeight: 240,
-    resizable: false,
+    resizable: true,
     frame: false,
     hasShadow: false,
     parent: mainWindow,
@@ -79,7 +80,7 @@ function openSettingsWindow() {
   });
 
   settingsWin.loadURL(url);
-
+  // settingsWin.webContents.openDevTools();
   settingsWin.once("ready-to-show", () => settingsWin.show());
 
   settingsWin.on("closed", () => {
@@ -650,6 +651,30 @@ function stopDragging() {
 
 // ========================== 置顶窗口 ==========================
 function pinWindow() {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+  
+  const isAlwaysOnTop = mainWindow.isAlwaysOnTop();
+  mainWindow.setAlwaysOnTop(!isAlwaysOnTop);
+  
+  // 发送置顶状态变化事件到渲染进程
+  mainWindow.webContents.send("pin-state-changed", !isAlwaysOnTop);
+  return !isAlwaysOnTop;
+}
+
+// ========================== 切换置顶窗口 ==========================
+function togglePinWindow() {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+  
+  const isAlwaysOnTop = mainWindow.isAlwaysOnTop();
+  mainWindow.setAlwaysOnTop(!isAlwaysOnTop);
+  
+  // 发送置顶状态变化事件到渲染进程
+  mainWindow.webContents.send("pin-state-changed", !isAlwaysOnTop);
+  return !isAlwaysOnTop;
+}
+
+// ========================== 切换置顶窗口 ==========================
+function togglePinWindow() {
   if (!mainWindow || mainWindow.isDestroyed()) return;
   
   const isAlwaysOnTop = mainWindow.isAlwaysOnTop();

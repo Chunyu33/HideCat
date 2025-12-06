@@ -50,12 +50,12 @@ body[data-theme="light"] {
 
 /* 根据主题切换遮罩层 */
 [data-theme='dark'] .app-container::before {
-  background-color: rgba(0, 0, 0, 0.7); /* 暗色模式下更深的遮罩层 */
+  background-color: rgba(0, 0, 0, 0.7); /* 深色模式下更深的遮罩层 */
   opacity: 0.5; /* 深色主题时提高透明度 */
 }
 
 [data-theme='light'] .app-container::before {
-  background-color: rgba(255, 255, 255, 0.1); /* 亮色模式下更浅的遮罩层 */
+  background-color: rgba(255, 255, 255, 0.1); /* 浅色模式下更浅的遮罩层 */
   opacity: 0.1; /* 亮色主题时减少透明度 */
 }
 

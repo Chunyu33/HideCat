@@ -9,11 +9,12 @@ import {
 } from "antd";
 import QuestionMark from "./QuestionMark";
 import "./css/setting.css";
+import UpdateChecker from "./UpdateChecker";
 
 // 主题选项
 const themeOptions = [
-  { label: "亮色模式", value: "light" },
-  { label: "暗色模式", value: "dark" },
+  { label: "浅色模式", value: "light" },
+  { label: "深色模式", value: "dark" },
   // { label: "跟随系统", value: "auto" },
 ];
 
@@ -220,6 +221,24 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
             />
           </div>
         </div>
+
+        {/* 应用更新检查 */}
+        {/* <div className="setting-item">
+          <span className="setting-label row-center">
+            应用更新
+            <Tooltip
+              title="检查并安装最新版本的应用"
+              placement="bottomRight"
+              color="#4caf50"
+              styles={{ body: { color: "#fff" } }}
+            >
+              <QuestionMark size="13" />
+            </Tooltip>
+          </span>
+          <div className="range-input" style={{ padding: '10px 0' }}>
+            <UpdateChecker />
+          </div>
+        </div> */}
       </div>
     </ConfigProvider>
   );

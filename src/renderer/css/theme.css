@@ -36,8 +36,8 @@
   --warning-color: #ff9800;
   --info-color: #2196f3;
 
-  --hover-bg-color: #ffffff;         /* 亮色模式下的 hover 背景色 */
-  --active-bg-color: #e6e6e6;        /* 亮色模式下的 active 背景色 */
+  --hover-bg-color: #ffffff;         /* 浅色模式下的 hover 背景色 */
+  --active-bg-color: #e6e6e6;        /* 浅色模式下的 active 背景色 */
 }
 
 /* 暗色主题 */
