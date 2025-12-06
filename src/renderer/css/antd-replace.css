@@ -31,3 +31,8 @@
 :where(.css-dev-only-do-not-override-1hp2dlu).ant-tabs {
   line-height: 0 !important;
 }
+
+/* tab栏 更多按钮 */
+.ant-tabs-nav-more {
+  padding: 0 4px !important;
+}

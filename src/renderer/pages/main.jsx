@@ -5,6 +5,7 @@ import HomePage from "./HomePage";
 import useTabEvents from "../hooks/useTabEvents"; // 保持使用
 import WebViewSkeleton from "../components/WebViewSkeleton"; // 骨架屏组件
 import "./css/main.css";
+import "./css/tabs.css";
 
 // Tab 常量
 const HOME_TAB_KEY = "tab-home";
@@ -250,10 +251,9 @@ const MainPage = () => {
         onEdit={onEdit}
         items={mappedItems}
         tabBarExtraContent={operations}
-        style={{ flexGrow: 1, height: "100%" }}
         tabBarStyle={{ marginBottom: 0 }}
         size="small"
-        className="full-height-tabs"
+        className="custom-theme-tabs no-more-tabs"
       />
     </div>
   );

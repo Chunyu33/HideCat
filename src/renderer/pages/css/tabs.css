@@ -1,0 +1,200 @@
+/* Tabs 样式 */
+.custom-theme-tabs .ant-tabs-nav {
+  background: var(--background-secondary);
+  border-bottom: 1px solid var(--border-color);
+  transition: all 0.3s ease;
+}
+
+.custom-theme-tabs .ant-tabs-tab {
+  border: none;
+  border-radius: 8px 8px 0 0;
+  background: transparent;
+  color: var(--text-color-secondary);
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+/* Tab 底部装饰线 */
+.custom-theme-tabs .ant-tabs-tab::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 20%;
+  right: 20%;
+  height: 2px;
+  background: var(--primary-color);
+  border-radius: 2px;
+  opacity: 0;
+  transform: scaleX(0);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.custom-theme-tabs .ant-tabs-tab:hover {
+  background: var(--hover-bg-color);
+  color: var(--text-color);
+}
+
+.custom-theme-tabs .ant-tabs-tab:hover::after {
+  opacity: 0.3;
+  transform: scaleX(1);
+  left: 10%;
+  right: 10%;
+}
+
+.custom-theme-tabs .ant-tabs-tab-active {
+  background: var(--background-color);
+  color: var(--primary-color);
+  box-shadow: 0 -2px 8px var(--shadow-color),
+              0 0 0 1px var(--border-color);
+}
+
+.custom-theme-tabs .ant-tabs-tab-active::after {
+  opacity: 1;
+  transform: scaleX(1);
+  left: 8px;
+  right: 8px;
+}
+
+.custom-theme-tabs .ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+/* 下划线指示器 */
+.custom-theme-tabs .ant-tabs-ink-bar {
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    var(--primary-color),
+    var(--ant-primary-color-hover)
+  );
+  border-radius: 3px 3px 0 0;
+  box-shadow: 0 -2px 8px var(--ant-primary-color-outline);
+}
+
+/* 关闭按钮 */
+.custom-theme-tabs .ant-tabs-tab-remove {
+  margin-left: 8px;
+  padding: 2px;
+  border-radius: 4px;
+  color: var(--text-color-secondary);
+  transition: all 0.2s;
+  opacity: 0;
+}
+
+.custom-theme-tabs .ant-tabs-tab:hover .ant-tabs-tab-remove {
+  opacity: 1;
+}
+
+.custom-theme-tabs .ant-tabs-tab-remove:hover {
+  background: var(--error-color);
+  color: #ffffff;
+  transform: scale(1.1);
+}
+
+/* 新增按钮 */
+.custom-theme-tabs .ant-tabs-nav-add {
+  margin: 0 8px;
+  padding: 6px 14px;
+  border: 1px dashed var(--border-color);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-color-secondary);
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.custom-theme-tabs .ant-tabs-nav-add:hover {
+  border-color: var(--primary-color);
+  border-style: solid;
+  background: var(--ant-primary-color-outline);
+  color: var(--primary-color);
+  transform: translateY(-1px);
+}
+
+.custom-theme-tabs .ant-tabs-nav-add:active {
+  transform: translateY(0);
+}
+
+/* 滚动按钮 */
+.custom-theme-tabs .ant-tabs-nav-operations {
+  background: var(--background-secondary);
+}
+
+.custom-theme-tabs .ant-tabs-nav-operations button {
+  border: none;
+  background: transparent;
+  color: var(--text-color-secondary);
+  transition: all 0.2s;
+}
+
+.custom-theme-tabs .ant-tabs-nav-operations button:hover {
+  background: var(--hover-bg-color);
+  color: var(--primary-color);
+}
+
+.custom-theme-tabs .ant-tabs-nav-operations button:disabled {
+  opacity: 0.3;
+}
+
+/* Tab 内容区域 */
+/* .custom-theme-tabs .ant-tabs-content {
+} */
+
+/* 更多按钮（如果需要显示） */
+.custom-theme-tabs .ant-tabs-nav-more {
+  border: none;
+  background: transparent;
+  color: var(--text-color-secondary);
+  padding: 8px;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.custom-theme-tabs .ant-tabs-nav-more:hover {
+  background: var(--hover-bg-color);
+  color: var(--primary-color);
+}
+
+/* 下拉菜单（如果启用） */
+.custom-theme-tabs .ant-tabs-dropdown {
+  background: var(--background-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.custom-theme-tabs .ant-tabs-dropdown-menu-item {
+  color: var(--text-color);
+  padding: 8px 16px;
+  transition: all 0.2s;
+}
+
+.custom-theme-tabs .ant-tabs-dropdown-menu-item:hover {
+  background: var(--hover-bg-color);
+  color: var(--primary-color);
+}
+
+/* 可拖拽的 Tab 样式增强 */
+.custom-theme-tabs .ant-tabs-tab[draggable="true"] {
+  cursor: move;
+}
+
+.custom-theme-tabs .ant-tabs-tab[draggable="true"]:active {
+  opacity: 0.6;
+  cursor: grabbing;
+}
+
+/* Tab 图标样式（如果有） */
+.custom-theme-tabs .ant-tabs-tab-btn .anticon {
+  margin-right: 6px;
+  transition: all 0.3s;
+}
+
+.custom-theme-tabs .ant-tabs-tab-active .ant-tabs-tab-btn .anticon {
+  color: var(--primary-color);
+}
