@@ -26,6 +26,7 @@ const {
   stopDragging,
   pinWindow
 } = require("./windowControl");
+const { checkForUpdates, quitAndInstall } = require("./autoUpdate");
 const { randomUUID } = require("crypto");
 
 function registerIPC(ipcMain, mainWindow) {
@@ -98,6 +99,13 @@ function registerIPC(ipcMain, mainWindow) {
   // ======================
   ipcMain.handle("get-theme", () => getTheme());
   ipcMain.handle("set-theme", (_, theme) => setTheme(theme));
+
+  // ======================
+  // 自动更新管理
+  // ======================
+  ipcMain.handle("check-for-updates", () => checkForUpdates());
+  ipcMain.handle("quit-and-install", () => quitAndInstall());
+
 }
 
 module.exports = registerIPC;

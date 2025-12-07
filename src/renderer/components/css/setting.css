@@ -213,8 +213,8 @@
 }
 
 .update-checker-btn-primary:hover {
-  background: var(--primary-hover) !important;
-  border-color: var(--primary-hover) !important;
+  background: #66bb6a !important;
+  border-color: #66bb6a !important;
   color: #ffffff !important; /* hover时保持白色文字 */
   transform: translateY(-1px) !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
