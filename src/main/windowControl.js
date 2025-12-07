@@ -45,9 +45,8 @@ function openSettingsWindow() {
 
   const [parentWidth, parentHeight] = mainWindow.getSize();
 
-  const width = Math.floor(parentWidth * 0.6);
-  const height = Math.floor(parentHeight * 0.4);
-  // const height = Math.floor(parentHeight * 0.8);
+  const width = Math.floor(parentWidth * 0.8);
+  const height = Math.floor(parentHeight * 0.8);
 
   const isDev = process.env.NODE_ENV === "development" || !app.isPackaged;
 
@@ -80,7 +79,9 @@ function openSettingsWindow() {
   });
 
   settingsWin.loadURL(url);
-  // settingsWin.webContents.openDevTools();
+  // if (isDev) {
+  //   settingsWin.webContents.openDevTools();
+  // }
   settingsWin.once("ready-to-show", () => settingsWin.show());
 
   settingsWin.on("closed", () => {
@@ -514,82 +515,6 @@ function removeShortcut(sid) {
 }
 
 // ===========================主题设置逻辑==========================
-// 用来存储每个 BrowserView 的暗色样式 key
-const browserViewCssKeys = new Map();
- 
-function updateBrowserViewsTheme(isDark) {
-  const css = `html::before {
-        content: '';
-        pointer-events: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.35);
-        mix-blend-mode: multiply;
-        z-index: 99999;
-      }
-    `;
-
-  const scrollCss = `
-    /* === 精细化滚动条（Chromium） === */
-    ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
-    ::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #4caf50 !important;
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #66bb6a !important;
-    }
-
-    /* === Firefox 风格滚动条提示（非强制、兼容） === */
-    * {
-      scrollbar-width: thin;
-      scrollbar-color: #4caf50 !important;
-    }
-
-    /* === 对一些自定义滚动区强化（避免被高优先级样式覆盖） === */
-    ::-webkit-scrollbar-thumb:window-inactive {
-      background: #66bb6a !important;
-    }
-    /* 去掉顶部和底部的三角按钮 */
-    ::-webkit-scrollbar-button {
-      display: none;
-      width: 0;
-      height: 0;
-    }
-
-  `
-
-  browserViews.forEach((view) => {
-    view.webContents.insertCSS(scrollCss);
-    if (isDark) {
-      // 注入 CSS 并记录 key
-      view.webContents.insertCSS(css).then((key) => {
-        browserViewCssKeys.set(view, key);
-      });
-    } else {
-      // 移除之前注入的 CSS
-      const key = browserViewCssKeys.get(view);
-      console.log('\n del css key', key)
-      if (key) {
-        view.webContents.removeInsertedCSS(key);
-        browserViewCssKeys.delete(view);
-        console.log('\n del ing.. css key', key);
-      }
-    }
-  });
-}
-
-function updateAllTheme() {
-  const theme = getTheme();
-  updateBrowserViewsTheme(theme === "dark");
-}
-
 // 设置主题
 function setTheme(theme) {
   store.set("theme", theme);
@@ -652,34 +577,10 @@ function stopDragging() {
 // ========================== 置顶窗口 ==========================
 function pinWindow() {
   if (!mainWindow || mainWindow.isDestroyed()) return;
-  
-  const isAlwaysOnTop = mainWindow.isAlwaysOnTop();
-  mainWindow.setAlwaysOnTop(!isAlwaysOnTop);
-  
-  // 发送置顶状态变化事件到渲染进程
-  mainWindow.webContents.send("pin-state-changed", !isAlwaysOnTop);
-  return !isAlwaysOnTop;
-}
 
-// ========================== 切换置顶窗口 ==========================
-function togglePinWindow() {
-  if (!mainWindow || mainWindow.isDestroyed()) return;
-  
   const isAlwaysOnTop = mainWindow.isAlwaysOnTop();
   mainWindow.setAlwaysOnTop(!isAlwaysOnTop);
-  
-  // 发送置顶状态变化事件到渲染进程
-  mainWindow.webContents.send("pin-state-changed", !isAlwaysOnTop);
-  return !isAlwaysOnTop;
-}
 
-// ========================== 切换置顶窗口 ==========================
-function togglePinWindow() {
-  if (!mainWindow || mainWindow.isDestroyed()) return;
-  
-  const isAlwaysOnTop = mainWindow.isAlwaysOnTop();
-  mainWindow.setAlwaysOnTop(!isAlwaysOnTop);
-  
   // 发送置顶状态变化事件到渲染进程
   mainWindow.webContents.send("pin-state-changed", !isAlwaysOnTop);
   return !isAlwaysOnTop;

@@ -8,78 +8,92 @@ const UpdateChecker = () => {
   const [devMessage, setDevMessage] = useState('');
 
   useEffect(() => {
-    // 监听更新事件
-    const handleUpdateStatus = (event, status) => {
+    console.log('UpdateChecker: useEffect called, registering event listeners')
+    
+    // ✅ 修复:移除 event 参数,直接接收数据
+    const handleUpdateStatus = (status) => {
+      console.log('UpdateChecker: received update-status:', status);
       setUpdateStatus(status);
     };
 
-    const handleUpdateAvailable = (event, info) => {
+    const handleUpdateAvailable = (info) => {
+      console.log('UpdateChecker: received update-available:', info);
       setUpdateStatus('available');
       setUpdateInfo(info);
-      console.log('发现新版本:', info);
     };
 
-    const handleUpdateNotAvailable = (event, info) => {
+    const handleUpdateNotAvailable = (info) => {
+      console.log('UpdateChecker: received update-not-available:', info);
       setUpdateStatus('not-available');
-      console.log('当前已是最新版本');
     };
 
-    const handleDownloadProgress = (event, progress) => {
+    const handleDownloadProgress = (progress) => {
+      console.log('UpdateChecker: received download-progress:', progress);
       setDownloadProgress(Math.round(progress.percent));
       setUpdateStatus('downloading');
     };
 
-    const handleUpdateDownloaded = (event, info) => {
+    const handleUpdateDownloaded = (info) => {
+      console.log('UpdateChecker: received update-downloaded:', info);
       setUpdateStatus('downloaded');
       setUpdateInfo(info);
-      console.log('更新已下载完成，准备安装');
     };
 
-    const handleUpdateError = (event, error) => {
+    const handleUpdateError = (error) => {
+      console.log('UpdateChecker: received update-error:', error);
       setUpdateStatus('error');
-      console.error('更新检查失败:', error);
     };
 
-    // 监听检查更新结果（处理开发环境）
-    const handleUpdateCheckResult = (event, result) => {
+    // ✅ 关键修复:移除 event 参数
+    const handleUpdateCheckResult = (result) => {
+      console.log('UpdateChecker: received update-check-result:', result);
+      
       if (result.isDev) {
         setUpdateStatus('dev-mode');
         setDevMessage(result.message || '开发模式下无法检查更新');
+        console.log('UpdateChecker: set status to dev-mode');
       } else if (result.success) {
         setUpdateStatus('not-available');
         setUpdateInfo(result.updateInfo);
+        console.log('UpdateChecker: set status to not-available');
       } else {
         setUpdateStatus('error');
         console.error('更新检查失败:', result.error);
+        console.log('UpdateChecker: set status to error');
       }
     };
 
     // 注册事件监听器
-    window.electronAPI?.onUpdateStatus?.(handleUpdateStatus);
-    window.electronAPI?.onUpdateAvailable?.(handleUpdateAvailable);
-    window.electronAPI?.onUpdateNotAvailable?.(handleUpdateNotAvailable);
-    window.electronAPI?.onDownloadProgress?.(handleDownloadProgress);
-    window.electronAPI?.onUpdateDownloaded?.(handleUpdateDownloaded);
-    window.electronAPI?.onUpdateError?.(handleUpdateError);
-    window.electronAPI?.onUpdateCheckResult?.(handleUpdateCheckResult);
+    const cleanupStatus = window.electronAPI?.onUpdateStatus?.(handleUpdateStatus);
+    const cleanupAvailable = window.electronAPI?.onUpdateAvailable?.(handleUpdateAvailable);
+    const cleanupNotAvailable = window.electronAPI?.onUpdateNotAvailable?.(handleUpdateNotAvailable);
+    const cleanupProgress = window.electronAPI?.onDownloadProgress?.(handleDownloadProgress);
+    const cleanupDownloaded = window.electronAPI?.onUpdateDownloaded?.(handleUpdateDownloaded);
+    const cleanupError = window.electronAPI?.onUpdateError?.(handleUpdateError);
+    const cleanupCheckResult = window.electronAPI?.onUpdateCheckResult?.(handleUpdateCheckResult);
+
+    console.log('UpdateChecker: all event listeners registered');
 
     return () => {
-      // 清理事件监听器
-      window.electronAPI?.removeUpdateStatusListener?.();
-      window.electronAPI?.removeUpdateAvailableListener?.();
-      window.electronAPI?.removeUpdateNotAvailableListener?.();
-      window.electronAPI?.removeDownloadProgressListener?.();
-      window.electronAPI?.removeUpdateDownloadedListener?.();
-      window.electronAPI?.removeUpdateErrorListener?.();
-      window.electronAPI?.removeUpdateCheckResultListener?.();
+      // 清理所有事件监听器
+      console.log('UpdateChecker: cleaning up event listeners');
+      cleanupStatus?.();
+      cleanupAvailable?.();
+      cleanupNotAvailable?.();
+      cleanupProgress?.();
+      cleanupDownloaded?.();
+      cleanupError?.();
+      cleanupCheckResult?.();
     };
   }, []);
 
   const checkForUpdates = async () => {
+    console.log('UpdateChecker: checkForUpdates called');
     setUpdateStatus('checking');
     setDevMessage('');
     try {
       await window.electronAPI?.checkForUpdates?.();
+      console.log('UpdateChecker: checkForUpdates invoked');
     } catch (error) {
       setUpdateStatus('error');
       console.error('检查更新失败:', error);
@@ -87,6 +101,7 @@ const UpdateChecker = () => {
   };
 
   const installUpdate = () => {
+    console.log('UpdateChecker: installUpdate called');
     window.electronAPI?.quitAndInstall?.();
   };
 
@@ -99,7 +114,7 @@ const UpdateChecker = () => {
       case 'downloading':
         return `正在下载更新: ${downloadProgress}%`;
       case 'downloaded':
-        return '更新已下载完成，重启应用即可安装';
+        return '更新已下载完成,重启应用即可安装';
       case 'not-available':
         return '当前已是最新版本';
       case 'dev-mode':
@@ -112,137 +127,86 @@ const UpdateChecker = () => {
   };
 
   return (
-    <div style={{ 
-      width: '100%', 
-      fontSize: '12px',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '8px'
-    }}>
-      {/* 状态显示区域 */}
-      <div style={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'space-between',
-        minHeight: '24px'
-      }}>
-        <span style={{ 
-          color: 'var(--text-color-secondary)',
-          fontWeight: '500',
-          fontSize: '12px'
-        }}>
-          自动更新状态:
-        </span>
-        <span style={{ 
-          color: updateStatus === 'idle' ? 'var(--text-color-secondary)' : 'var(--text-color)',
-          fontWeight: 'normal',
-          fontSize: '12px',
-          fontStyle: updateStatus === 'idle' ? 'italic' : 'normal'
-        }}>
-          {getStatusText()}
-        </span>
-      </div>
-      
-      {/* 按钮区域 - 始终显示，但不同状态显示不同内容 */}
-      <div style={{ 
-        display: 'flex', 
-        gap: '8px', 
-        justifyContent: 'flex-end',
-        minHeight: '24px'
-      }}>
-        {updateStatus === 'idle' && (
-          <Button 
-            type="primary" 
-            size="small"
-            onClick={checkForUpdates}
-            style={{
-              fontSize: '12px',
-              height: '24px',
-              padding: '0 12px'
-            }}
-          >
-            检查更新
-          </Button>
-        )}
-        
-        {updateStatus === 'downloaded' && (
-          <Button 
-            type="primary" 
-            size="small"
-            onClick={installUpdate}
-            style={{
-              fontSize: '12px',
-              height: '24px',
-              padding: '0 12px',
-              backgroundColor: '#ff9800',
-              borderColor: '#ff9800'
-            }}
-          >
-            立即重启并安装
-          </Button>
-        )}
-        
-        {(updateStatus === 'not-available' || updateStatus === 'dev-mode') && (
-          <Button 
-            size="small"
-            onClick={checkForUpdates}
-            style={{
-              fontSize: '12px',
-              height: '24px',
-              padding: '0 12px'
-            }}
-          >
-            再次检查
-          </Button>
-        )}
-      </div>
-      
-      {/* 进度条 - 只在下载时显示 */}
-      {updateStatus === 'downloading' && (
-        <div style={{ marginTop: '4px' }}>
-          <Progress
-            percent={downloadProgress}
-            size="small"
-            strokeColor={{
-              '0%': '#4caf50',
-              '100%': '#4caf50',
-            }}
-            trailColor="rgba(0, 0, 0, 0.06)"
-            showInfo={false}
-            style={{
-              width: '100%'
-            }}
-          />
+    <div className="update-checker-section">
+      <div className="update-checker-header">
+        <div className="update-checker-title">
+          应用更新
+          <span className="update-checker-status">
+            {getStatusText()}
+          </span>
         </div>
-      )}
+      </div>
       
-      {/* 错误信息 */}
-      {updateStatus === 'error' && (
-        <Alert
-          message={getStatusText()}
-          type="error"
-          showIcon
-          size="small"
-          style={{ 
-            fontSize: '12px',
-            marginTop: '4px'
-          }}
-        />
-      )}
-      
-      {/* 开发模式信息 */}
-      {updateStatus === 'dev-mode' && (
-        <Alert
-          message={getStatusText()}
-          type="info"
-          showIcon
-          size="small"
-          style={{ 
-            fontSize: '12px',
-            marginTop: '4px'
-          }}
-        />
-      )}
+      <div className="update-checker-content">
+        {/* 按钮区域 */}
+        <div className="update-checker-actions">
+          {updateStatus === 'idle' && (
+            <Button 
+              type="primary" 
+              size="small"
+              onClick={checkForUpdates}
+              className="update-checker-btn-primary"
+            >
+              检查更新
+            </Button>
+          )}
+          
+          {updateStatus === 'downloaded' && (
+            <Button 
+              type="primary" 
+              size="small"
+              onClick={installUpdate}
+              className="update-checker-btn-install"
+            >
+              立即重启并安装
+            </Button>
+          )}
+          
+          {(updateStatus === 'not-available' || updateStatus === 'dev-mode' || updateStatus === 'error') && (
+            <Button 
+              size="small"
+              onClick={checkForUpdates}
+              className="update-checker-btn-secondary"
+            >
+              再次检查
+            </Button>
+          )}
+        </div>
+        
+        {/* 进度条 */}
+        {updateStatus === 'downloading' && (
+          <div className="update-checker-progress">
+            <Progress
+              percent={downloadProgress}
+              size="small"
+              showInfo={false}
+              className="update-checker-progress-bar"
+            />
+          </div>
+        )}
+        
+        {/* 错误信息 */}
+        {updateStatus === 'error' && (
+          <Alert
+            message={getStatusText()}
+            type="error"
+            showIcon
+            size="small"
+            className="update-checker-alert"
+          />
+        )}
+        
+        {/* 开发模式信息 */}
+        {updateStatus === 'dev-mode' && (
+          <Alert
+            message={getStatusText()}
+            type="info"
+            showIcon
+            size="small"
+            className="update-checker-alert"
+          />
+        )}
+      </div>
     </div>
   );
 };

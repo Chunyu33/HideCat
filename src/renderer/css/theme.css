@@ -10,6 +10,7 @@
 
   /* 绿色主色调（亮背景下稍深一点） */
   --primary-color: #4caf50;
+  --primary-hover: #66bb6a;
   --ant-primary-color: #4caf50;
   --ant-primary-color-hover: #66bb6a;
   --ant-primary-color-active: #43a047;
@@ -51,6 +52,7 @@
   --text-color-title: #f5f5f5;
 
   --primary-color: #5dd39e;
+  --primary-hover: #81c784;
   --ant-primary-color: #81c784;
   --ant-primary-color-hover: #66bb6a;
   --ant-primary-color-active: #388e3c;

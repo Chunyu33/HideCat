@@ -107,7 +107,11 @@ contextBridge.exposeInMainWorld("electronAPI", {
     return () => ipcRenderer.removeListener("update-error", handler);
   },
   onUpdateCheckResult: (callback) => {
-    const handler = (_, result) => callback && callback(result);
+    console.log('\n===onUpdateCheckResult========== callback registered')
+    const handler = (_, result) => {
+      console.log('preload: update-check-result received:', result)
+      callback && callback(result);
+    };
     ipcRenderer.on("update-check-result", handler);
     return () => ipcRenderer.removeListener("update-check-result", handler);
   },
