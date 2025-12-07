@@ -1,13 +1,15 @@
 /* Tabs 样式 */
 .custom-theme-tabs .ant-tabs-nav {
-  background: var(--background-secondary);
-  border-bottom: 1px solid var(--border-color);
+  /* background: var(--background-color); */
+  /* background: rgba(245, 245, 245, 0.5); */
+  /* border-bottom: 1px solid var(--border-color); */
   transition: all 0.3s ease;
 }
 
 .custom-theme-tabs .ant-tabs-tab {
-  border: none;
-  border-radius: 8px 8px 0 0;
+  border: none !important;
+  /* border-color: var(--border-color) !important; */
+  border-radius: 2px 2px 0 0 !important;
   background: transparent;
   color: var(--text-color-secondary);
   font-weight: 500;

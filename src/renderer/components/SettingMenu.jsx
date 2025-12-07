@@ -9,6 +9,7 @@ import {
 } from "antd";
 import QuestionMark from "./QuestionMark";
 import "./css/setting.css";
+import UpdateChecker from "./UpdateChecker";
 
 // 主题选项
 const themeOptions = [
@@ -141,85 +142,91 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
           </button>
         </div>
 
-        <div className="setting-item">
-          <span className="setting-label row-center">
-            自动隐藏
-            <Tooltip
-              title="开启后，鼠标离开窗口后自动隐藏在任务栏中。"
-              placement="bottomRight"
-              color="#4caf50"
-              styles={{ body: { color: "#fff" } }}
-            >
-              <QuestionMark size="13" />
-            </Tooltip>
-          </span>
-          <div className="range-input">
-            <Switch checked={autoHide} onChange={handleAutoHide} />
+        {/* 设置项卡片容器 */}
+        <div className="setting-items-container">
+          <div className="setting-item">
+            <span className="setting-label row-center">
+              自动隐藏
+              <Tooltip
+                title="开启后，鼠标离开窗口后自动隐藏在任务栏中。"
+                placement="bottomRight"
+                color="#4caf50"
+                styles={{ body: { color: "#fff" } }}
+              >
+                <QuestionMark size="13" />
+              </Tooltip>
+            </span>
+            <div className="range-input">
+              <Switch checked={autoHide} onChange={handleAutoHide} />
+            </div>
+          </div>
+
+          <div className="setting-item">
+            <span className="setting-label row-center">
+              透明度
+              <Tooltip
+                title="窗口的透明度，范围0.2~1.0。"
+                placement="bottomRight"
+                color="#4caf50"
+                styles={{ body: { color: "#fff" } }}
+              >
+                <QuestionMark size="13" />
+              </Tooltip>
+            </span>
+            <div className="range-input">
+              <Slider
+                min={0.2}
+                max={1}
+                step={0.01}
+                value={opacity}
+                onChange={handleOpacity}
+                style={{ width: "100%" }}
+                tooltip={{ formatter: formatTip }}
+              />
+            </div>
+          </div>
+
+          <div className="setting-item">
+            <span className="setting-label row-center">
+              网页缩放
+              <Tooltip
+                title="网页缩放，范围50%~150%。首页不会进行缩放。"
+                placement="topRight"
+                color="#4caf50"
+                styles={{ body: { color: "#fff" } }}
+              >
+                <QuestionMark size="13" />
+              </Tooltip>
+            </span>
+            <div className="range-input">
+              <Slider
+                min={0.5}
+                max={1.5}
+                step={0.1}
+                value={scale}
+                onChange={handleScale}
+                style={{ width: "100%" }}
+                tooltip={{ formatter: formatTip }}
+              />
+            </div>
+          </div>
+
+          {/* 主题选择 */}
+          <div className="setting-item">
+            <span className="setting-label row-center">外观设置</span>
+            <div className="range-input">
+              <Select
+                value={theme}
+                onChange={handleThemeChange}
+                options={themeOptions}
+                style={{ width: "100%" }}
+              />
+            </div>
           </div>
         </div>
 
-        <div className="setting-item">
-          <span className="setting-label row-center">
-            透明度
-            <Tooltip
-              title="窗口的透明度，范围0.2~1.0。"
-              placement="bottomRight"
-              color="#4caf50"
-              styles={{ body: { color: "#fff" } }}
-            >
-              <QuestionMark size="13" />
-            </Tooltip>
-          </span>
-          <div className="range-input">
-            <Slider
-              min={0.2}
-              max={1}
-              step={0.01}
-              value={opacity}
-              onChange={handleOpacity}
-              style={{ width: "100%" }}
-              tooltip={{ formatter: formatTip }}
-            />
-          </div>
-        </div>
-
-        <div className="setting-item">
-          <span className="setting-label row-center">
-            网页缩放
-            <Tooltip
-              title="网页缩放，范围50%~150%。首页不会进行缩放。"
-              placement="topRight"
-              color="#4caf50"
-              styles={{ body: { color: "#fff" } }}
-            >
-              <QuestionMark size="13" />
-            </Tooltip>
-          </span>
-          <div className="range-input">
-            <Slider
-              min={0.5}
-              max={1.5}
-              step={0.1}
-              value={scale}
-              onChange={handleScale}
-              style={{ width: "100%" }}
-              tooltip={{ formatter: formatTip }}
-            />
-          </div>
-        </div>
-
-        {/* 主题选择 */}
-        <div className="setting-item">
-          <span className="setting-label row-center">外观设置</span>
-          <div className="range-input">
-            <Select
-              value={theme}
-              onChange={handleThemeChange}
-              options={themeOptions}
-              style={{ width: "100%" }}
-            />
-          </div>
-        </div>
+        {/* 应用更新检查 - 独立区域 */}
+        <UpdateChecker />
       </div>
     </ConfigProvider>
   );

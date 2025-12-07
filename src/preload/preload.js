@@ -70,4 +70,49 @@ contextBridge.exposeInMainWorld("electronAPI", {
     ipcRenderer.on("theme-changed", handler);
     return () => ipcRenderer.removeListener("theme-changed", handler); // 返回取消函数
   },
+
+  // 自动更新
+  checkForUpdates: () => ipcRenderer.invoke("check-for-updates"),
+  quitAndInstall: () => ipcRenderer.invoke("quit-and-install"),
+  
+  // 更新事件监听器
+  onUpdateStatus: (callback) => {
+    const handler = (_, status) => callback && callback(status);
+    ipcRenderer.on("update-status", handler);
+    return () => ipcRenderer.removeListener("update-status", handler);
+  },
+  onUpdateAvailable: (callback) => {
+    const handler = (_, info) => callback && callback(info);
+    ipcRenderer.on("update-available", handler);
+    return () => ipcRenderer.removeListener("update-available", handler);
+  },
+  onUpdateNotAvailable: (callback) => {
+    const handler = (_, info) => callback && callback(info);
+    ipcRenderer.on("update-not-available", handler);
+    return () => ipcRenderer.removeListener("update-not-available", handler);
+  },
+  onDownloadProgress: (callback) => {
+    const handler = (_, progress) => callback && callback(progress);
+    ipcRenderer.on("download-progress", handler);
+    return () => ipcRenderer.removeListener("download-progress", handler);
+  },
+  onUpdateDownloaded: (callback) => {
+    const handler = (_, info) => callback && callback(info);
+    ipcRenderer.on("update-downloaded", handler);
+    return () => ipcRenderer.removeListener("update-downloaded", handler);
+  },
+  onUpdateError: (callback) => {
+    const handler = (_, error) => callback && callback(error);
+    ipcRenderer.on("update-error", handler);
+    return () => ipcRenderer.removeListener("update-error", handler);
+  },
+  onUpdateCheckResult: (callback) => {
+    console.log('\n===onUpdateCheckResult========== callback registered')
+    const handler = (_, result) => {
+      console.log('preload: update-check-result received:', result)
+      callback && callback(result);
+    };
+    ipcRenderer.on("update-check-result", handler);
+    return () => ipcRenderer.removeListener("update-check-result", handler);
+  },
 });
