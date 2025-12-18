@@ -31,8 +31,8 @@ function sendToAllWindows(channel, data) {
  * 配置自动更新器
  */
 function configureUpdater() {
-  // 设置自动下载更新
-  autoUpdater.autoDownload = true;
+  // 不自动下载：由用户在弹窗/设置页触发下载，体验更可控
+  autoUpdater.autoDownload = false;
   autoUpdater.autoInstallOnAppQuit = true;
 
   // 开发环境下强制启用更新检查（仅用于测试）
@@ -158,9 +158,15 @@ function checkForUpdates() {
     .checkForUpdates()
     .then((result) => {
       console.log("[Updater] ✅ 检查更新成功:", result);
-      
+
+      const currentVersion = app.getVersion();
+      const nextVersion = result?.updateInfo?.version;
+      const isUpdateAvailable = !!(nextVersion && nextVersion !== currentVersion);
+
       sendToAllWindows("update-check-result", {
         success: true,
+        currentVersion,
+        isUpdateAvailable,
         updateInfo: result.updateInfo,
       });
     })
@@ -208,7 +214,11 @@ autoUpdater.on("update-available", (info) => {
     if (returnValue.response === 0) {
       // 用户点击"立即更新"
       console.log("[Updater] 用户确认更新，开始下载");
-      // autoDownload = true 会自动下载，无需手动触发
+      sendToAllWindows("update-status", "downloading");
+      autoUpdater.downloadUpdate().catch((err) => {
+        console.error("[Updater] ❌ 下载更新失败:", err?.message || err);
+        sendToAllWindows("update-error", err?.message || String(err));
+      });
     } else {
       // 用户点击"稍后提醒"
       console.log("[Updater] 用户选择稍后更新");

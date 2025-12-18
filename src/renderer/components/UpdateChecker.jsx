@@ -6,6 +6,7 @@ const UpdateChecker = () => {
   const [updateInfo, setUpdateInfo] = useState(null);
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [devMessage, setDevMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     console.log('UpdateChecker: useEffect called, registering event listeners')
@@ -42,6 +43,7 @@ const UpdateChecker = () => {
     const handleUpdateError = (error) => {
       console.log('UpdateChecker: received update-error:', error);
       setUpdateStatus('error');
+      setErrorMessage(typeof error === 'string' ? error : '');
     };
 
     // ✅ 关键修复:移除 event 参数
@@ -51,13 +53,22 @@ const UpdateChecker = () => {
       if (result.isDev) {
         setUpdateStatus('dev-mode');
         setDevMessage(result.message || '开发模式下无法检查更新');
+        setErrorMessage('');
         console.log('UpdateChecker: set status to dev-mode');
       } else if (result.success) {
-        setUpdateStatus('not-available');
-        setUpdateInfo(result.updateInfo);
-        console.log('UpdateChecker: set status to not-available');
+        setErrorMessage('');
+        if (result.isUpdateAvailable) {
+          setUpdateStatus('available');
+          setUpdateInfo(result.updateInfo);
+          console.log('UpdateChecker: set status to available');
+        } else {
+          setUpdateStatus('not-available');
+          setUpdateInfo(result.updateInfo);
+          console.log('UpdateChecker: set status to not-available');
+        }
       } else {
         setUpdateStatus('error');
+        setErrorMessage(result.error || '');
         console.error('更新检查失败:', result.error);
         console.log('UpdateChecker: set status to error');
       }
@@ -91,11 +102,13 @@ const UpdateChecker = () => {
     console.log('UpdateChecker: checkForUpdates called');
     setUpdateStatus('checking');
     setDevMessage('');
+    setErrorMessage('');
     try {
       await window.electronAPI?.checkForUpdates?.();
       console.log('UpdateChecker: checkForUpdates invoked');
     } catch (error) {
       setUpdateStatus('error');
+      setErrorMessage(error?.message || String(error));
       console.error('检查更新失败:', error);
     }
   };
@@ -120,7 +133,7 @@ const UpdateChecker = () => {
       case 'dev-mode':
         return devMessage || '开发模式下无法检查更新';
       case 'error':
-        return '检查更新失败';
+        return errorMessage ? `检查更新失败：${errorMessage}` : '检查更新失败';
       default:
         return '点击检查更新';
     }
