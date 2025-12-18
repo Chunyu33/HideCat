@@ -35,7 +35,13 @@
         "nsis",
         "zip"
       ],
-      "icon": "src/assets/app.ico"
+      "icon": "src/assets/app.ico",
+      "artifactName": "${productName}-${version}.${ext}"
+    },
+    "nsis": {
+      "artifactName": "${productName}-Setup-${version}.${ext}",
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
     },
     "publish": {
       "provider": "github",
