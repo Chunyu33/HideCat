@@ -403,6 +403,133 @@
   background: rgba(255, 255, 255, 0.06) !important;
 }
 
+.setting-shortcut-container {
+  padding: 6px 0;
+}
+
+.setting-shortcut-record-input {
+  position: fixed;
+  left: -9999px;
+  top: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.setting-shortcut-item {
+  position: relative;
+}
+
+.setting-shortcut-item.is-recording {
+  background-color: rgba(76, 175, 80, 0.12);
+}
+
+[data-theme="dark"] .setting-shortcut-item.is-recording {
+  background-color: rgba(76, 175, 80, 0.16);
+}
+
+.setting-shortcut-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.setting-shortcut-pill {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--text-color);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  min-width: 92px;
+  text-align: center;
+}
+
+[data-theme="dark"] .setting-shortcut-pill {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(20, 20, 20, 0.6);
+}
+
+.setting-shortcut-pill.is-empty {
+  color: var(--text-color-secondary);
+}
+
+.setting-shortcut-pill:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="dark"] .setting-shortcut-pill:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.setting-shortcut-clear {
+  width: 22px;
+  height: 22px;
+  border-radius: 11px;
+  border: none;
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--text-color-secondary);
+  cursor: pointer;
+  line-height: 22px;
+  text-align: center;
+}
+
+[data-theme="dark"] .setting-shortcut-clear {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.setting-shortcut-clear:hover {
+  color: var(--text-color);
+}
+
+.setting-shortcut-item-wrapper {
+  border-radius: 12px;
+}
+
+.setting-shortcut-item-wrapper.is-recording {
+  background-color: rgba(76, 175, 80, 0.08);
+}
+
+[data-theme="dark"] .setting-shortcut-item-wrapper.is-recording {
+  background-color: rgba(76, 175, 80, 0.12);
+}
+
+.setting-shortcut-actions-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px 12px;
+}
+
+.setting-shortcut-actions-left {
+  min-width: 0;
+}
+
+.setting-shortcut-tip {
+  font-size: 12px;
+  color: var(--text-color-secondary);
+}
+
+.setting-shortcut-actions-right {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.setting-shortcut-footer {
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.setting-shortcut-reset {
+  opacity: 0.85;
+}
+
 .update-checker-header {
   display: flex;
   align-items: flex-start;

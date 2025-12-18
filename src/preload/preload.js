@@ -30,6 +30,14 @@ contextBridge.exposeInMainWorld("electronAPI", {
     ipcRenderer.invoke("set-auto-hide", { enabled, count }),
   getAutoHide: () => ipcRenderer.invoke("get-auto-hide"),
 
+  // 全局快捷键（可自定义）
+  getGlobalShortcuts: () => ipcRenderer.invoke("get-global-shortcuts"),
+  setGlobalShortcuts: (overrides) =>
+    ipcRenderer.invoke("set-global-shortcuts", overrides),
+  resetGlobalShortcuts: () => ipcRenderer.invoke("reset-global-shortcuts"),
+  setShortcutRecordingPaused: (paused) =>
+    ipcRenderer.invoke("set-shortcut-recording-paused", paused),
+
   // tab窗口功能
   getActiveKey: () => ipcRenderer.invoke("get-active-key"),
   addTab: (key, url) => ipcRenderer.invoke("add-tab", { key, url }),

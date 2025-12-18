@@ -27,6 +27,12 @@ const {
   stopDragging,
   pinWindow
 } = require("./windowControl");
+const {
+  getGlobalShortcuts,
+  setGlobalShortcuts,
+  resetGlobalShortcuts,
+  setShortcutRecordingPaused,
+} = require("./shortcuts");
 const { checkForUpdates, quitAndInstall } = require("./autoUpdate");
 const { randomUUID } = require("crypto");
 
@@ -40,6 +46,18 @@ function registerIPC(ipcMain, mainWindow) {
   ipcMain.handle("open-settings-window", () => openSettingsWindow());
   ipcMain.handle("close-settings-window", () => closeSettingsWindow());
   ipcMain.on("navigate-view", (_, action) => navigateView(action));
+
+  // ======================
+  // 全局快捷键（可自定义）
+  // ======================
+  ipcMain.handle("get-global-shortcuts", () => getGlobalShortcuts());
+  ipcMain.handle("set-global-shortcuts", (_, overrides) =>
+    setGlobalShortcuts(overrides)
+  );
+  ipcMain.handle("reset-global-shortcuts", () => resetGlobalShortcuts());
+  ipcMain.handle("set-shortcut-recording-paused", (_, paused) =>
+    setShortcutRecordingPaused(paused)
+  );
 
   // ======================
   // 打开外部链接

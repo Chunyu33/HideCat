@@ -8,6 +8,7 @@ const store = new Store({
     opacity: 1.0,
     scale: 1.0,
     shortcuts: [], // 用户快捷入口列表
+    globalShortcuts: {}, // 全局快捷键配置（可自定义）
     theme: "light", // 主题
   },
 });
