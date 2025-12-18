@@ -537,6 +537,21 @@ function getTheme() {
   return store.get("theme", "light");
 }
 
+// ===========================搜索引擎设置==========================
+// 设置搜索引擎（bing/google）
+function setSearchEngine(engine) {
+  const next = engine === "google" ? "google" : "bing";
+  store.set("searchEngine", next);
+  if (!mainWindow) return;
+  mainWindow.webContents.send("search-engine-changed", next);
+}
+
+// 获取当前搜索引擎
+function getSearchEngine() {
+  const v = store.get("searchEngine", "bing");
+  return v === "google" ? "google" : "bing";
+}
+
 // ========================== 拖动窗口 ==========================
 function dragWindow() {
   if (!mainWindow || mainWindow.isDestroyed()) return;
@@ -621,6 +636,8 @@ module.exports = {
   removeShortcut,
   setTheme,
   getTheme,
+  setSearchEngine,
+  getSearchEngine,
   setAutoShow,
   dragWindow,
   stopDragging,

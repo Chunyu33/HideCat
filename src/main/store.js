@@ -9,6 +9,7 @@ const store = new Store({
     scale: 1.0,
     shortcuts: [], // 用户快捷入口列表
     globalShortcuts: {}, // 全局快捷键配置（可自定义）
+    searchEngine: "bing", // 搜索引擎（bing/google）
     theme: "light", // 主题
   },
 });

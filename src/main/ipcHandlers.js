@@ -23,6 +23,8 @@ const {
   removeShortcut,
   setTheme,
   getTheme,
+  setSearchEngine,
+  getSearchEngine,
   dragWindow,
   stopDragging,
   pinWindow
@@ -123,6 +125,12 @@ function registerIPC(ipcMain, mainWindow) {
   // ======================
   ipcMain.handle("get-theme", () => getTheme());
   ipcMain.handle("set-theme", (_, theme) => setTheme(theme));
+
+  // ======================
+  // 搜索引擎
+  // ======================
+  ipcMain.handle("get-search-engine", () => getSearchEngine());
+  ipcMain.handle("set-search-engine", (_, engine) => setSearchEngine(engine));
 
   // ======================
   // 自动更新管理

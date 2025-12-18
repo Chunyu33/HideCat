@@ -3,6 +3,11 @@ import { Input, Typography, Space, message } from "antd";
 import { SearchOutlined, PlusOutlined, MoreOutlined } from "@ant-design/icons";
 import BrowserMark from "../components/BrowserMark";
 import defaultShortcuts from "../services/defaultShortcuts";
+import {
+  buildSearchUrl,
+  getSearchPlaceholder,
+  useSearchEngine,
+} from "../services/searchEngine";
 import ShortcutListModal from "../components/ShortcutListModal";
 import AddShortcutModal from "../components/AddShortcutModal";
 import { useShortcutStore } from "../store/useShortcutStore";
@@ -12,14 +17,13 @@ import WebViewSkeleton from "../components/WebViewSkeleton"; // 骨架屏
 const { Title, Text } = Typography;
 const { Search } = Input;
 
-const BING_SEARCH_URL = "https://www.bing.com/search?q=";
-
 // 此组件仅处理主页 没有tab相关的逻辑
 const HomePageOnly = ({ onUpdateTab, currentKey }) => {
   const [searchValue, setSearchValue] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [showMoreModal, setShowMoreModal] = useState(false);
   const [isSkeletonVisible, setSkeletonVisible] = useState(false);
+  const searchEngine = useSearchEngine("bing");
 
   const { shortcuts, initialized, initShortcuts, addShortcut, deleteShortcut } =
     useShortcutStore();
@@ -50,7 +54,7 @@ const HomePageOnly = ({ onUpdateTab, currentKey }) => {
     if (value.includes(".") && value.length > 5 && !value.startsWith("http")) {
       targetUrl = "http://" + value;
     } else if (!value.includes(".")) {
-      targetUrl = BING_SEARCH_URL + encodeURIComponent(value);
+      targetUrl = buildSearchUrl(value, searchEngine);
       tabName = `搜索: ${value}`;
     }
     // 显示骨架屏
@@ -126,7 +130,7 @@ const HomePageOnly = ({ onUpdateTab, currentKey }) => {
       </Title>
 
       <Search
-        placeholder="在 Bing 上搜索，或者输入一个网址"
+        placeholder={getSearchPlaceholder(searchEngine)}
         allowClear
         enterButton={<SearchOutlined />}
         size="large"

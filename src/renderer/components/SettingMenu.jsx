@@ -42,6 +42,7 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
   const [opacity, setOpacity] = useState(0.9);
   const [scale, setScale] = useState(1.0);
   const [theme, setTheme] = useState("auto"); // 本地状态
+  const [searchEngine, setSearchEngine] = useState("bing");
   const [activeNav, setActiveNav] = useState("general");
   const [globalShortcuts, setGlobalShortcuts] = useState([]);
   const [editingShortcutId, setEditingShortcutId] = useState(null);
@@ -52,11 +53,12 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
   useEffect(() => {
     // 初始化时读取设置
     const fetchSettings = async () => {
-      const [auto, op, sc, th] = await Promise.all([
+      const [auto, op, sc, th, se] = await Promise.all([
         window.electronAPI.getAutoHide?.(),
         window.electronAPI.getOpacity?.(),
         window.electronAPI.getScale?.(),
         window.electronAPI.getTheme?.(),
+        window.electronAPI.getSearchEngine?.(),
       ]);
       if (auto !== undefined) setAutoHide(auto);
       if (op !== undefined) setOpacity(op);
@@ -65,6 +67,7 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
         setTheme(th);
         applyThemeToDOM(th);
       }
+      if (se) setSearchEngine(se);
     };
     fetchSettings();
   }, []);
@@ -143,6 +146,13 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
     setTheme(value);
     applyThemeToDOM(value);
     await window.electronAPI?.setTheme?.(value); // 通知主进程
+  };
+
+  // 切换搜索引擎
+  const handleSearchEngineChange = async (value) => {
+    const next = value === "google" ? "google" : "bing";
+    setSearchEngine(next);
+    await window.electronAPI?.setSearchEngine?.(next);
   };
   const antdConfig = useMemo(() => {
     console.log("\n setting theme", theme);
@@ -420,7 +430,7 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
 
                     <div className="setting-item">
                       <span className="setting-label row-center">
-                        透明度
+                        窗口透明
                         <Tooltip
                           title="窗口的透明度，范围0.2~1.0。"
                           placement="bottomRight"
@@ -469,12 +479,47 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
                     </div>
 
                     <div className="setting-item">
-                      <span className="setting-label row-center">外观设置</span>
+                      <span className="setting-label row-center">
+                        外观设置
+                        <Tooltip
+                          title="应用的外观，深色或者浅色模式。"
+                          placement="bottomRight"
+                          color="#4caf50"
+                          styles={{ body: { color: "#fff" } }}
+                        >
+                          <QuestionMark size="13" />
+                        </Tooltip>
+                      </span>
                       <div className="range-input">
                         <Select
                           value={theme}
                           onChange={handleThemeChange}
                           options={themeOptions}
+                          style={{ width: "100%" }}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="setting-item">
+                      <span className="setting-label row-center">
+                        搜索引擎
+                        <Tooltip
+                          title="输入关键词搜索时使用的默认搜索引擎。"
+                          placement="topRight"
+                          color="#4caf50"
+                          styles={{ body: { color: "#fff" } }}
+                        >
+                          <QuestionMark size="13" />
+                        </Tooltip>
+                      </span>
+                      <div className="range-input">
+                        <Select
+                          value={searchEngine}
+                          onChange={handleSearchEngineChange}
+                          options={[
+                            { label: "Bing", value: "bing" },
+                            { label: "Google", value: "google" },
+                          ]}
                           style={{ width: "100%" }}
                         />
                       </div>
@@ -495,7 +540,7 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
                         href="#"
                         onClick={(e) => {
                           e.preventDefault();
-                          openExternal("https://example.com/terms");
+                          openExternal("https://www.evanspace.icu/service?product=slackefish");
                         }}
                       >
                         服务协议
@@ -505,7 +550,7 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
                         href="#"
                         onClick={(e) => {
                           e.preventDefault();
-                          openExternal("https://example.com/privacy");
+                          openExternal("https://www.evanspace.icu/privacy?product=slackefish");
                         }}
                       >
                         隐私协议
@@ -545,7 +590,7 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
                   <div className="setting-feedback-section">
                     <div className="setting-feedback-header">
                       <div className="setting-feedback-title">联系方式</div>
-                      <div className="setting-feedback-subtitle">
+                      <div className="setting-feedback-subtitle" style={{marginTop: '4px'}}>
                         欢迎通过以下方式联系我
                       </div>
                     </div>

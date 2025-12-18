@@ -82,6 +82,15 @@ contextBridge.exposeInMainWorld("electronAPI", {
     return () => ipcRenderer.removeListener("theme-changed", handler); // 返回取消函数
   },
 
+  // 搜索引擎
+  setSearchEngine: (engine) => ipcRenderer.invoke("set-search-engine", engine),
+  getSearchEngine: () => ipcRenderer.invoke("get-search-engine"),
+  onSearchEngineChanged: (callback) => {
+    const handler = (_, engine) => callback && callback(engine);
+    ipcRenderer.on("search-engine-changed", handler);
+    return () => ipcRenderer.removeListener("search-engine-changed", handler);
+  },
+
   // 自动更新
   checkForUpdates: () => ipcRenderer.invoke("check-for-updates"),
   quitAndInstall: () => ipcRenderer.invoke("quit-and-install"),
