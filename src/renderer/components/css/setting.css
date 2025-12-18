@@ -544,6 +544,7 @@
   flex-direction: column;
   gap: 4px;
   flex: 1;
+  min-width: 0;
 }
 
 .update-checker-status {
@@ -551,12 +552,16 @@
   color: var(--text-color-secondary);
   font-weight: 400;
   line-height: 1.4;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .update-checker-content {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  min-width: 0;
 }
 
 .update-checker-actions {
@@ -564,6 +569,7 @@
   gap: 12px;
   justify-content: flex-end;
   align-items: center;
+  min-width: 0;
 }
 
 .update-checker-progress {
@@ -575,6 +581,18 @@
   border: none;
   background: transparent;
   padding: 0;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.update-checker-alert .ant-alert-content {
+  min-width: 0;
+}
+
+.update-checker-alert .ant-alert-message {
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 /* 按钮样式 - 简约风格 */
