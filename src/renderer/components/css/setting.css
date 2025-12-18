@@ -18,6 +18,113 @@
     backdrop-filter 0.3s ease;
 }
 
+.setting-layout {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.setting-body {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  height: 100%;
+  min-height: 0;
+  background: var(--background-secondary);
+}
+
+.setting-sidebar {
+  background: rgba(255, 255, 255, 0.55);
+  border-right: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="dark"] .setting-sidebar {
+  background: rgba(20, 20, 20, 0.65);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.setting-sidebar-inner {
+  padding: 10px 10px 12px;
+}
+
+.setting-nav-item {
+  width: 100%;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text-color);
+  transition: background-color 0.15s ease;
+  text-align: left;
+}
+
+.setting-nav-item:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="dark"] .setting-nav-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.setting-nav-item.is-active {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="dark"] .setting-nav-item.is-active {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.setting-nav-icon {
+  display: inline-flex;
+  width: 18px;
+  height: 18px;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.85;
+}
+
+.setting-nav-label {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.setting-content {
+  background: #f6f6f6;
+}
+
+[data-theme="dark"] .setting-content {
+  background: #0f0f10;
+}
+
+.setting-content-scroll {
+  height: 100%;
+  overflow: auto;
+  padding: 14px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.setting-section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-color);
+  margin: 4px 2px 12px;
+}
+
+.setting-placeholder {
+  background: var(--background-primary);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px var(--shadow-color);
+  padding: 18px;
+  color: var(--text-color-secondary);
+}
+
 .setting-items-container {
   background: var(--background-primary);
   border-radius: 12px;
@@ -41,6 +148,7 @@
 
 .setting-item:not(:last-child) {
   /* 移除分隔线 */
+  border-bottom: none;
 }
 
 .setting-label {
@@ -81,6 +189,22 @@
   padding: 0 0 8px 0;
 }
 
+.setting-titlebar {
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.7);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  -webkit-app-region: drag;
+}
+
+[data-theme="dark"] .setting-titlebar {
+  background: rgba(20, 20, 20, 0.75);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.setting-titlebar-btn {
+  -webkit-app-region: no-drag;
+}
+
 .setting-title {
   font-size: 20px;
   font-weight: 600;
@@ -119,6 +243,45 @@
   align-items: center;
 }
 
+.setting-footer {
+  margin-top: auto;
+  padding: 28px 4px 18px;
+  text-align: center;
+}
+
+.setting-footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.setting-footer-link {
+  font-size: 12px;
+  color: #2b6de5;
+  text-decoration: none;
+}
+
+.setting-footer-link:hover {
+  text-decoration: underline;
+}
+
+.setting-footer-copy {
+  font-size: 11px;
+  color: var(--text-color-secondary);
+  opacity: 0.8;
+}
+
+@media (max-width: 520px) {
+  .setting-body {
+    grid-template-columns: 150px 1fr;
+  }
+  .setting-content-scroll {
+    padding: 12px;
+  }
+}
+
 /* 去除 Ant Tabs 默认边线 */
 :where(.ant-tabs-top > .ant-tabs-nav)::before,
 :where(.ant-tabs-bottom > .ant-tabs-nav)::before {
@@ -145,6 +308,226 @@
   border-radius: 12px;
   box-shadow: 0 2px 8px var(--shadow-color);
   /* border: 1px solid var(--border-color); */
+}
+
+.setting-feedback-section {
+  margin-top: 16px;
+  padding: 18px 20px;
+  background: var(--background-primary);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+.setting-feedback-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.setting-feedback-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.setting-feedback-subtitle {
+  font-size: 12px;
+  color: var(--text-color-secondary);
+}
+
+.setting-feedback-items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.setting-feedback-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+}
+
+.setting-feedback-label {
+  font-size: 13px;
+  color: var(--text-color);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.setting-feedback-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.setting-feedback-value {
+  font-size: 13px;
+  color: var(--text-color);
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.setting-feedback-link {
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-size: 13px;
+  color: #2b6de5;
+  cursor: pointer;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.setting-feedback-link:hover {
+  text-decoration: underline;
+}
+
+.setting-copy-btn {
+  color: var(--text-color-secondary) !important;
+}
+
+.setting-copy-btn:hover {
+  color: var(--text-color) !important;
+  background: rgba(0, 0, 0, 0.04) !important;
+}
+
+[data-theme="dark"] .setting-copy-btn:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+}
+
+.setting-shortcut-container {
+  padding: 6px 0;
+}
+
+.setting-shortcut-record-input {
+  position: fixed;
+  left: -9999px;
+  top: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.setting-shortcut-item {
+  position: relative;
+}
+
+.setting-shortcut-item.is-recording {
+  background-color: rgba(76, 175, 80, 0.12);
+}
+
+[data-theme="dark"] .setting-shortcut-item.is-recording {
+  background-color: rgba(76, 175, 80, 0.16);
+}
+
+.setting-shortcut-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.setting-shortcut-pill {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--text-color);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  min-width: 92px;
+  text-align: center;
+}
+
+[data-theme="dark"] .setting-shortcut-pill {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(20, 20, 20, 0.6);
+}
+
+.setting-shortcut-pill.is-empty {
+  color: var(--text-color-secondary);
+}
+
+.setting-shortcut-pill:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="dark"] .setting-shortcut-pill:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.setting-shortcut-clear {
+  width: 22px;
+  height: 22px;
+  border-radius: 11px;
+  border: none;
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--text-color-secondary);
+  cursor: pointer;
+  line-height: 22px;
+  text-align: center;
+}
+
+[data-theme="dark"] .setting-shortcut-clear {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.setting-shortcut-clear:hover {
+  color: var(--text-color);
+}
+
+.setting-shortcut-item-wrapper {
+  border-radius: 12px;
+}
+
+.setting-shortcut-item-wrapper.is-recording {
+  background-color: rgba(76, 175, 80, 0.08);
+}
+
+[data-theme="dark"] .setting-shortcut-item-wrapper.is-recording {
+  background-color: rgba(76, 175, 80, 0.12);
+}
+
+.setting-shortcut-actions-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px 12px;
+}
+
+.setting-shortcut-actions-left {
+  min-width: 0;
+}
+
+.setting-shortcut-tip {
+  font-size: 12px;
+  color: var(--text-color-secondary);
+}
+
+.setting-shortcut-actions-right {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.setting-shortcut-footer {
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.setting-shortcut-reset {
+  opacity: 0.85;
 }
 
 .update-checker-header {
@@ -213,8 +596,8 @@
 }
 
 .update-checker-btn-primary:hover {
-  background: #66bb6a !important;
-  border-color: #66bb6a !important;
+  background: var(--primary-hover) !important;
+  border-color: var(--primary-hover) !important;
   color: #ffffff !important; /* hover时保持白色文字 */
   transform: translateY(-1px) !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;

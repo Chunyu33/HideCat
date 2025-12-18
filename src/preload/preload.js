@@ -8,7 +8,10 @@ contextBridge.exposeInMainWorld("electronAPI", {
   showWindow: () => ipcRenderer.invoke("show-window"),
   dragWindow: () => ipcRenderer.invoke("drag-window"),
   stopDragging: () => ipcRenderer.send("stop-dragging"),
-  togglePinWindow: () => ipcRenderer.invoke("pinned-window"),
+  togglePinWindow: () => ipcRenderer.invoke("toggle-pin-window"),
+
+  // 打开外部链接
+  openExternal: (url) => ipcRenderer.invoke("open-external", url),
 
   // 设置窗口
   openSettingsWindow: () => ipcRenderer.invoke("open-settings-window"),
@@ -26,6 +29,14 @@ contextBridge.exposeInMainWorld("electronAPI", {
   setAutoHide: (enabled, count) =>
     ipcRenderer.invoke("set-auto-hide", { enabled, count }),
   getAutoHide: () => ipcRenderer.invoke("get-auto-hide"),
+
+  // 全局快捷键（可自定义）
+  getGlobalShortcuts: () => ipcRenderer.invoke("get-global-shortcuts"),
+  setGlobalShortcuts: (overrides) =>
+    ipcRenderer.invoke("set-global-shortcuts", overrides),
+  resetGlobalShortcuts: () => ipcRenderer.invoke("reset-global-shortcuts"),
+  setShortcutRecordingPaused: (paused) =>
+    ipcRenderer.invoke("set-shortcut-recording-paused", paused),
 
   // tab窗口功能
   getActiveKey: () => ipcRenderer.invoke("get-active-key"),
@@ -69,6 +80,15 @@ contextBridge.exposeInMainWorld("electronAPI", {
     const handler = (_, theme) => callback(theme); // 只传递 theme
     ipcRenderer.on("theme-changed", handler);
     return () => ipcRenderer.removeListener("theme-changed", handler); // 返回取消函数
+  },
+
+  // 搜索引擎
+  setSearchEngine: (engine) => ipcRenderer.invoke("set-search-engine", engine),
+  getSearchEngine: () => ipcRenderer.invoke("get-search-engine"),
+  onSearchEngineChanged: (callback) => {
+    const handler = (_, engine) => callback && callback(engine);
+    ipcRenderer.on("search-engine-changed", handler);
+    return () => ipcRenderer.removeListener("search-engine-changed", handler);
   },
 
   // 自动更新

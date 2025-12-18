@@ -3,6 +3,11 @@ import { Input, Typography, Space, message } from "antd";
 import { SearchOutlined, PlusOutlined, MoreOutlined } from "@ant-design/icons";
 import BrowserMark from "../components/BrowserMark";
 import defaultShortcuts from "../services/defaultShortcuts";
+import {
+  buildSearchUrl,
+  getSearchPlaceholder,
+  useSearchEngine,
+} from "../services/searchEngine";
 import ShortcutListModal from "../components/ShortcutListModal";
 import AddShortcutModal from "../components/AddShortcutModal";
 import { useShortcutStore } from "../store/useShortcutStore";
@@ -12,13 +17,12 @@ import "./css/homepage.css";
 const { Title, Text } = Typography;
 const { Search } = Input;
 
-const BING_SEARCH_URL = "https://www.bing.com/search?q=";
-
 const HomePage = ({ onNewTab, onUpdateTab, currentKey }) => {
   const [searchValue, setSearchValue] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [showMoreModal, setShowMoreModal] = useState(false);
   const [showManualModal, setShowManualModal] = useState(false);
+  const searchEngine = useSearchEngine("bing");
 
   // ✅ 从全局 zustand store 读取状态和方法
   const { shortcuts, initialized, initShortcuts, addShortcut, deleteShortcut } =
@@ -51,7 +55,7 @@ const HomePage = ({ onNewTab, onUpdateTab, currentKey }) => {
     if (value.includes(".") && value.length > 5 && !value.startsWith("http")) {
       targetUrl = "http://" + value;
     } else if (!value.includes(".")) {
-      targetUrl = BING_SEARCH_URL + encodeURIComponent(value);
+      targetUrl = buildSearchUrl(value, searchEngine);
       tabName = `搜索: ${value}`;
     }
 
@@ -127,7 +131,7 @@ const HomePage = ({ onNewTab, onUpdateTab, currentKey }) => {
       </Title>
 
       <Search
-        placeholder="在 Bing 上搜索，或者输入一个网址"
+        placeholder={getSearchPlaceholder(searchEngine)}
         allowClear
         enterButton={<SearchOutlined />}
         size="large"

@@ -1,4 +1,4 @@
-const { BrowserWindow, BrowserView, screen, app } = require("electron");
+const { BrowserWindow, BrowserView, screen, app, shell } = require("electron");
 const path = require("path");
 const { randomUUID } = require("crypto");
 const store = require("./store"); // 使用持久化 store
@@ -46,7 +46,7 @@ function openSettingsWindow() {
   const [parentWidth, parentHeight] = mainWindow.getSize();
 
   const width = Math.floor(parentWidth * 0.8);
-  const height = Math.floor(parentHeight * 0.86);
+  const height = Math.floor(parentHeight * 0.8);
 
   const isDev = process.env.NODE_ENV === "development" || !app.isPackaged;
 
@@ -64,7 +64,7 @@ function openSettingsWindow() {
     height,
     minWidth: 340,
     minHeight: 240,
-    resizable: false,
+    resizable: true,
     frame: false,
     hasShadow: false,
     parent: mainWindow,
@@ -79,7 +79,9 @@ function openSettingsWindow() {
   });
 
   settingsWin.loadURL(url);
-
+  // if (isDev) {
+  //   settingsWin.webContents.openDevTools();
+  // }
   settingsWin.once("ready-to-show", () => settingsWin.show());
 
   settingsWin.on("closed", () => {
@@ -96,10 +98,18 @@ function closeSettingsWindow() {
   }
 }
 
+function openExternalUrl(url) {
+  if (!url || typeof url !== "string") return false;
+  const trimmed = url.trim();
+  if (!trimmed) return false;
+  if (!/^https?:\/\//i.test(trimmed) && !/^mailto:/i.test(trimmed)) return false;
+  shell.openExternal(trimmed);
+  return true;
+}
+
 // ============== 窗口控制基本功能 ==============
 function setAutoHide(enabled, count) {
   // console.log('\n config----', enabled, '===count===', count);
-
   // 持久化状态
   store.set("autoHide", enabled);
 
@@ -369,12 +379,14 @@ async function addTab(key, url) {
 
     // view.webContents.on("did-navigate", (event, url) => {
     //   console.log("\njump new URL:", url);
+    //   updateAllTheme();
     // });
 
     // view.webContents.on(
     //   "did-navigate-in-page",
     //   (event, url, isMainFrame, frameProcessId, frameRoutingId) => {
     //     console.log("\n inner router:", url);
+    //     updateAllTheme();
     //   }
     // );
   }
@@ -518,10 +530,26 @@ function setTheme(theme) {
   if (!mainWindow) return;
   mainWindow.setBackgroundColor(theme === "dark" ? "#1E1E1E" : "#FFFFFF");
   mainWindow.webContents.send("theme-changed", theme);
+  // updateAllTheme();
 }
 // 获取当前主题
 function getTheme() {
   return store.get("theme", "light");
+}
+
+// ===========================搜索引擎设置==========================
+// 设置搜索引擎（bing/google）
+function setSearchEngine(engine) {
+  const next = engine === "google" ? "google" : "bing";
+  store.set("searchEngine", next);
+  if (!mainWindow) return;
+  mainWindow.webContents.send("search-engine-changed", next);
+}
+
+// 获取当前搜索引擎
+function getSearchEngine() {
+  const v = store.get("searchEngine", "bing");
+  return v === "google" ? "google" : "bing";
 }
 
 // ========================== 拖动窗口 ==========================
@@ -572,10 +600,10 @@ function stopDragging() {
 // ========================== 置顶窗口 ==========================
 function pinWindow() {
   if (!mainWindow || mainWindow.isDestroyed()) return;
-  
+
   const isAlwaysOnTop = mainWindow.isAlwaysOnTop();
   mainWindow.setAlwaysOnTop(!isAlwaysOnTop);
-  
+
   // 发送置顶状态变化事件到渲染进程
   mainWindow.webContents.send("pin-state-changed", !isAlwaysOnTop);
   return !isAlwaysOnTop;
@@ -587,6 +615,7 @@ module.exports = {
   minimizeWindow,
   openSettingsWindow,
   closeSettingsWindow,
+  openExternalUrl,
   showWindow,
   hideWindow,
   hideImmediately,
@@ -607,6 +636,8 @@ module.exports = {
   removeShortcut,
   setTheme,
   getTheme,
+  setSearchEngine,
+  getSearchEngine,
   setAutoShow,
   dragWindow,
   stopDragging,

@@ -4,6 +4,7 @@ const {
   setMainWindow,
   openSettingsWindow,
   closeSettingsWindow,
+  openExternalUrl,
   showWindow,
   hideWindow,
   hideImmediately,
@@ -22,10 +23,18 @@ const {
   removeShortcut,
   setTheme,
   getTheme,
+  setSearchEngine,
+  getSearchEngine,
   dragWindow,
   stopDragging,
   pinWindow
 } = require("./windowControl");
+const {
+  getGlobalShortcuts,
+  setGlobalShortcuts,
+  resetGlobalShortcuts,
+  setShortcutRecordingPaused,
+} = require("./shortcuts");
 const { checkForUpdates, quitAndInstall } = require("./autoUpdate");
 const { randomUUID } = require("crypto");
 
@@ -41,6 +50,23 @@ function registerIPC(ipcMain, mainWindow) {
   ipcMain.on("navigate-view", (_, action) => navigateView(action));
 
   // ======================
+  // 全局快捷键（可自定义）
+  // ======================
+  ipcMain.handle("get-global-shortcuts", () => getGlobalShortcuts());
+  ipcMain.handle("set-global-shortcuts", (_, overrides) =>
+    setGlobalShortcuts(overrides)
+  );
+  ipcMain.handle("reset-global-shortcuts", () => resetGlobalShortcuts());
+  ipcMain.handle("set-shortcut-recording-paused", (_, paused) =>
+    setShortcutRecordingPaused(paused)
+  );
+
+  // ======================
+  // 打开外部链接
+  // ======================
+  ipcMain.handle("open-external", (_, url) => openExternalUrl(url));
+
+  // ======================
   // 主窗口操作
   // ======================
   ipcMain.handle("minimize-window", () => minimizeWindow());
@@ -48,7 +74,7 @@ function registerIPC(ipcMain, mainWindow) {
   ipcMain.handle("hide-window", (_, ms) => hideWindow(ms));
   ipcMain.handle("hide-immediately", () => hideImmediately());
   ipcMain.handle("drag-window", () => dragWindow());
-  ipcMain.handle("pinned-window", () => pinWindow());
+  ipcMain.handle("toggle-pin-window", () => pinWindow());
   
   // 停止拖动（通过 IPC 消息）
   ipcMain.on("stop-dragging", () => {
@@ -101,11 +127,16 @@ function registerIPC(ipcMain, mainWindow) {
   ipcMain.handle("set-theme", (_, theme) => setTheme(theme));
 
   // ======================
+  // 搜索引擎
+  // ======================
+  ipcMain.handle("get-search-engine", () => getSearchEngine());
+  ipcMain.handle("set-search-engine", (_, engine) => setSearchEngine(engine));
+
+  // ======================
   // 自动更新管理
   // ======================
   ipcMain.handle("check-for-updates", () => checkForUpdates());
   ipcMain.handle("quit-and-install", () => quitAndInstall());
-
 }
 
 module.exports = registerIPC;
