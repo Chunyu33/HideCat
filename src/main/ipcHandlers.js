@@ -4,6 +4,7 @@ const {
   setMainWindow,
   openSettingsWindow,
   closeSettingsWindow,
+  openExternalUrl,
   showWindow,
   hideWindow,
   hideImmediately,
@@ -39,6 +40,11 @@ function registerIPC(ipcMain, mainWindow) {
   ipcMain.handle("open-settings-window", () => openSettingsWindow());
   ipcMain.handle("close-settings-window", () => closeSettingsWindow());
   ipcMain.on("navigate-view", (_, action) => navigateView(action));
+
+  // ======================
+  // 打开外部链接
+  // ======================
+  ipcMain.handle("open-external", (_, url) => openExternalUrl(url));
 
   // ======================
   // 主窗口操作

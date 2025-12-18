@@ -10,6 +10,9 @@ contextBridge.exposeInMainWorld("electronAPI", {
   stopDragging: () => ipcRenderer.send("stop-dragging"),
   togglePinWindow: () => ipcRenderer.invoke("toggle-pin-window"),
 
+  // 打开外部链接
+  openExternal: (url) => ipcRenderer.invoke("open-external", url),
+
   // 设置窗口
   openSettingsWindow: () => ipcRenderer.invoke("open-settings-window"),
   closeSettingsWindow: () => ipcRenderer.invoke("close-settings-window"),

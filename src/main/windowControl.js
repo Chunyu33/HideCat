@@ -1,4 +1,4 @@
-const { BrowserWindow, BrowserView, screen, app } = require("electron");
+const { BrowserWindow, BrowserView, screen, app, shell } = require("electron");
 const path = require("path");
 const { randomUUID } = require("crypto");
 const store = require("./store"); // 使用持久化 store
@@ -98,10 +98,18 @@ function closeSettingsWindow() {
   }
 }
 
+function openExternalUrl(url) {
+  if (!url || typeof url !== "string") return false;
+  const trimmed = url.trim();
+  if (!trimmed) return false;
+  if (!/^https?:\/\//i.test(trimmed) && !/^mailto:/i.test(trimmed)) return false;
+  shell.openExternal(trimmed);
+  return true;
+}
+
 // ============== 窗口控制基本功能 ==============
 function setAutoHide(enabled, count) {
   // console.log('\n config----', enabled, '===count===', count);
-
   // 持久化状态
   store.set("autoHide", enabled);
 
@@ -592,6 +600,7 @@ module.exports = {
   minimizeWindow,
   openSettingsWindow,
   closeSettingsWindow,
+  openExternalUrl,
   showWindow,
   hideWindow,
   hideImmediately,

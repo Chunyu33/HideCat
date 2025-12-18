@@ -4,12 +4,16 @@ import {
   Switch,
   Tooltip,
   Select,
+  Button,
+  message,
   ConfigProvider,
   theme as antdTheme,
 } from "antd";
 import {
   SettingOutlined,
   InfoCircleOutlined,
+  MessageOutlined,
+  CopyOutlined,
 } from "@ant-design/icons";
 import QuestionMark from "./QuestionMark";
 import "./css/setting.css";
@@ -24,8 +28,12 @@ const themeOptions = [
 
 const NAV_ITEMS = [
   { key: "general", label: "通用", icon: <SettingOutlined /> },
+  { key: "feedback", label: "意见反馈", icon: <MessageOutlined /> },
   { key: "about", label: "关于", icon: <InfoCircleOutlined /> },
 ];
+
+const CONTACT_WECHAT = "B_HH6050";
+const CONTACT_EMAIL = "1378813463@qq.com";
 
 const SettingMenu = ({ onClose, onScaleChange }) => {
   const [autoHide, setAutoHide] = useState(false);
@@ -132,6 +140,37 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
       return null;
     }
     return `${Math.round(tipValue * 100)}%`;
+  };
+
+  const openExternal = async (url) => {
+    try {
+      await window.electronAPI?.openExternal?.(url);
+    } catch (e) {
+      message.error("打开失败");
+    }
+  };
+
+  const copyText = async (text) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      message.success("已复制");
+    } catch (e) {
+      try {
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        textarea.style.position = "fixed";
+        textarea.style.left = "-9999px";
+        textarea.style.top = "-9999px";
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+        message.success("已复制");
+      } catch (err) {
+        message.error("复制失败");
+      }
+    }
   };
 
   return (
@@ -270,22 +309,108 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
 
                   <div className="setting-footer">
                     <div className="setting-footer-links">
-                      <a className="setting-footer-link" href="#">
+                      <a
+                        className="setting-footer-link"
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          openExternal("https://example.com/terms");
+                        }}
+                      >
                         服务协议
                       </a>
-                      <a className="setting-footer-link" href="#">
+                      <a
+                        className="setting-footer-link"
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          openExternal("https://example.com/privacy");
+                        }}
+                      >
                         隐私协议
                       </a>
-                      <a className="setting-footer-link" href="#">
+                      <a
+                        className="setting-footer-link"
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setActiveNav("feedback");
+                        }}
+                      >
                         意见反馈
                       </a>
-                      <a className="setting-footer-link" href="#">
+                      <a
+                        className="setting-footer-link"
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          message.info("暂未配置上传日志");
+                        }}
+                      >
                         上传日志
                       </a>
                     </div>
                     <div className="setting-footer-copy">
                       Copyright © {new Date().getFullYear()} SlackeFish. All
                       rights reserved.
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {activeNav === "feedback" && (
+                <>
+                  <div className="setting-section-title">意见反馈</div>
+                  <div className="setting-feedback-section">
+                    <div className="setting-feedback-header">
+                      <div className="setting-feedback-title">联系方式</div>
+                      <div className="setting-feedback-subtitle">
+                        欢迎通过以下方式联系我
+                      </div>
+                    </div>
+
+                    <div className="setting-feedback-items">
+                      <div className="setting-feedback-row">
+                        <div className="setting-feedback-label">微信号</div>
+                        <div className="setting-feedback-right">
+                          <span className="setting-feedback-value">
+                            {CONTACT_WECHAT}
+                          </span>
+                          <Button
+                            size="small"
+                            type="text"
+                            className="setting-copy-btn"
+                            icon={<CopyOutlined />}
+                            onClick={() => copyText(CONTACT_WECHAT)}
+                          >
+                            复制
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="setting-feedback-row">
+                        <div className="setting-feedback-label">邮箱</div>
+                        <div className="setting-feedback-right">
+                          <button
+                            type="button"
+                            className="setting-feedback-link"
+                            onClick={() =>
+                              openExternal(`mailto:${CONTACT_EMAIL}`)
+                            }
+                          >
+                            {CONTACT_EMAIL}
+                          </button>
+                          <Button
+                            size="small"
+                            type="text"
+                            className="setting-copy-btn"
+                            icon={<CopyOutlined />}
+                            onClick={() => copyText(CONTACT_EMAIL)}
+                          >
+                            复制
+                          </Button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </>
