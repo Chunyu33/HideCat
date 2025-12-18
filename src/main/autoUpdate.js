@@ -181,6 +181,20 @@ function checkForUpdates() {
 }
 
 /**
+ * 手动触发下载更新（供设置页按钮使用）
+ */
+function downloadUpdate() {
+  console.log("[Updater] 手动触发下载更新");
+  configureUpdater();
+  sendToAllWindows("update-status", "downloading");
+  return autoUpdater.downloadUpdate().catch((err) => {
+    console.error("[Updater] ❌ 下载更新失败:", err?.message || err);
+    sendToAllWindows("update-error", err?.message || String(err));
+    throw err;
+  });
+}
+
+/**
  * 退出并安装更新
  */
 function quitAndInstall() {
@@ -274,6 +288,7 @@ autoUpdater.on("error", (error) => {
 module.exports = {
   checkUpdate,
   checkForUpdates,
+  downloadUpdate,
   quitAndInstall,
   startAutoCheck, // 导出自动检查函数
 };

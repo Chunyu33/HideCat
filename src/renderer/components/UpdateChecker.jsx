@@ -103,6 +103,7 @@ const UpdateChecker = () => {
     setUpdateStatus('checking');
     setDevMessage('');
     setErrorMessage('');
+
     try {
       await window.electronAPI?.checkForUpdates?.();
       console.log('UpdateChecker: checkForUpdates invoked');
@@ -116,6 +117,18 @@ const UpdateChecker = () => {
   const installUpdate = () => {
     console.log('UpdateChecker: installUpdate called');
     window.electronAPI?.quitAndInstall?.();
+  };
+
+  const downloadUpdate = async () => {
+    console.log('UpdateChecker: downloadUpdate called');
+    setErrorMessage('');
+    setUpdateStatus('downloading');
+    try {
+      await window.electronAPI?.downloadUpdate?.();
+    } catch (error) {
+      setUpdateStatus('error');
+      setErrorMessage(error?.message || String(error));
+    }
   };
 
   const getStatusText = () => {
@@ -161,6 +174,17 @@ const UpdateChecker = () => {
               className="update-checker-btn-primary"
             >
               检查更新
+            </Button>
+          )}
+
+          {updateStatus === 'available' && (
+            <Button
+              type="primary"
+              size="small"
+              onClick={downloadUpdate}
+              className="update-checker-btn-primary"
+            >
+              立即下载更新
             </Button>
           )}
           
