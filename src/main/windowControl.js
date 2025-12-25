@@ -1,8 +1,6 @@
 const {
   BrowserWindow,
   BrowserView,
-  Menu,
-  Notification,
   screen,
   app,
   shell,
@@ -10,6 +8,7 @@ const {
 const path = require("path");
 const { randomUUID } = require("crypto");
 const store = require("./store"); // 使用持久化 store
+const { bindBrowserViewEvents } = require("./browserViewBindings");
 
 let mainWindow = null;
 let settingsWin = undefined;
@@ -353,98 +352,18 @@ async function addTab(key, url) {
 
     browserViews.set(key, view);
 
-    view.webContents.setWindowOpenHandler(({ url: targetUrl }) => {
-      view.webContents.loadURL(targetUrl);
-      return { action: "deny" };
-    });
-
-    view.webContents.on(
-      "did-fail-load",
-      (e, errorCode, errorDescription, validatedURL) => {
-        mainWindow.webContents.send("tab-load-failed", {
-          key,
-          errorCode,
-          errorDescription,
-          url: validatedURL,
-        });
-      }
-    );
-
-    view.webContents.on("dom-ready", () => {
-      const title = view.webContents.getTitle?.() || "";
-      mainWindow.webContents.send("tab-loaded", { key, url, title });
-      console.log(`DOM ready...Tab ${key} loaded: ${url}`);
-    });
-
-    view.webContents.on("did-finish-load", () => {
-      mainWindow.webContents.send("tab-finish", { key, url });
-      // 加载完成后 确保缩放比例立即生效
-      const scale = store.get("scale", 1.0); // 获取全局缩放比例
-      view.webContents.setZoomFactor(scale); // 立即应用缩放
-      console.log(`\n setZoomFactor for scale=${scale}`);
-      console.log(`✅ Tab ${key} finished loading: ${url}`);
-    });
-
-    // =========================
-    // BrowserView 右键菜单：一键收藏到主页“快捷入口”
-    // - 右键触发时，从页面拿到 title/url
-    // - 调用现有 addShortcut 写入 store
-    // - 通过 IPC 通知渲染进程刷新快捷入口列表
-    // =========================
-    view.webContents.on("context-menu", (_, params) => {
-      try {
-        // 只做最小功能：提供一个入口即可，避免菜单过于冗余
-        const menu = Menu.buildFromTemplate([
-          {
-            label: "重新加载",
-            click: () => {
-              try {
-                view.webContents.reload();
-              } catch (e) {
-                console.warn("reload failed", e);
-              }
-            },
-          },
-          { type: "separator" },
-          {
-            label: "收藏到快捷入口",
-            click: () => {
-              if (!mainWindow || mainWindow.isDestroyed()) return;
-
-              // params.pageURL 通常更准确（尤其是 iframe / 特殊页面）
-              const pageUrl = (params && params.pageURL) || view.webContents.getURL();
-              const title = (view.webContents.getTitle && view.webContents.getTitle()) || pageUrl;
-
-              // 写入快捷入口（store 持久化）
-              const updated = addShortcut({
-                name: title,
-                url: pageUrl,
-              });
-
-              // 轻量提示：使用系统通知（Windows/macOS/Linux）
-              // 说明：Electron 没有内置“应用内 toast”组件，推荐用 Notification 做轻提示
-              try {
-                if (Notification && Notification.isSupported()) {
-                  new Notification({
-                    appID: "SlackeFish",
-                    title: "已收藏到快捷入口",
-                    body: title,
-                  }).show();
-                }
-              } catch (e) {
-                // 通知失败不影响主流程
-              }
-
-              // 通知渲染进程：快捷入口已更新（主页可选择监听此事件刷新 UI）
-              mainWindow.webContents.send("shortcuts-updated", updated);
-            },
-          },
-        ]);
-
-        menu.popup({ window: mainWindow });
-      } catch (e) {
-        console.warn("context-menu failed", e);
-      }
+    // 统一在一个模块里绑定 BrowserView 的事件，避免 addTab 过长
+    bindBrowserViewEvents({
+      view,
+      mainWindow,
+      key,
+      getScale: () => store.get("scale", 1.0),
+      getTheme: () => store.get("theme", "light"),
+      addShortcut,
+      getShortcuts,
+      getHiddenDefaultShortcutIds,
+      unhideDefaultShortcut,
+      appName: "SlackeFish",
     });
     // view.webContents.on(
     //   "did-navigate-in-page",
@@ -666,13 +585,19 @@ function dragWindow() {
   }
 
   // 对于无边框窗口，需要手动实现拖动
-  const { screen } = require("electron");
+  // 说明：这里尽量减少 setPosition 的调用频率与无效更新，降低抖动/卡顿
   const mousePos = screen.getCursorScreenPoint();
   const windowBounds = mainWindow.getBounds();
 
   // 计算鼠标在窗口内的相对位置
   const offsetX = mousePos.x - windowBounds.x;
   const offsetY = mousePos.y - windowBounds.y;
+
+  // 记录上一帧的位置，避免目标位置未变化时重复 setPosition
+  let lastMouseX = mousePos.x;
+  let lastMouseY = mousePos.y;
+  let lastX = windowBounds.x;
+  let lastY = windowBounds.y;
 
   // 开始拖动循环
   dragInterval = setInterval(() => {
@@ -684,11 +609,25 @@ function dragWindow() {
 
     const currentMousePos = screen.getCursorScreenPoint();
 
+    // 鼠标没动就不需要更新窗口位置
+    if (currentMousePos.x === lastMouseX && currentMousePos.y === lastMouseY) {
+      return;
+    }
+    lastMouseX = currentMousePos.x;
+    lastMouseY = currentMousePos.y;
+
+    const nextX = currentMousePos.x - offsetX;
+    const nextY = currentMousePos.y - offsetY;
+
+    // 目标位置没变则跳过（减少 setPosition 带来的抖动）
+    if (nextX === lastX && nextY === lastY) {
+      return;
+    }
+    lastX = nextX;
+    lastY = nextY;
+
     // 移动窗口到新的位置
-    mainWindow.setPosition(
-      currentMousePos.x - offsetX,
-      currentMousePos.y - offsetY
-    );
+    mainWindow.setPosition(nextX, nextY);
   }, 16); // 约60fps
 }
 

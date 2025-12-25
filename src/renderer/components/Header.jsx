@@ -38,7 +38,7 @@ const Header = ({ onOpenSettings, headerVisible, onRequestHide }) => {
     }
   };
 
-  // 处理拖动窗口
+  // 处理拖动窗口（IPC 自定义实现）
   const handleDragStart = (e) => {
     // 阻止事件冒泡，避免影响按钮点击
     e.stopPropagation();

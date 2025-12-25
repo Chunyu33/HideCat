@@ -12,7 +12,7 @@ const HOME_TAB_KEY = "tab-home";
 const initialItems = [
   {
     key: HOME_TAB_KEY,
-    label: "主页",
+    label: "SlackeFish",
     children: "LOADING_HOME",
     closable: false,
     // status: undefined 默认
