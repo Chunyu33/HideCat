@@ -73,6 +73,19 @@ contextBridge.exposeInMainWorld("electronAPI", {
   updateShortcut: (item) => ipcRenderer.invoke("update-shortcut", item),
   removeShortcut: (id) => ipcRenderer.invoke("remove-shortcut", id),
 
+  // 默认快捷入口隐藏（非删除）
+  getHiddenDefaultShortcuts: () => ipcRenderer.invoke("get-hidden-default-shortcuts"),
+  hideDefaultShortcut: (id) => ipcRenderer.invoke("hide-default-shortcut", id),
+  unhideDefaultShortcut: (id) => ipcRenderer.invoke("unhide-default-shortcut", id),
+
+  // 快捷入口更新通知
+  // 主进程在 BrowserView 右键菜单“收藏到快捷入口”成功后，会发送 shortcuts-updated
+  onShortcutsUpdated: (cb) => {
+    const listener = (_, shortcuts) => cb && cb(shortcuts);
+    ipcRenderer.on("shortcuts-updated", listener);
+    return () => ipcRenderer.removeListener("shortcuts-updated", listener);
+  },
+
   // 主题切换
   setTheme: (theme) => ipcRenderer.invoke("set-theme", theme),
   getTheme: () => ipcRenderer.invoke("get-theme"),

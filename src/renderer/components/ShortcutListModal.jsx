@@ -99,8 +99,10 @@ const ShortcutListModal = ({
                 </Text>
               </div>
             </div>
-            {/* 删除按钮 系统内置的不可删除 */}
-            {!item.system ? (
+            {/* 删除按钮：
+                - 自定义快捷入口：真删除
+                - 默认快捷入口：若 delAble=true，则允许“删除=隐藏” */}
+            {(!item.system || item.delAble) ? (
               <Popconfirm
                 title="确认删除？"
                 okText="删除"

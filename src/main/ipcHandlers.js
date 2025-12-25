@@ -18,6 +18,9 @@ const {
   navigateView,
   getActiveKey,
   getShortcuts,
+  getHiddenDefaultShortcutIds,
+  hideDefaultShortcut,
+  unhideDefaultShortcut,
   addShortcut,
   updateShortcut,
   removeShortcut,
@@ -119,6 +122,15 @@ function registerIPC(ipcMain, mainWindow) {
   ipcMain.handle("add-shortcut", (_, item) => addShortcut(item));
   ipcMain.handle("update-shortcut", (_, item) => updateShortcut(item));
   ipcMain.handle("remove-shortcut", (_, id) => removeShortcut(id));
+
+  // 默认快捷入口隐藏（非删除）
+  ipcMain.handle("get-hidden-default-shortcuts", () =>
+    getHiddenDefaultShortcutIds()
+  );
+  ipcMain.handle("hide-default-shortcut", (_, id) => hideDefaultShortcut(id));
+  ipcMain.handle("unhide-default-shortcut", (_, id) =>
+    unhideDefaultShortcut(id)
+  );
 
   // ======================
   // 主题管理

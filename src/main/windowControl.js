@@ -1,4 +1,12 @@
-const { BrowserWindow, BrowserView, screen, app, shell } = require("electron");
+const {
+  BrowserWindow,
+  BrowserView,
+  Menu,
+  Notification,
+  screen,
+  app,
+  shell,
+} = require("electron");
 const path = require("path");
 const { randomUUID } = require("crypto");
 const store = require("./store"); // 使用持久化 store
@@ -377,11 +385,67 @@ async function addTab(key, url) {
       console.log(`✅ Tab ${key} finished loading: ${url}`);
     });
 
-    // view.webContents.on("did-navigate", (event, url) => {
-    //   console.log("\njump new URL:", url);
-    //   updateAllTheme();
-    // });
+    // =========================
+    // BrowserView 右键菜单：一键收藏到主页“快捷入口”
+    // - 右键触发时，从页面拿到 title/url
+    // - 调用现有 addShortcut 写入 store
+    // - 通过 IPC 通知渲染进程刷新快捷入口列表
+    // =========================
+    view.webContents.on("context-menu", (_, params) => {
+      try {
+        // 只做最小功能：提供一个入口即可，避免菜单过于冗余
+        const menu = Menu.buildFromTemplate([
+          {
+            label: "重新加载",
+            click: () => {
+              try {
+                view.webContents.reload();
+              } catch (e) {
+                console.warn("reload failed", e);
+              }
+            },
+          },
+          { type: "separator" },
+          {
+            label: "收藏到快捷入口",
+            click: () => {
+              if (!mainWindow || mainWindow.isDestroyed()) return;
 
+              // params.pageURL 通常更准确（尤其是 iframe / 特殊页面）
+              const pageUrl = (params && params.pageURL) || view.webContents.getURL();
+              const title = (view.webContents.getTitle && view.webContents.getTitle()) || pageUrl;
+
+              // 写入快捷入口（store 持久化）
+              const updated = addShortcut({
+                name: title,
+                url: pageUrl,
+              });
+
+              // 轻量提示：使用系统通知（Windows/macOS/Linux）
+              // 说明：Electron 没有内置“应用内 toast”组件，推荐用 Notification 做轻提示
+              try {
+                if (Notification && Notification.isSupported()) {
+                  new Notification({
+                    appID: "SlackeFish",
+                    title: "已收藏到快捷入口",
+                    body: title,
+                  }).show();
+                }
+              } catch (e) {
+                // 通知失败不影响主流程
+              }
+
+              // 通知渲染进程：快捷入口已更新（主页可选择监听此事件刷新 UI）
+              mainWindow.webContents.send("shortcuts-updated", updated);
+            },
+          },
+        ]);
+
+        menu.popup({ window: mainWindow });
+      } catch (e) {
+        console.warn("context-menu failed", e);
+      }
+    });
     // view.webContents.on(
     //   "did-navigate-in-page",
     //   (event, url, isMainFrame, frameProcessId, frameRoutingId) => {
@@ -492,6 +556,45 @@ function navigateView(action) {
 function getShortcuts() {
   return store.get("shortcuts", []);
 }
+
+// =================== 默认快捷入口（内置）隐藏逻辑 ===================
+// 说明：delAble=true 的系统默认快捷入口“删除”行为实际是隐藏（不改 defaultShortcuts.js）
+// 持久化方式：在 electron-store 存一份被隐藏的 default shortcut id 列表
+function getHiddenDefaultShortcutIds() {
+  return store.get("hiddenDefaultShortcutIds", []);
+}
+
+function hideDefaultShortcut(id) {
+  if (!id) return getHiddenDefaultShortcutIds();
+  const current = new Set(getHiddenDefaultShortcutIds());
+  current.add(id);
+  const updated = Array.from(current);
+  store.set("hiddenDefaultShortcutIds", updated);
+
+  // 通知渲染进程：快捷入口展示状态已变化（主页可选择监听此事件刷新 UI）
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send("shortcuts-updated", {
+      hiddenDefaultShortcutIds: updated,
+    });
+  }
+  return updated;
+}
+
+function unhideDefaultShortcut(id) {
+  if (!id) return getHiddenDefaultShortcutIds();
+  const current = new Set(getHiddenDefaultShortcutIds());
+  current.delete(id);
+  const updated = Array.from(current);
+  store.set("hiddenDefaultShortcutIds", updated);
+
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send("shortcuts-updated", {
+      hiddenDefaultShortcutIds: updated,
+    });
+  }
+  return updated;
+}
+
 function addShortcut(newShortcut) {
   newShortcut.id = randomUUID();
   const current = store.get("shortcuts", []);
@@ -631,6 +734,9 @@ module.exports = {
   navigateView,
   getActiveKey,
   getShortcuts,
+  getHiddenDefaultShortcutIds,
+  hideDefaultShortcut,
+  unhideDefaultShortcut,
   addShortcut,
   updateShortcut,
   removeShortcut,
