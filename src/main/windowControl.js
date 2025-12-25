@@ -85,6 +85,11 @@ function openSettingsWindow() {
     },
   });
 
+  if (getAutoHideState()) {
+    clearTimeout(startupTimer);
+    startMouseWatcher();
+  }
+
   settingsWin.loadURL(url);
   // if (isDev) {
   //   settingsWin.webContents.openDevTools();
@@ -138,7 +143,7 @@ function getAutoHideState() {
 }
 
 // 显示窗口
-function showWindow(customCountDown = undefined) {
+function showWindow() {
   if (!mainWindow || mainWindow.isDestroyed()) return;
 
   mainWindow.show(); // 原来的抢焦点方式
@@ -148,14 +153,7 @@ function showWindow(customCountDown = undefined) {
   // 重新启动 秒定时器
   if (getAutoHideState()) {
     clearTimeout(startupTimer);
-    startupTimer = setTimeout(() => {
-      console.log(
-        `\n ⏳ Mouse status monitoring will begin ${
-          customCountDown ?? COUNTDOWN
-        } seconds after startup.`
-      );
-      startMouseWatcher();
-    }, customCountDown ?? COUNTDOWN);
+    startMouseWatcher();
   }
 }
 
@@ -270,10 +268,7 @@ function initAutoHideWatcher(customCountDown = undefined) {
     `\n🚀 initAutoHideWatcher ${COUNTDOWN} secends，active mouse check...`
   );
 
-  // 启动定时器开始检测鼠标
-  startupTimer = setTimeout(() => {
-    startMouseWatcher();
-  }, customCountDown ?? COUNTDOWN);
+  startMouseWatcher();
 }
 
 // ======================== BrowserView 标签管理逻辑 ========================
