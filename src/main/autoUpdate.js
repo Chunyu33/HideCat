@@ -204,6 +204,18 @@ function quitAndInstall() {
   sendToAllWindows("update-status", "installing");
 
   try {
+    console.log("[Updater] install context:", {
+      platform: process.platform,
+      version: app.getVersion(),
+      execPath: process.execPath,
+      appPath: app.getAppPath(),
+      isPackaged: app.isPackaged,
+    });
+  } catch (e) {
+    console.warn("[Updater] install context log failed:", e?.message || e);
+  }
+
+  try {
     if (process.platform === "darwin") {
       autoUpdater.quitAndInstall(false, true);
       setTimeout(() => {
@@ -278,6 +290,20 @@ autoUpdater.on("download-progress", (progressObj) => {
 autoUpdater.on("update-downloaded", (info) => {
   console.log("[Updater] 事件: update-downloaded", info);
   sendToAllWindows("update-downloaded", info);
+
+  try {
+    console.log("[Updater] downloaded context:", {
+      platform: process.platform,
+      version: app.getVersion(),
+      execPath: process.execPath,
+      appPath: app.getAppPath(),
+      isPackaged: app.isPackaged,
+      downloadedFile: info?.downloadedFile,
+      files: info?.files?.map((f) => ({ url: f?.url, sha512: !!f?.sha512, size: f?.size })),
+    });
+  } catch (e) {
+    console.warn("[Updater] downloaded context log failed:", e?.message || e);
+  }
   
   // 下载完成后弹出对话框询问是否立即安装
   const dialogOpts = {
@@ -304,6 +330,10 @@ autoUpdater.on("update-downloaded", (info) => {
 autoUpdater.on("error", (error) => {
   console.error("[Updater] 事件: error", error.message);
   sendToAllWindows("update-error", error.message);
+});
+
+autoUpdater.on("before-quit-for-update", () => {
+  console.log("[Updater] 事件: before-quit-for-update");
 });
 
 // ========================================
