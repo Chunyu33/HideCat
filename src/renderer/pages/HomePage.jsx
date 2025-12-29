@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Input, Typography, Space, message } from "antd";
+import { Input, Typography, Space, Tooltip, message } from "antd";
 import { SearchOutlined, PlusOutlined, MoreOutlined } from "@ant-design/icons";
 import BrowserMark from "../components/BrowserMark";
 import defaultShortcuts from "../services/defaultShortcuts";
@@ -22,6 +22,7 @@ const HomePage = ({ onNewTab, onUpdateTab, currentKey }) => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showMoreModal, setShowMoreModal] = useState(false);
   const [showManualModal, setShowManualModal] = useState(false);
+  const [hiddenDefaultShortcutIds, setHiddenDefaultShortcutIds] = useState([]);
   const searchEngine = useSearchEngine("bing");
 
   // ✅ 从全局 zustand store 读取状态和方法
@@ -35,8 +36,43 @@ const HomePage = ({ onNewTab, onUpdateTab, currentKey }) => {
     }
   }, [initialized, initShortcuts]);
 
+  useEffect(() => {
+    // 初始化：从主进程读取“被隐藏的默认快捷入口”列表
+    // 说明：默认快捷入口的删除行为是“隐藏”，所以需要单独维护一份 id 列表
+    const initHidden = async () => {
+      const ids = await window.electronAPI.getHiddenDefaultShortcuts?.();
+      setHiddenDefaultShortcutIds(Array.isArray(ids) ? ids : []);
+    };
+    initHidden();
+  }, []);
+
+  useEffect(() => {
+    // 监听主进程通知：当 BrowserView 右键“收藏到快捷入口”后，自动刷新主页快捷入口
+    // 这里采用最小实现：收到事件后重新从 store 拉取一次列表，避免在渲染层重复拼装逻辑
+    const off = window.electronAPI.onShortcutsUpdated?.((payload) => {
+      initShortcuts();
+
+      // 若主进程顺带通知了隐藏列表，也一并刷新（兼容 payload 为数组/对象/空）
+      if (payload && Array.isArray(payload.hiddenDefaultShortcutIds)) {
+        setHiddenDefaultShortcutIds(payload.hiddenDefaultShortcutIds);
+      }
+    });
+
+    return () => {
+      if (typeof off === "function") off();
+    };
+  }, [initShortcuts]);
+
   // 合并默认和用户快捷方式并按排序字段排序（数字越小越靠前）
-  const allShortcuts = [...defaultShortcuts, ...shortcuts].sort((a, b) => {
+  const hiddenSet = new Set(hiddenDefaultShortcutIds || []);
+  const visibleDefaultShortcuts = defaultShortcuts.filter((it) => {
+    // 兼容 defaultShortcuts.js 里没加 isDel/delAble 的老数据
+    if (hiddenSet.has(it.id)) return false;
+    if (it.isDel === true) return false;
+    return true;
+  });
+
+  const allShortcuts = [...visibleDefaultShortcuts, ...shortcuts].sort((a, b) => {
     const sortA = a.sort || 0;
     const sortB = b.sort || 0;
     return sortA - sortB;
@@ -98,8 +134,16 @@ const HomePage = ({ onNewTab, onUpdateTab, currentKey }) => {
     await addShortcut(newItem);
   };
 
-  const handleDeleteShortcut = async (id) => {
-    await deleteShortcut(id);
+  const handleDeleteShortcut = async (item) => {
+    // 默认快捷入口：delAble=true 才允许“删除=隐藏”
+    if (item?.system) {
+      if (!item?.delAble) return;
+      await window.electronAPI.hideDefaultShortcut?.(item.id);
+      return;
+    }
+
+    // 自定义快捷入口：保持原有逻辑（真删除 store 里的数据）
+    await deleteShortcut(item.id);
   };
 
   const handleShowManual = () => {
@@ -164,7 +208,10 @@ const HomePage = ({ onNewTab, onUpdateTab, currentKey }) => {
             <div className="shortcut-icon">
               {item.icon || <BrowserMark size={22} />}
             </div>
-            <Text className="shortcut-text">{item.name}</Text>
+            <Tooltip title={item.name} placement="bottom" color="var(--button-bg-hover)"
+              styles={{ body: { color: "var(--text-color)" } }}>
+              <Text className="shortcut-text">{item.name}</Text>
+            </Tooltip>
           </div>
         ))}
       </Space>
@@ -177,7 +224,7 @@ const HomePage = ({ onNewTab, onUpdateTab, currentKey }) => {
           setShowMoreModal(false);
           handleShortcutClick(item);
         }}
-        onDelete={(item) => handleDeleteShortcut(item.id)}
+        onDelete={(item) => handleDeleteShortcut(item)}
         onClose={() => setShowMoreModal(false)}
       />
 
@@ -192,10 +239,10 @@ const HomePage = ({ onNewTab, onUpdateTab, currentKey }) => {
         visible={showManualModal}
         onClose={() => setShowManualModal(false)}
       />
-
+      {/* 
       <footer className="copyright">
         Copyright © {new Date().getFullYear()} SlackeFish. All rights reserved.
-      </footer>
+      </footer> */}
     </div>
   );
 };

@@ -1,7 +1,14 @@
-const { BrowserWindow, BrowserView, screen, app, shell } = require("electron");
+const {
+  BrowserWindow,
+  BrowserView,
+  screen,
+  app,
+  shell,
+} = require("electron");
 const path = require("path");
 const { randomUUID } = require("crypto");
 const store = require("./store"); // 使用持久化 store
+const { bindBrowserViewEvents } = require("./browserViewBindings");
 
 let mainWindow = null;
 let settingsWin = undefined;
@@ -78,6 +85,11 @@ function openSettingsWindow() {
     },
   });
 
+  if (getAutoHideState()) {
+    clearTimeout(startupTimer);
+    startMouseWatcher();
+  }
+
   settingsWin.loadURL(url);
   // if (isDev) {
   //   settingsWin.webContents.openDevTools();
@@ -131,7 +143,7 @@ function getAutoHideState() {
 }
 
 // 显示窗口
-function showWindow(customCountDown = undefined) {
+function showWindow() {
   if (!mainWindow || mainWindow.isDestroyed()) return;
 
   mainWindow.show(); // 原来的抢焦点方式
@@ -141,14 +153,7 @@ function showWindow(customCountDown = undefined) {
   // 重新启动 秒定时器
   if (getAutoHideState()) {
     clearTimeout(startupTimer);
-    startupTimer = setTimeout(() => {
-      console.log(
-        `\n ⏳ Mouse status monitoring will begin ${
-          customCountDown ?? COUNTDOWN
-        } seconds after startup.`
-      );
-      startMouseWatcher();
-    }, customCountDown ?? COUNTDOWN);
+    startMouseWatcher();
   }
 }
 
@@ -263,10 +268,7 @@ function initAutoHideWatcher(customCountDown = undefined) {
     `\n🚀 initAutoHideWatcher ${COUNTDOWN} secends，active mouse check...`
   );
 
-  // 启动定时器开始检测鼠标
-  startupTimer = setTimeout(() => {
-    startMouseWatcher();
-  }, customCountDown ?? COUNTDOWN);
+  startMouseWatcher();
 }
 
 // ======================== BrowserView 标签管理逻辑 ========================
@@ -345,43 +347,19 @@ async function addTab(key, url) {
 
     browserViews.set(key, view);
 
-    view.webContents.setWindowOpenHandler(({ url: targetUrl }) => {
-      view.webContents.loadURL(targetUrl);
-      return { action: "deny" };
+    // 统一在一个模块里绑定 BrowserView 的事件，避免 addTab 过长
+    bindBrowserViewEvents({
+      view,
+      mainWindow,
+      key,
+      getScale: () => store.get("scale", 1.0),
+      getTheme: () => store.get("theme", "light"),
+      addShortcut,
+      getShortcuts,
+      getHiddenDefaultShortcutIds,
+      unhideDefaultShortcut,
+      appName: "SlackeFish",
     });
-
-    view.webContents.on(
-      "did-fail-load",
-      (e, errorCode, errorDescription, validatedURL) => {
-        mainWindow.webContents.send("tab-load-failed", {
-          key,
-          errorCode,
-          errorDescription,
-          url: validatedURL,
-        });
-      }
-    );
-
-    view.webContents.on("dom-ready", () => {
-      const title = view.webContents.getTitle?.() || "";
-      mainWindow.webContents.send("tab-loaded", { key, url, title });
-      console.log(`DOM ready...Tab ${key} loaded: ${url}`);
-    });
-
-    view.webContents.on("did-finish-load", () => {
-      mainWindow.webContents.send("tab-finish", { key, url });
-      // 加载完成后 确保缩放比例立即生效
-      const scale = store.get("scale", 1.0); // 获取全局缩放比例
-      view.webContents.setZoomFactor(scale); // 立即应用缩放
-      console.log(`\n setZoomFactor for scale=${scale}`);
-      console.log(`✅ Tab ${key} finished loading: ${url}`);
-    });
-
-    // view.webContents.on("did-navigate", (event, url) => {
-    //   console.log("\njump new URL:", url);
-    //   updateAllTheme();
-    // });
-
     // view.webContents.on(
     //   "did-navigate-in-page",
     //   (event, url, isMainFrame, frameProcessId, frameRoutingId) => {
@@ -492,6 +470,45 @@ function navigateView(action) {
 function getShortcuts() {
   return store.get("shortcuts", []);
 }
+
+// =================== 默认快捷入口（内置）隐藏逻辑 ===================
+// 说明：delAble=true 的系统默认快捷入口“删除”行为实际是隐藏（不改 defaultShortcuts.js）
+// 持久化方式：在 electron-store 存一份被隐藏的 default shortcut id 列表
+function getHiddenDefaultShortcutIds() {
+  return store.get("hiddenDefaultShortcutIds", []);
+}
+
+function hideDefaultShortcut(id) {
+  if (!id) return getHiddenDefaultShortcutIds();
+  const current = new Set(getHiddenDefaultShortcutIds());
+  current.add(id);
+  const updated = Array.from(current);
+  store.set("hiddenDefaultShortcutIds", updated);
+
+  // 通知渲染进程：快捷入口展示状态已变化（主页可选择监听此事件刷新 UI）
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send("shortcuts-updated", {
+      hiddenDefaultShortcutIds: updated,
+    });
+  }
+  return updated;
+}
+
+function unhideDefaultShortcut(id) {
+  if (!id) return getHiddenDefaultShortcutIds();
+  const current = new Set(getHiddenDefaultShortcutIds());
+  current.delete(id);
+  const updated = Array.from(current);
+  store.set("hiddenDefaultShortcutIds", updated);
+
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send("shortcuts-updated", {
+      hiddenDefaultShortcutIds: updated,
+    });
+  }
+  return updated;
+}
+
 function addShortcut(newShortcut) {
   newShortcut.id = randomUUID();
   const current = store.get("shortcuts", []);
@@ -563,13 +580,19 @@ function dragWindow() {
   }
 
   // 对于无边框窗口，需要手动实现拖动
-  const { screen } = require("electron");
+  // 说明：这里尽量减少 setPosition 的调用频率与无效更新，降低抖动/卡顿
   const mousePos = screen.getCursorScreenPoint();
   const windowBounds = mainWindow.getBounds();
 
   // 计算鼠标在窗口内的相对位置
   const offsetX = mousePos.x - windowBounds.x;
   const offsetY = mousePos.y - windowBounds.y;
+
+  // 记录上一帧的位置，避免目标位置未变化时重复 setPosition
+  let lastMouseX = mousePos.x;
+  let lastMouseY = mousePos.y;
+  let lastX = windowBounds.x;
+  let lastY = windowBounds.y;
 
   // 开始拖动循环
   dragInterval = setInterval(() => {
@@ -581,11 +604,25 @@ function dragWindow() {
 
     const currentMousePos = screen.getCursorScreenPoint();
 
+    // 鼠标没动就不需要更新窗口位置
+    if (currentMousePos.x === lastMouseX && currentMousePos.y === lastMouseY) {
+      return;
+    }
+    lastMouseX = currentMousePos.x;
+    lastMouseY = currentMousePos.y;
+
+    const nextX = currentMousePos.x - offsetX;
+    const nextY = currentMousePos.y - offsetY;
+
+    // 目标位置没变则跳过（减少 setPosition 带来的抖动）
+    if (nextX === lastX && nextY === lastY) {
+      return;
+    }
+    lastX = nextX;
+    lastY = nextY;
+
     // 移动窗口到新的位置
-    mainWindow.setPosition(
-      currentMousePos.x - offsetX,
-      currentMousePos.y - offsetY
-    );
+    mainWindow.setPosition(nextX, nextY);
   }, 16); // 约60fps
 }
 
@@ -631,6 +668,9 @@ module.exports = {
   navigateView,
   getActiveKey,
   getShortcuts,
+  getHiddenDefaultShortcutIds,
+  hideDefaultShortcut,
+  unhideDefaultShortcut,
   addShortcut,
   updateShortcut,
   removeShortcut,
