@@ -199,7 +199,32 @@ function downloadUpdate() {
  */
 function quitAndInstall() {
   console.log("[Updater] 退出并安装更新");
-  autoUpdater.quitAndInstall();
+  configureUpdater();
+
+  sendToAllWindows("update-status", "installing");
+
+  try {
+    if (process.platform === "darwin") {
+      autoUpdater.quitAndInstall(false, true);
+      setTimeout(() => {
+        try {
+          console.warn("[Updater] macOS quitAndInstall fallback: calling app.quit()");
+          app.quit();
+        } catch (e) {
+          console.error("[Updater] macOS fallback app.quit() failed:", e?.message || e);
+        }
+      }, 1500);
+
+      return { success: true };
+    }
+
+    autoUpdater.quitAndInstall();
+    return { success: true };
+  } catch (error) {
+    console.error("[Updater] ❌ quitAndInstall 失败:", error?.message || error);
+    sendToAllWindows("update-error", error?.message || String(error));
+    return { success: false, error: error?.message || String(error) };
+  }
 }
 
 // ========================================
@@ -267,7 +292,7 @@ autoUpdater.on("update-downloaded", (info) => {
     if (returnValue.response === 0) {
       // 用户点击"立即重启"
       console.log("[Updater] 用户确认立即重启安装");
-      setImmediate(() => autoUpdater.quitAndInstall());
+      setImmediate(() => quitAndInstall());
     } else {
       // 用户点击"稍后重启"
       console.log("[Updater] 用户选择稍后重启，下次启动时自动安装");

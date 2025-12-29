@@ -116,7 +116,21 @@ const UpdateChecker = () => {
 
   const installUpdate = () => {
     console.log('UpdateChecker: installUpdate called');
-    window.electronAPI?.quitAndInstall?.();
+    setErrorMessage('');
+    try {
+      Promise.resolve(window.electronAPI?.quitAndInstall?.()).then((res) => {
+        if (res && res.success === false) {
+          setUpdateStatus('error');
+          setErrorMessage(res.error || '安装更新失败');
+        }
+      }).catch((error) => {
+        setUpdateStatus('error');
+        setErrorMessage(error?.message || String(error));
+      });
+    } catch (error) {
+      setUpdateStatus('error');
+      setErrorMessage(error?.message || String(error));
+    }
   };
 
   const downloadUpdate = async () => {
