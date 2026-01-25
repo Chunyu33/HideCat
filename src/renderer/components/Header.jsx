@@ -122,7 +122,7 @@ const Header = ({ onOpenSettings, headerVisible, onRequestHide }) => {
 
         {/* 右侧操作按钮 */}
         <div className="header-actions">
-          <IconButton title="后退" onClick={() => navigate("back")}>
+          {/* <IconButton title="后退" onClick={() => navigate("back")}>
             <IconBack />
           </IconButton>
           <IconButton title="前进" onClick={() => navigate("forward")}>
@@ -133,7 +133,7 @@ const Header = ({ onOpenSettings, headerVisible, onRequestHide }) => {
           </IconButton>
           <IconButton title="刷新" onClick={() => navigate("reload")}>
             <IconRefresh />
-          </IconButton>
+          </IconButton> */}
           <IconButton title="设置" onClick={onOpenSettings}>
             <IconSetting />
           </IconButton>

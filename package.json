@@ -1,7 +1,7 @@
 {
   "name": "slacke-fish",
   "productName": "SlackeFish",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "SlackeFish",
   "main": "src/main/main.js",
   "scripts": {
@@ -13,13 +13,24 @@
   },
   "build": {
     "appId": "com.liuchunyu.slackefish",
+    "asar": true,
     "files": [
       "src/main/**/*",
       "src/preload/**/*",
       "src/assets/**/*",
       "h5/**/*",
-      "node_modules/**/*",
-      "package.json"
+      "package.json",
+      "!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
+      "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
+      "!**/node_modules/*.d.ts",
+      "!**/node_modules/.bin",
+      "!**/*.{iml,o,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,xproj}",
+      "!.editorconfig",
+      "!**/._*",
+      "!**/{.DS_Store,.git,.hg,.svn,CVS,RCS,SCCS,.gitignore,.gitattributes}",
+      "!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}",
+      "!**/{appveyor.yml,.travis.yml,circle.yml}",
+      "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}"
     ],
     "extraMetadata": {
       "main": "src/main/main.js"
@@ -70,16 +81,15 @@
     "electron-builder": "^26.0.12",
     "node-loader": "^2.1.0",
     "style-loader": "^3.3.4",
-    "vite": "^7.2.2"
-  },
-  "dependencies": {
+    "vite": "^7.2.2",
     "antd": "^5.27.6",
-    "electron-log": "^5.4.3",
-    "electron-squirrel-startup": "^1.0.1",
-    "electron-store": "^11.0.2",
-    "electron-updater": "^6.6.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "zustand": "^5.0.8"
+  },
+  "dependencies": {
+    "electron-log": "^5.4.3",
+    "electron-store": "^11.0.2",
+    "electron-updater": "^6.6.2"
   }
 }

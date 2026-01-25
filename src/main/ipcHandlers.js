@@ -12,6 +12,8 @@ const {
   getAutoHideState,
   setOpacity,
   setScale,
+  setAutoZoom,
+  getAutoZoom,
   addTab,
   setActiveTab,
   removeTab,
@@ -99,6 +101,10 @@ function registerIPC(ipcMain, mainWindow) {
 
   ipcMain.handle("set-scale", (_, val) => setScale(val));
   ipcMain.handle("get-scale", () => require("./store").get("scale"));
+
+  // 自动缩放开关
+  ipcMain.handle("set-auto-zoom", (_, enabled) => setAutoZoom(enabled));
+  ipcMain.handle("get-auto-zoom", () => getAutoZoom());
 
   // ======================
   // 主窗口关闭

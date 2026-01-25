@@ -18,12 +18,65 @@ let startupTimer = null;
 let lastCursorInside = true;
 let autoShowPaused = false; // 是否暂停自动显示
 let dragInterval = null; // 拖动定时器
+let resizeDebounceTimer = null; // 窗口缩放防抖定时器
 
 const COUNTDOWN = 3500; // 倒计时
 
 // 设置主窗口引用
 function setMainWindow(win) {
   mainWindow = win;
+  
+  // 监听窗口大小变化，自动调整所有 BrowserView 的缩放（带防抖）
+  if (win) {
+    win.on("resize", () => {
+      // 防抖处理，避免拖拽时频繁触发
+      if (resizeDebounceTimer) clearTimeout(resizeDebounceTimer);
+      resizeDebounceTimer = setTimeout(() => {
+        _updateAllViewsZoom();
+      }, 100);
+    });
+  }
+}
+
+// =================== 缩放管理模块 ===================
+
+/**
+ * 获取当前应该使用的缩放比例
+ * - autoZoom 开启时：自动根据窗口大小计算
+ * - autoZoom 关闭时：使用用户设置的 scale
+ */
+function _getEffectiveZoom() {
+  const autoZoom = store.get("autoZoom", true);
+  if (autoZoom) {
+    return _calculateAutoZoom();
+  }
+  return store.get("scale", 1.0);
+}
+
+/**
+ * 根据窗口大小计算适合的缩放比例
+ * 基准宽度：1280px 对应 100% 缩放
+ */
+function _calculateAutoZoom() {
+  if (!mainWindow) return 1.0;
+  const [width] = mainWindow.getContentSize();
+  const baseWidth = 1280;
+  let zoom = width / baseWidth;
+  zoom = Math.max(0.5, Math.min(1.5, zoom));
+  return Math.round(zoom * 100) / 100;
+}
+
+/**
+ * 更新所有 BrowserView 的缩放以适配窗口大小
+ */
+function _updateAllViewsZoom() {
+  if (!mainWindow) return;
+  const zoomFactor = _getEffectiveZoom();
+  browserViews.forEach((view) => {
+    if (view && !view.webContents.isDestroyed()) {
+      view.webContents.setZoomFactor(zoomFactor);
+    }
+  });
 }
 
 function quit() {
@@ -181,25 +234,25 @@ function setOpacity(val) {
   }
 }
 
-// 设置网页缩放
+// 设置网页缩放（手动缩放，仅在 autoZoom 关闭时生效）
 function setScale(scale) {
-  store.set("scale", scale); // 持久化
-  // 为了避免整个主窗口被缩放, 不在mainWindow使用setZoomFactor
-  // if (mainWindow && !mainWindow.isDestroyed()) {
-  //   mainWindow.webContents.setZoomFactor(scale);
-  // }
-
-  // 缩放BrowserView
-  // 更新所有的 BrowserView 缩放
-  browserViews.forEach((view) => {
-    view.webContents.setZoomFactor(scale);
-  });
-
-  // 更新当前活动 BrowserView 的缩放
-  if (activeTabKey && browserViews.has(activeTabKey)) {
-    const activeView = browserViews.get(activeTabKey);
-    activeView.webContents.setZoomFactor(scale);
+  store.set("scale", scale);
+  // 只有在 autoZoom 关闭时才立即应用手动缩放
+  if (!store.get("autoZoom", true)) {
+    _updateAllViewsZoom();
   }
+}
+
+// 设置自动缩放开关
+function setAutoZoom(enabled) {
+  store.set("autoZoom", enabled);
+  // 立即应用新的缩放设置
+  _updateAllViewsZoom();
+}
+
+// 获取自动缩放状态
+function getAutoZoom() {
+  return store.get("autoZoom", true);
 }
 
 // -----------------------------
@@ -384,14 +437,32 @@ async function addTab(key, url) {
       view.setBounds(_getBorserSize());
       view.setAutoResize({ width: true, height: true });
       setTimeout(() => {
-        const scale = store.get("scale", 1.0); // 获取全局缩放比例
-        view.webContents.setZoomFactor(scale); // 立即应用缩放
+        view.webContents.setZoomFactor(_getEffectiveZoom());
       }, 1000);
       console.log(`🔁 refreshed active tab view for key=${key}`);
     } catch (e) {
       console.warn("refresh active tab failed", e);
     }
   }
+
+  // 页面加载完成后应用缩放
+  view.webContents.once("did-finish-load", () => {
+    if (!view || view.webContents.isDestroyed()) return;
+    view.webContents.setZoomFactor(_getEffectiveZoom());
+    
+    // 注入 viewport meta 标签确保网页响应式
+    view.webContents.executeJavaScript(`
+      (function() {
+        let viewport = document.querySelector('meta[name="viewport"]');
+        if (!viewport) {
+          viewport = document.createElement('meta');
+          viewport.name = 'viewport';
+          document.head.appendChild(viewport);
+        }
+        viewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+      })();
+    `).catch(() => {});
+  });
 }
 
 /**
@@ -410,6 +481,7 @@ async function setActiveTab(key) {
     mainWindow.setBrowserView(newView);
     newView.setBounds(_getBorserSize());
     newView.setAutoResize({ width: true, height: true });
+    newView.webContents.setZoomFactor(_getEffectiveZoom());
   }
 
   activeTabKey = key;
@@ -660,6 +732,8 @@ module.exports = {
   getAutoHideState,
   setOpacity,
   setScale,
+  setAutoZoom,
+  getAutoZoom,
   initAutoHideWatcher,
   clearAllTimer,
   addTab,
