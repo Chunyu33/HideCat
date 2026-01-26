@@ -132,12 +132,12 @@ const Header = ({ onOpenSettings, headerVisible, onRequestHide }) => {
           <IconButton title="设置" onClick={onOpenSettings}>
             <IconSetting />
           </IconButton>
-          <IconButton title="最小化" onClick={handleMinimize}>
+          {/* <IconButton title="最小化" onClick={handleMinimize}>
             <IconMinimize />
           </IconButton>
           <IconButton title="关闭" onClick={handleClose}>
             <IconClose />
-          </IconButton>
+          </IconButton> */}
         </div>
       </div>
     </div>
