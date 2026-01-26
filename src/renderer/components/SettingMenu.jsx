@@ -384,14 +384,14 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
     >
       <div className="setting-menu setting-layout">
         <div className="setting-header setting-titlebar" role="banner">
-          <span className="setting-title">设置</span>
           <button
-            className="close-btn setting-titlebar-btn"
+            className="macos-close-btn setting-titlebar-btn"
             onClick={handleClose}
             aria-label="Close"
           >
-            ✕
+            <span className="macos-close-icon"></span>
           </button>
+          <span className="setting-title">设置</span>
         </div>
 
         <div className="setting-body">

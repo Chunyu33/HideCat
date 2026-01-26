@@ -16,6 +16,7 @@ const isHome = query.get("window") === "home";
 const App = () => {
   const [scale, setScale] = useState(1.0);
   const [currentKey, setCurrentKey] = useState(false);
+  const tabRef = useRef(null);
 
   const [headerVisible, setHeaderVisible] = useState(false);
 
@@ -50,6 +51,13 @@ const App = () => {
       window.electronAPI?.setScale?.(sc);
     }
     if (key !== undefined) setCurrentKey(key);
+
+    // macOs 红绿灯
+    // 设置 tab 栏位,兼容 macOS 红绿灯组件
+    tabRef.current = document.querySelector('div[role="tablist"]');
+    if(tabRef.current) {
+      tabRef.current.style.paddingLeft = "70px";
+    }
   };
 
   useEffect(() => {

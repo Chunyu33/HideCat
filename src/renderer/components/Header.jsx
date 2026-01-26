@@ -110,14 +110,6 @@ const Header = ({ onOpenSettings, headerVisible, onRequestHide }) => {
             <img src={AppIcon} alt="" style={iconStyle} />
             SlackeFish
           </div> */}
-          {/* 生成一个置顶的图标 */}
-          <div
-            className="pinned-box"
-            title={isPinned ? "取消置顶" : "置顶窗口"}
-            onClick={handlePinToggle}
-          >
-            <IconPin className={isPinned ? "pinned" : ""} />
-          </div>
         </div>
 
         {/* 右侧操作按钮 */}
@@ -134,6 +126,9 @@ const Header = ({ onOpenSettings, headerVisible, onRequestHide }) => {
           <IconButton title="刷新" onClick={() => navigate("reload")}>
             <IconRefresh />
           </IconButton> */}
+          <IconButton title={isPinned ? "取消置顶" : "置顶窗口"} onClick={handlePinToggle}>
+            <IconPin className={isPinned ? "pinned" : ""} />
+          </IconButton>
           <IconButton title="设置" onClick={onOpenSettings}>
             <IconSetting />
           </IconButton>
