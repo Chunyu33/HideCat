@@ -24,6 +24,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
   getOpacity: () => ipcRenderer.invoke("get-opacity"),
   setScale: (val) => ipcRenderer.invoke("set-scale", val),
   getScale: () => ipcRenderer.invoke("get-scale"),
+  setAutoZoom: (enabled) => ipcRenderer.invoke("set-auto-zoom", enabled),
+  getAutoZoom: () => ipcRenderer.invoke("get-auto-zoom"),
 
   // 自动隐藏功能
   setAutoHide: (enabled, count) =>

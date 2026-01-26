@@ -24,7 +24,7 @@ import UpdateChecker from "./UpdateChecker";
 const themeOptions = [
   { label: "浅色模式", value: "light" },
   { label: "深色模式", value: "dark" },
-  // { label: "跟随系统", value: "auto" },
+  { label: "跟随系统", value: "auto" },
 ];
 
 const NAV_ITEMS = [
@@ -41,6 +41,7 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
   const [autoHide, setAutoHide] = useState(false);
   const [opacity, setOpacity] = useState(0.9);
   const [scale, setScale] = useState(1.0);
+  const [autoZoom, setAutoZoom] = useState(true); // 自动缩放开关
   const [theme, setTheme] = useState("auto"); // 本地状态
   const [searchEngine, setSearchEngine] = useState("bing");
   const [activeNav, setActiveNav] = useState("general");
@@ -53,16 +54,18 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
   useEffect(() => {
     // 初始化时读取设置
     const fetchSettings = async () => {
-      const [auto, op, sc, th, se] = await Promise.all([
+      const [auto, op, sc, az, th, se] = await Promise.all([
         window.electronAPI.getAutoHide?.(),
         window.electronAPI.getOpacity?.(),
         window.electronAPI.getScale?.(),
+        window.electronAPI.getAutoZoom?.(),
         window.electronAPI.getTheme?.(),
         window.electronAPI.getSearchEngine?.(),
       ]);
       if (auto !== undefined) setAutoHide(auto);
       if (op !== undefined) setOpacity(op);
       if (sc !== undefined) setScale(sc);
+      if (az !== undefined) setAutoZoom(az);
       if (th !== undefined) {
         setTheme(th);
         applyThemeToDOM(th);
@@ -92,6 +95,12 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
     setScale(value);
     window.electronAPI?.setScale?.(value);
     if (onScaleChange) onScaleChange(value);
+  };
+
+  // 处理自动缩放开关
+  const handleAutoZoom = (checked) => {
+    setAutoZoom(checked);
+    window.electronAPI?.setAutoZoom?.(checked);
   };
 
   // 将主题应用到当前页面
@@ -154,22 +163,21 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
     setSearchEngine(next);
     await window.electronAPI?.setSearchEngine?.(next);
   };
-  const antdConfig = useMemo(() => {
-    console.log("\n setting theme", theme);
+  // 计算实际生效的主题（处理 auto 模式）
+  const effectiveTheme = useMemo(() => {
     if (theme === "auto") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
+      return window.matchMedia("(prefers-color-scheme: dark)").matches
         ? "dark"
         : "light";
-      console.log("systemTheme", systemTheme);
-      return systemTheme === "dark"
-        ? { algorithm: antdTheme.darkAlgorithm }
-        : { algorithm: antdTheme.defaultAlgorithm };
     }
-    return theme === "dark"
+    return theme;
+  }, [theme]);
+
+  const antdConfig = useMemo(() => {
+    return effectiveTheme === "dark"
       ? { algorithm: antdTheme.darkAlgorithm }
       : { algorithm: antdTheme.defaultAlgorithm };
-  }, [theme]);
+  }, [effectiveTheme]);
 
   useEffect(() => {
     return () => {
@@ -370,7 +378,7 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
         ...antdConfig,
         token: {
           colorPrimary: "#4caf50",
-          colorBgBase: theme === "dark" ? "#000" : "#fff",
+          colorBgBase: effectiveTheme === "dark" ? "#000" : "#fff",
         },
       }}
     >
@@ -455,9 +463,26 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
 
                     <div className="setting-item">
                       <span className="setting-label row-center">
+                        自动适配
+                        <Tooltip
+                          title="开启后，网页会根据窗口大小自动调整缩放比例。关闭后使用下方手动设置的缩放比例。"
+                          placement="bottomRight"
+                          color="#4caf50"
+                          styles={{ body: { color: "#fff" } }}
+                        >
+                          <QuestionMark size="13" />
+                        </Tooltip>
+                      </span>
+                      <div className="range-input">
+                        <Switch checked={autoZoom} onChange={handleAutoZoom} />
+                      </div>
+                    </div>
+
+                    <div className="setting-item">
+                      <span className="setting-label row-center">
                         网页缩放
                         <Tooltip
-                          title="网页缩放，范围50%~150%。首页不会进行缩放。"
+                          title="手动设置网页缩放比例，范围50%~150%。仅在关闭自动适配时生效。"
                           placement="topRight"
                           color="#4caf50"
                           styles={{ body: { color: "#fff" } }}
@@ -474,6 +499,7 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
                           onChange={handleScale}
                           style={{ width: "100%" }}
                           tooltip={{ formatter: formatTip }}
+                          disabled={autoZoom}
                         />
                       </div>
                     </div>
@@ -534,7 +560,7 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
                   <UpdateChecker />
 
                   <div className="setting-footer">
-                    <div className="setting-footer-links">
+                    {/* <div className="setting-footer-links">
                       <a
                         className="setting-footer-link"
                         href="#"
@@ -575,7 +601,7 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
                       >
                         上传日志
                       </a>
-                    </div>
+                    </div> */}
                     <div className="setting-footer-copy">
                       Copyright © {new Date().getFullYear()} SlackeFish. All
                       rights reserved.

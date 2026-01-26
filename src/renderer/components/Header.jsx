@@ -38,7 +38,7 @@ const Header = ({ onOpenSettings, headerVisible, onRequestHide }) => {
     }
   };
 
-  // 处理拖动窗口
+  // 处理拖动窗口（IPC 自定义实现）
   const handleDragStart = (e) => {
     // 阻止事件冒泡，避免影响按钮点击
     e.stopPropagation();
@@ -110,14 +110,19 @@ const Header = ({ onOpenSettings, headerVisible, onRequestHide }) => {
             <img src={AppIcon} alt="" style={iconStyle} />
             SlackeFish
           </div> */}
+          {/* 生成一个置顶的图标 */}
+          <div
+            className="pinned-box"
+            title={isPinned ? "取消置顶" : "置顶窗口"}
+            onClick={handlePinToggle}
+          >
+            <IconPin className={isPinned ? "pinned" : ""} />
+          </div>
         </div>
 
         {/* 右侧操作按钮 */}
         <div className="header-actions">
-          <IconButton title={isPinned ? "取消置顶" : "置顶窗口"} onClick={handlePinToggle}>
-            <IconPin className={isPinned ? "pinned" : ""} />
-          </IconButton>
-          <IconButton title="后退" onClick={() => navigate("back")}>
+          {/* <IconButton title="后退" onClick={() => navigate("back")}>
             <IconBack />
           </IconButton>
           <IconButton title="前进" onClick={() => navigate("forward")}>
@@ -128,16 +133,16 @@ const Header = ({ onOpenSettings, headerVisible, onRequestHide }) => {
           </IconButton>
           <IconButton title="刷新" onClick={() => navigate("reload")}>
             <IconRefresh />
-          </IconButton>
+          </IconButton> */}
           <IconButton title="设置" onClick={onOpenSettings}>
             <IconSetting />
           </IconButton>
-          {/* <IconButton title="最小化" onClick={handleMinimize}>
+          <IconButton title="最小化" onClick={handleMinimize}>
             <IconMinimize />
           </IconButton>
           <IconButton title="关闭" onClick={handleClose}>
             <IconClose />
-          </IconButton> */}
+          </IconButton>
         </div>
       </div>
     </div>

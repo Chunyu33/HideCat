@@ -11,7 +11,7 @@ const autoUpdate = require("./autoUpdate");
 const registerIpcHandlers = require("./ipcHandlers");
 const { registerShortcuts, unregisterShortcuts } = require("./shortcuts");
 
-if (require("electron-squirrel-startup")) app.quit();
+// if (require("electron-squirrel-startup")) app.quit();
 
 let mainWindow;
 let tray;
@@ -25,6 +25,7 @@ const createWindow = () => {
     height: 600,
     center: true,
     minWidth: 350,
+    minHeight: 260,
     frame: false,
     hasShadow: false,
     resizable: true,

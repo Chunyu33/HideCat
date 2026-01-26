@@ -7,6 +7,7 @@ const store = new Store({
     autoHide: false, //初始化时默认不自动隐藏
     opacity: 1.0,
     scale: 1.0,
+    autoZoom: true, // 自动适配窗口缩放（开启时忽略 scale，自动计算缩放比例）
     shortcuts: [], // 用户快捷入口列表
     globalShortcuts: {}, // 全局快捷键配置（可自定义）
     searchEngine: "bing", // 搜索引擎（bing/google）

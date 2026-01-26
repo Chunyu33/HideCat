@@ -6,9 +6,7 @@ import MainPage from "./pages/main";
 import HomePageOnly from "./pages/HomePageOnly";
 import { handleUpdateTab } from "./services/browserViewService";
 import useTheme from "./hooks/useTheme"; // 引入自定义 Hook
-
-import bgLightImage from "../assets/bg-light.png"; // 背景图
-import bgDarkImage from "../assets/bg-dark.png"; // 背景图
+import AnimatedBackground from "./components/AnimatedBackground"; // 动态背景
 
 // 判断当前窗口类型
 const query = new URLSearchParams(window.location.search);
@@ -18,7 +16,6 @@ const isHome = query.get("window") === "home";
 const App = () => {
   const [scale, setScale] = useState(1.0);
   const [currentKey, setCurrentKey] = useState(false);
-  const tabRef = useRef(null);
 
   const [headerVisible, setHeaderVisible] = useState(false);
 
@@ -38,27 +35,6 @@ const App = () => {
   // 🎨 从 Hook 获取主题状态和更新逻辑
   const { theme } = useTheme();
 
-  const bgImg = useMemo(() => {
-    if (theme === "auto") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
-        ? "dark"
-        : "light";
-      return systemTheme === "dark"
-        ? bgDarkImage
-        : bgLightImage;
-    }
-    return theme === "dark"
-      ? bgDarkImage
-      : bgLightImage;
-  }, [theme]);
-
-  const bgStyles = {
-    backgroundImage: `url(${bgImg})`,
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-  };
-
   // 初始化设置
   const initSettings = async () => {
     const [auto, op, sc, key] = await Promise.all([
@@ -74,12 +50,6 @@ const App = () => {
       window.electronAPI?.setScale?.(sc);
     }
     if (key !== undefined) setCurrentKey(key);
-
-    // 设置 tab 栏位,兼容 macOS 红绿灯组件
-    tabRef.current = document.querySelector('div[role="tablist"]');
-    if(tabRef.current) {
-      tabRef.current.style.paddingLeft = "70px";
-    }
   };
 
   useEffect(() => {
@@ -90,22 +60,22 @@ const App = () => {
     window.electronAPI.openSettingsWindow();
   };
 
-  // 动态控制 antd 主题：根据当前主题切换 light/dark algorithm
-  const antdConfig = useMemo(() => {
+  // 计算实际生效的主题（处理 auto 模式）
+  const effectiveTheme = useMemo(() => {
     if (theme === "auto") {
-      // 检测系统主题
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
+      return window.matchMedia("(prefers-color-scheme: dark)").matches
         ? "dark"
         : "light";
-      return systemTheme === "dark"
-        ? { algorithm: antdTheme.darkAlgorithm }
-        : { algorithm: antdTheme.defaultAlgorithm };
     }
-    return theme === "dark"
+    return theme;
+  }, [theme]);
+
+  // 动态控制 antd 主题：根据实际主题切换 light/dark algorithm
+  const antdConfig = useMemo(() => {
+    return effectiveTheme === "dark"
       ? { algorithm: antdTheme.darkAlgorithm }
       : { algorithm: antdTheme.defaultAlgorithm };
-  }, [theme]);
+  }, [effectiveTheme]);
 
   // 根据窗口类型渲染
   const getDom = () => {
@@ -139,11 +109,12 @@ const App = () => {
             ...antdConfig,
             token: {
               colorPrimary: "#4caf50",
-              colorBgBase: theme === "dark" ? "#000" : "#fff",
+              colorBgBase: effectiveTheme === "dark" ? "#000" : "#fff",
             },
           }}
         >
-          <div className="app-container" style={bgStyles}>
+          <div className="app-container">
+            <AnimatedBackground theme={theme} />
             {getDom()}
           </div>
         </ConfigProvider>
