@@ -10,11 +10,13 @@
     "start": "cross-env NODE_ENV=development electron .",
     "start:prod": "cross-env NODE_ENV=production electron .",
     "make": "npm run build:renderer && electron-builder",
+    "make:dmg": "npm run build:renderer && PYTHON=/Library/Frameworks/Python.framework/Versions/3.9/bin/python3 electron-builder -m",
     "dev:all": "npm run dev & sleep 3 && npm start"
   },
   "build": {
     "appId": "com.liuchunyu.slackefish",
     "asar": true,
+    "icon": "src/assets/app.icns",
     "files": [
       "src/main/**/*",
       "src/preload/**/*",
@@ -37,8 +39,8 @@
       "main": "src/main/main.js"
     },
     "mac": {
+      "icon": "src/assets/app.icns",
       "target": [
-        "dmg",
         "zip"
       ]
     },
