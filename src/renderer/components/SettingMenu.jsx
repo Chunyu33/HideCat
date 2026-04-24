@@ -36,6 +36,7 @@ const NAV_ITEMS = [
 
 const CONTACT_WECHAT = "ZENITH3399";
 const CONTACT_EMAIL = "1378813463@qq.com";
+const CONTACT_GITHUB = "https://github.com/Chunyu33/HideCat/issues";
 
 const SettingMenu = ({ onClose, onScaleChange }) => {
   const [autoHide, setAutoHide] = useState(false);
@@ -616,6 +617,28 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
                             className="setting-copy-btn"
                             icon={<CopyOutlined />}
                             onClick={() => copyText(CONTACT_EMAIL)}
+                          >
+                            复制
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="setting-feedback-row">
+                        <div className="setting-feedback-label">GitHub</div>
+                        <div className="setting-feedback-right">
+                          <button
+                            type="button"
+                            className="setting-feedback-link"
+                            onClick={() => openExternal(CONTACT_GITHUB)}
+                          >
+                            提交 Issue
+                          </button>
+                          <Button
+                            size="small"
+                            type="text"
+                            className="setting-copy-btn"
+                            icon={<CopyOutlined />}
+                            onClick={() => copyText(CONTACT_GITHUB)}
                           >
                             复制
                           </Button>

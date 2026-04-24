@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useMemo } from "react";
 
 /**
- * 炫酷的动态背景组件
- * - 暗色主题：深海星空 + 游动的小鱼
- * - 亮色主题：柔和波浪 + 游动的小鱼
+ * 动态背景组件 - 猫咪主题
+ * - 暗色主题：夜空星空 + 飘落的猫爪印 + 右下角猫咪
+ * - 亮色主题：清新草原绿 + 飘落的猫爪印 + 右下角猫咪
  */
 const AnimatedBackground = ({ theme = "light" }) => {
   const canvasRef = useRef(null);
@@ -27,240 +27,231 @@ const AnimatedBackground = ({ theme = "light" }) => {
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
 
-    // 小鱼数组
-    let fishes = [];
-    const fishCount = effectiveTheme === "dark" ? 15 : 12;
+    // 猫爪印数组
+    let pawPrints = [];
+    const pawCount = 12;
 
-    // 绘制小鱼的函数
-    const drawFish = (x, y, size, angle, color, alpha, tailWag) => {
+    // 绘制猫爪印
+    const drawPawPrint = (x, y, size, rotation, alpha, color) => {
       ctx.save();
       ctx.translate(x, y);
-      ctx.rotate(angle);
+      ctx.rotate(rotation);
       ctx.globalAlpha = alpha;
 
-      // 鱼身 - 椭圆形
+      // 主掌垫
       ctx.beginPath();
-      ctx.ellipse(0, 0, size * 1.2, size * 0.6, 0, 0, Math.PI * 2);
+      ctx.ellipse(0, 0, size * 0.5, size * 0.6, 0, 0, Math.PI * 2);
       ctx.fillStyle = color;
       ctx.fill();
 
-      // 鱼尾 - 三角形，带摆动效果
-      const tailAngle = Math.sin(tailWag) * 0.3;
-      ctx.save();
-      ctx.rotate(tailAngle);
-      ctx.beginPath();
-      ctx.moveTo(-size * 1.1, 0);
-      ctx.lineTo(-size * 2, -size * 0.5);
-      ctx.lineTo(-size * 2, size * 0.5);
-      ctx.closePath();
-      ctx.fillStyle = color;
-      ctx.fill();
-      ctx.restore();
+      // 四个小肉垫
+      const toePositions = [
+        { x: -size * 0.45, y: -size * 0.55, rx: size * 0.22, ry: size * 0.25 },
+        { x: -size * 0.15, y: -size * 0.75, rx: size * 0.2, ry: size * 0.22 },
+        { x: size * 0.15, y: -size * 0.75, rx: size * 0.2, ry: size * 0.22 },
+        { x: size * 0.45, y: -size * 0.55, rx: size * 0.22, ry: size * 0.25 },
+      ];
 
-      // 鱼鳍 - 上鳍
-      ctx.beginPath();
-      ctx.moveTo(0, -size * 0.5);
-      ctx.quadraticCurveTo(size * 0.3, -size * 1.1, -size * 0.3, -size * 0.6);
-      ctx.fillStyle = color;
-      ctx.fill();
-
-      // 鱼眼
-      ctx.beginPath();
-      ctx.arc(size * 0.5, -size * 0.1, size * 0.15, 0, Math.PI * 2);
-      ctx.fillStyle = effectiveTheme === "dark" ? "#fff" : "#333";
-      ctx.fill();
-
-      // 眼珠
-      ctx.beginPath();
-      ctx.arc(size * 0.55, -size * 0.1, size * 0.08, 0, Math.PI * 2);
-      ctx.fillStyle = "#000";
-      ctx.fill();
+      toePositions.forEach((toe) => {
+        ctx.beginPath();
+        ctx.ellipse(toe.x, toe.y, toe.rx, toe.ry, 0, 0, Math.PI * 2);
+        ctx.fill();
+      });
 
       ctx.restore();
     };
 
-    // 初始化小鱼
-    const initFishes = () => {
-      fishes = [];
-      const colors = effectiveTheme === "dark"
-        ? ["#60a5fa", "#818cf8", "#a78bfa", "#38bdf8", "#22d3ee", "#34d399"]
-        : ["#3b82f6", "#6366f1", "#8b5cf6", "#0ea5e9", "#14b8a6", "#10b981"];
+    // 绘制右下角的猫咪装饰
+    const drawCornerCat = (isDark) => {
+      // 根据屏幕大小自适应猫咪尺寸
+      const baseSize = Math.min(width, height) * 0.12;
+      const size = Math.max(60, Math.min(baseSize, 120));
+      const x = width - size * 0.8;
+      const y = height - size * 0.6;
 
-      for (let i = 0; i < fishCount; i++) {
-        const speedX = (Math.random() * 0.8 + 0.3) * (Math.random() > 0.5 ? 1 : -1);
-        fishes.push({
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.globalAlpha = isDark ? 0.15 : 0.12;
+
+      const catColor = isDark ? "#a0a0a0" : "#2d5a3d";
+      const earInnerColor = isDark ? "#d4a0b0" : "#7cb08a";
+
+      // 身体
+      ctx.beginPath();
+      ctx.ellipse(-size * 0.3, size * 0.1, size * 0.5, size * 0.35, -0.2, 0, Math.PI * 2);
+      ctx.fillStyle = catColor;
+      ctx.fill();
+
+      // 头部
+      ctx.beginPath();
+      ctx.arc(size * 0.15, -size * 0.15, size * 0.35, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 左耳
+      ctx.beginPath();
+      ctx.moveTo(-size * 0.05, -size * 0.4);
+      ctx.lineTo(-size * 0.15, -size * 0.7);
+      ctx.lineTo(size * 0.1, -size * 0.45);
+      ctx.closePath();
+      ctx.fill();
+      // 左耳内
+      ctx.beginPath();
+      ctx.moveTo(-size * 0.02, -size * 0.42);
+      ctx.lineTo(-size * 0.1, -size * 0.62);
+      ctx.lineTo(size * 0.06, -size * 0.45);
+      ctx.closePath();
+      ctx.fillStyle = earInnerColor;
+      ctx.fill();
+
+      // 右耳
+      ctx.fillStyle = catColor;
+      ctx.beginPath();
+      ctx.moveTo(size * 0.35, -size * 0.4);
+      ctx.lineTo(size * 0.45, -size * 0.7);
+      ctx.lineTo(size * 0.2, -size * 0.45);
+      ctx.closePath();
+      ctx.fill();
+      // 右耳内
+      ctx.beginPath();
+      ctx.moveTo(size * 0.32, -size * 0.42);
+      ctx.lineTo(size * 0.4, -size * 0.62);
+      ctx.lineTo(size * 0.22, -size * 0.45);
+      ctx.closePath();
+      ctx.fillStyle = earInnerColor;
+      ctx.fill();
+
+      // 尾巴 - 翘起来
+      ctx.strokeStyle = catColor;
+      ctx.lineWidth = size * 0.12;
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(-size * 0.7, size * 0.15);
+      ctx.quadraticCurveTo(-size * 1.0, -size * 0.2, -size * 0.85, -size * 0.5);
+      ctx.stroke();
+
+      ctx.restore();
+    };
+
+    // 初始化猫爪印
+    const initPawPrints = () => {
+      pawPrints = [];
+      for (let i = 0; i < pawCount; i++) {
+        pawPrints.push({
           x: Math.random() * width,
           y: Math.random() * height,
-          size: Math.random() * 8 + 6,
-          speedX: speedX,
-          speedY: (Math.random() - 0.5) * 0.3,
-          opacity: Math.random() * 0.4 + 0.3,
-          color: colors[Math.floor(Math.random() * colors.length)],
-          tailWag: Math.random() * Math.PI * 2,
-          wagSpeed: Math.random() * 0.15 + 0.1,
+          size: Math.random() * 12 + 8,
+          rotation: Math.random() * Math.PI * 2,
+          rotationSpeed: (Math.random() - 0.5) * 0.008,
+          speedY: Math.random() * 0.25 + 0.08,
+          speedX: (Math.random() - 0.5) * 0.15,
+          opacity: Math.random() * 0.2 + 0.08,
+          phase: Math.random() * Math.PI * 2,
         });
       }
     };
 
-    // 暗色主题：深海效果 + 小鱼
+    // 暗色主题：夜空 + 星星 + 猫爪印
     const drawDarkTheme = (time) => {
-      // 深海渐变背景
+      // 深色渐变背景 - 偏绿色调
       const gradient = ctx.createLinearGradient(0, 0, width, height);
-      gradient.addColorStop(0, "#0a0a1a");
-      gradient.addColorStop(0.5, "#1a1a2e");
-      gradient.addColorStop(1, "#16213e");
+      gradient.addColorStop(0, "#0a1510");
+      gradient.addColorStop(0.5, "#121f1a");
+      gradient.addColorStop(1, "#0f1a15");
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, width, height);
 
-      // 流动的光晕
-      const glowX = width * 0.3 + Math.sin(time * 0.0005) * 100;
-      const glowY = height * 0.4 + Math.cos(time * 0.0003) * 80;
-      const glowGradient = ctx.createRadialGradient(
-        glowX, glowY, 0, glowX, glowY, 300
-      );
-      glowGradient.addColorStop(0, "rgba(99, 102, 241, 0.15)");
-      glowGradient.addColorStop(0.5, "rgba(139, 92, 246, 0.08)");
+      // 绘制星星
+      const starCount = 40;
+      for (let i = 0; i < starCount; i++) {
+        const starX = (Math.sin(i * 567.89 + time * 0.00005) * 0.5 + 0.5) * width;
+        const starY = (Math.cos(i * 123.45) * 0.5 + 0.5) * height;
+        const twinkle = Math.sin(time * 0.0015 + i) * 0.5 + 0.5;
+        const starSize = (Math.sin(i * 234.56) * 0.5 + 0.5) * 1.2 + 0.4;
+
+        ctx.beginPath();
+        ctx.arc(starX, starY, starSize, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(200, 230, 210, ${twinkle * 0.5 + 0.15})`;
+        ctx.fill();
+      }
+
+      // 柔和的绿色光晕
+      const glowX = width * 0.3 + Math.sin(time * 0.0002) * 40;
+      const glowY = height * 0.4 + Math.cos(time * 0.00015) * 25;
+      const glowGradient = ctx.createRadialGradient(glowX, glowY, 0, glowX, glowY, 200);
+      glowGradient.addColorStop(0, "rgba(100, 180, 130, 0.06)");
       glowGradient.addColorStop(1, "transparent");
       ctx.fillStyle = glowGradient;
       ctx.fillRect(0, 0, width, height);
 
-      // 第二个光晕
-      const glow2X = width * 0.7 + Math.cos(time * 0.0004) * 120;
-      const glow2Y = height * 0.6 + Math.sin(time * 0.0006) * 60;
-      const glow2Gradient = ctx.createRadialGradient(
-        glow2X, glow2Y, 0, glow2X, glow2Y, 250
-      );
-      glow2Gradient.addColorStop(0, "rgba(6, 182, 212, 0.12)");
-      glow2Gradient.addColorStop(0.5, "rgba(34, 211, 238, 0.06)");
-      glow2Gradient.addColorStop(1, "transparent");
-      ctx.fillStyle = glow2Gradient;
-      ctx.fillRect(0, 0, width, height);
+      // 绘制飘落的猫爪印
+      const pawColor = "rgba(120, 160, 140, 0.35)";
+      pawPrints.forEach((paw) => {
+        paw.y += paw.speedY;
+        paw.x += paw.speedX + Math.sin(time * 0.0008 + paw.phase) * 0.2;
+        paw.rotation += paw.rotationSpeed;
 
-      // 深海波浪效果
-      for (let i = 0; i < 3; i++) {
-        ctx.beginPath();
-        ctx.moveTo(0, height);
-
-        const waveHeight = 40 + i * 25;
-        const waveSpeed = 0.0002 + i * 0.00008;
-        const waveOffset = i * 80;
-
-        for (let x = 0; x <= width; x += 10) {
-          const y =
-            height * (0.65 + i * 0.1) +
-            Math.sin(x * 0.004 + time * waveSpeed + waveOffset) * waveHeight +
-            Math.sin(x * 0.008 + time * waveSpeed * 1.3) * (waveHeight * 0.4);
-          ctx.lineTo(x, y);
+        if (paw.y > height + paw.size) {
+          paw.y = -paw.size;
+          paw.x = Math.random() * width;
         }
+        if (paw.x < -paw.size) paw.x = width + paw.size;
+        if (paw.x > width + paw.size) paw.x = -paw.size;
 
-        ctx.lineTo(width, height);
-        ctx.closePath();
-
-        const waveGradient = ctx.createLinearGradient(0, height * 0.5, 0, height);
-        const alpha = 0.15 - i * 0.04;
-        waveGradient.addColorStop(0, `rgba(99, 102, 241, ${alpha})`);
-        waveGradient.addColorStop(0.5, `rgba(139, 92, 246, ${alpha * 0.6})`);
-        waveGradient.addColorStop(1, `rgba(6, 182, 212, ${alpha * 0.3})`);
-        ctx.fillStyle = waveGradient;
-        ctx.fill();
-      }
-
-      // 绘制游动的小鱼
-      fishes.forEach((fish) => {
-        // 更新位置
-        fish.x += fish.speedX;
-        fish.y += fish.speedY + Math.sin(time * 0.002 + fish.tailWag) * 0.2;
-        fish.tailWag += fish.wagSpeed;
-
-        // 边界检测 - 从另一边出现
-        if (fish.speedX > 0 && fish.x > width + fish.size * 3) {
-          fish.x = -fish.size * 3;
-          fish.y = Math.random() * height;
-        } else if (fish.speedX < 0 && fish.x < -fish.size * 3) {
-          fish.x = width + fish.size * 3;
-          fish.y = Math.random() * height;
-        }
-        if (fish.y < 0) fish.y = height;
-        if (fish.y > height) fish.y = 0;
-
-        // 计算鱼的朝向角度
-        const angle = fish.speedX > 0 ? 0 : Math.PI;
-
-        drawFish(fish.x, fish.y, fish.size, angle, fish.color, fish.opacity, fish.tailWag);
+        drawPawPrint(paw.x, paw.y, paw.size, paw.rotation, paw.opacity, pawColor);
       });
+
+      // 右下角猫咪
+      drawCornerCat(true);
     };
 
-    // 亮色主题：柔和波浪效果 + 小鱼
+    // 亮色主题：清新草原绿 + 猫爪印
     const drawLightTheme = (time) => {
-      // 浅色渐变背景
+      // 清新绿色渐变背景
       const gradient = ctx.createLinearGradient(0, 0, width, height);
-      gradient.addColorStop(0, "#f0f9ff");
-      gradient.addColorStop(0.3, "#e0f2fe");
-      gradient.addColorStop(0.6, "#f0fdf4");
-      gradient.addColorStop(1, "#fefce8");
+      gradient.addColorStop(0, "#f5faf7");
+      gradient.addColorStop(0.3, "#eef6f0");
+      gradient.addColorStop(0.6, "#f0f8f2");
+      gradient.addColorStop(1, "#f8fcf9");
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, width, height);
 
-      // 柔和的波浪
-      for (let i = 0; i < 3; i++) {
-        ctx.beginPath();
-        ctx.moveTo(0, height);
+      // 柔和的绿色光斑
+      const spotX = width * 0.75 + Math.sin(time * 0.00015) * 50;
+      const spotY = height * 0.25 + Math.cos(time * 0.0002) * 35;
+      const spotGradient = ctx.createRadialGradient(spotX, spotY, 0, spotX, spotY, 280);
+      spotGradient.addColorStop(0, "rgba(144, 200, 160, 0.1)");
+      spotGradient.addColorStop(1, "transparent");
+      ctx.fillStyle = spotGradient;
+      ctx.fillRect(0, 0, width, height);
 
-        const waveHeight = 50 + i * 30;
-        const waveSpeed = 0.0003 + i * 0.0001;
-        const waveOffset = i * 100;
+      // 第二个光斑
+      const spot2X = width * 0.2 + Math.cos(time * 0.00012) * 45;
+      const spot2Y = height * 0.65 + Math.sin(time * 0.00018) * 30;
+      const spot2Gradient = ctx.createRadialGradient(spot2X, spot2Y, 0, spot2X, spot2Y, 220);
+      spot2Gradient.addColorStop(0, "rgba(180, 220, 190, 0.08)");
+      spot2Gradient.addColorStop(1, "transparent");
+      ctx.fillStyle = spot2Gradient;
+      ctx.fillRect(0, 0, width, height);
 
-        for (let x = 0; x <= width; x += 10) {
-          const y =
-            height * (0.6 + i * 0.1) +
-            Math.sin(x * 0.005 + time * waveSpeed + waveOffset) * waveHeight +
-            Math.sin(x * 0.01 + time * waveSpeed * 1.5) * (waveHeight * 0.5);
-          ctx.lineTo(x, y);
+      // 绘制飘落的猫爪印 - 绿色调
+      const pawColor = "rgba(100, 150, 120, 0.18)";
+      pawPrints.forEach((paw) => {
+        paw.y += paw.speedY;
+        paw.x += paw.speedX + Math.sin(time * 0.0008 + paw.phase) * 0.2;
+        paw.rotation += paw.rotationSpeed;
+
+        if (paw.y > height + paw.size) {
+          paw.y = -paw.size;
+          paw.x = Math.random() * width;
         }
+        if (paw.x < -paw.size) paw.x = width + paw.size;
+        if (paw.x > width + paw.size) paw.x = -paw.size;
 
-        ctx.lineTo(width, height);
-        ctx.closePath();
-
-        const waveGradient = ctx.createLinearGradient(0, height * 0.5, 0, height);
-        const alpha = 0.08 - i * 0.02;
-        waveGradient.addColorStop(0, `rgba(59, 130, 246, ${alpha})`);
-        waveGradient.addColorStop(1, `rgba(147, 197, 253, ${alpha * 0.5})`);
-        ctx.fillStyle = waveGradient;
-        ctx.fill();
-      }
-
-      // 绘制游动的小鱼
-      fishes.forEach((fish) => {
-        // 更新位置
-        fish.x += fish.speedX;
-        fish.y += fish.speedY + Math.sin(time * 0.002 + fish.tailWag) * 0.2;
-        fish.tailWag += fish.wagSpeed;
-
-        // 边界检测 - 从另一边出现
-        if (fish.speedX > 0 && fish.x > width + fish.size * 3) {
-          fish.x = -fish.size * 3;
-          fish.y = Math.random() * height;
-        } else if (fish.speedX < 0 && fish.x < -fish.size * 3) {
-          fish.x = width + fish.size * 3;
-          fish.y = Math.random() * height;
-        }
-        if (fish.y < 0) fish.y = height;
-        if (fish.y > height) fish.y = 0;
-
-        // 计算鱼的朝向角度
-        const angle = fish.speedX > 0 ? 0 : Math.PI;
-
-        drawFish(fish.x, fish.y, fish.size, angle, fish.color, fish.opacity, fish.tailWag);
+        drawPawPrint(paw.x, paw.y, paw.size, paw.rotation, paw.opacity, pawColor);
       });
 
-      // 顶部光晕
-      const topGlow = ctx.createRadialGradient(
-        width * 0.5, -100, 0, width * 0.5, -100, 400
-      );
-      topGlow.addColorStop(0, "rgba(251, 191, 36, 0.1)");
-      topGlow.addColorStop(1, "transparent");
-      ctx.fillStyle = topGlow;
-      ctx.fillRect(0, 0, width, height * 0.5);
+      // 右下角猫咪
+      drawCornerCat(false);
     };
 
     // 动画循环
@@ -280,7 +271,7 @@ const AnimatedBackground = ({ theme = "light" }) => {
     };
 
     window.addEventListener("resize", handleResize);
-    initFishes();
+    initPawPrints();
     animationRef.current = requestAnimationFrame(animate);
 
     return () => {
