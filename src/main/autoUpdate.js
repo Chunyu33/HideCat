@@ -6,6 +6,11 @@ let mainWindowRef = null;
 // 检查是否为开发环境
 const isDev = process.env.NODE_ENV === "development" || !app.isPackaged;
 
+// 标志位：是否为手动检查（手动检查时不弹原生dialog，由前端处理）
+let isManualCheck = false;
+// 防止重复弹窗
+let isDialogShowing = false;
+
 /**
  * 向所有窗口发送消息
  * @param {string} channel - IPC 频道名称
@@ -124,6 +129,9 @@ function autoCheckForUpdates() {
 function checkForUpdates() {
   console.log("[Updater] 手动检查更新被调用");
   
+  // 标记为手动检查，不弹原生dialog
+  isManualCheck = true;
+  
   configureUpdater();
 
   // 向所有窗口发送检查中状态
@@ -198,10 +206,25 @@ autoUpdater.on("checking-for-update", () => {
 });
 
 autoUpdater.on("update-available", (info) => {
-  console.log("[Updater] 事件: update-available", info);
+  console.log("[Updater] 事件: update-available, isManualCheck:", isManualCheck);
   sendToAllWindows("update-available", info);
   
-  // 弹出系统原生对话框提示用户
+  // 手动检查时不弹原生dialog，由前端 UpdateChecker 组件处理
+  if (isManualCheck) {
+    console.log("[Updater] 手动检查，跳过原生弹窗");
+    isManualCheck = false; // 重置标志
+    return;
+  }
+  
+  // 防止重复弹窗
+  if (isDialogShowing) {
+    console.log("[Updater] 弹窗已显示，跳过");
+    return;
+  }
+  
+  isDialogShowing = true;
+  
+  // 弹出系统原生对话框提示用户（仅自动检查时）
   const dialogOpts = {
     type: 'info',
     buttons: ['立即更新', '稍后提醒'],
@@ -211,6 +234,8 @@ autoUpdater.on("update-available", (info) => {
   };
   
   dialog.showMessageBox(mainWindowRef, dialogOpts).then((returnValue) => {
+    isDialogShowing = false; // 弹窗关闭，重置标志
+    
     if (returnValue.response === 0) {
       // 用户点击"立即更新"
       console.log("[Updater] 用户确认更新，开始下载");
@@ -223,6 +248,8 @@ autoUpdater.on("update-available", (info) => {
       // 用户点击"稍后提醒"
       console.log("[Updater] 用户选择稍后更新");
     }
+  }).catch(() => {
+    isDialogShowing = false;
   });
 });
 
@@ -240,6 +267,14 @@ autoUpdater.on("update-downloaded", (info) => {
   console.log("[Updater] 事件: update-downloaded", info);
   sendToAllWindows("update-downloaded", info);
   
+  // 防止重复弹窗
+  if (isDialogShowing) {
+    console.log("[Updater] 弹窗已显示，跳过下载完成弹窗");
+    return;
+  }
+  
+  isDialogShowing = true;
+  
   // 下载完成后弹出对话框询问是否立即安装
   const dialogOpts = {
     type: 'info',
@@ -250,6 +285,8 @@ autoUpdater.on("update-downloaded", (info) => {
   };
   
   dialog.showMessageBox(mainWindowRef, dialogOpts).then((returnValue) => {
+    isDialogShowing = false;
+    
     if (returnValue.response === 0) {
       // 用户点击"立即重启"
       console.log("[Updater] 用户确认立即重启安装");
@@ -259,6 +296,8 @@ autoUpdater.on("update-downloaded", (info) => {
       console.log("[Updater] 用户选择稍后重启，下次启动时自动安装");
       // autoInstallOnAppQuit = true 会在下次退出时自动安装
     }
+  }).catch(() => {
+    isDialogShowing = false;
   });
 });
 
