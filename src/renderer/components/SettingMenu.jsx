@@ -560,50 +560,8 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
                   <UpdateChecker />
 
                   <div className="setting-footer">
-                    {/* <div className="setting-footer-links">
-                      <a
-                        className="setting-footer-link"
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          openExternal("https://www.evanspace.icu/service?product=slackefish");
-                        }}
-                      >
-                        服务协议
-                      </a>
-                      <a
-                        className="setting-footer-link"
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          openExternal("https://www.evanspace.icu/privacy?product=slackefish");
-                        }}
-                      >
-                        隐私协议
-                      </a>
-                      <a
-                        className="setting-footer-link"
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setActiveNav("feedback");
-                        }}
-                      >
-                        意见反馈
-                      </a>
-                      <a
-                        className="setting-footer-link"
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          message.info("暂未配置上传日志");
-                        }}
-                      >
-                        上传日志
-                      </a>
-                    </div> */}
                     <div className="setting-footer-copy">
-                      Copyright © {new Date().getFullYear()} SlackeFish. All
+                      Copyright © {new Date().getFullYear()} 躲躲猫. All
                       rights reserved.
                     </div>
                   </div>

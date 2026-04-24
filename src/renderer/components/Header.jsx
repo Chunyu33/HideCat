@@ -108,7 +108,7 @@ const Header = ({ onOpenSettings, headerVisible, onRequestHide }) => {
         <div className="header-left">
           {/* <div className="header-title">
             <img src={AppIcon} alt="" style={iconStyle} />
-            SlackeFish
+            躲躲猫
           </div> */}
           {/* 生成一个置顶的图标 */}
           <div

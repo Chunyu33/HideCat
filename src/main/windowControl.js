@@ -411,7 +411,7 @@ async function addTab(key, url) {
       getShortcuts,
       getHiddenDefaultShortcutIds,
       unhideDefaultShortcut,
-      appName: "SlackeFish",
+      appName: "躲躲猫",
     });
     // view.webContents.on(
     //   "did-navigate-in-page",

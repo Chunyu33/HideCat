@@ -86,7 +86,7 @@ const createTray = () => {
       { label: "退出", click: () => app.quit() },
     ]);
     tray.setContextMenu(contextMenu);
-    tray.setToolTip("SlackeFish");
+    tray.setToolTip("躲躲猫");
 
     tray.on("click", () =>
       mainWindow.isVisible()
@@ -102,13 +102,13 @@ app.whenReady().then(() => {
   // Windows 系统通知/任务栏分组用的 AppUserModelId
   // 不设置时可能显示为 electron.app.Electron
   if (process.platform === "win32") {
-    app.setAppUserModelId("SlackeFish");
+    app.setAppUserModelId("HideCat");
   }
 
   // macOS 通知/菜单栏等展示名通常来自应用 bundle 信息。
   // 开发态可能显示为 Electron，这里设置一下 name，尽量让展示名更符合产品。
   if (process.platform === "darwin") {
-    app.setName("SlackeFish");
+    app.setName("躲躲猫");
   }
 
   createWindow();

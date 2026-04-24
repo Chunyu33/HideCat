@@ -69,7 +69,7 @@ function _applyWhiteBackground(view) {
     // 根据主题决定背景色：亮色白 / 暗色深色
     // 说明：暗色取值尽量与主窗口 dark theme 的背景一致
     const theme =
-      (view && view.__slackeFishThemeGetter && view.__slackeFishThemeGetter()) ||
+      (view && view.__hideCatThemeGetter && view.__hideCatThemeGetter()) ||
       "light";
     const bg = theme === "dark" ? "#1E1E1E" : "#FFFFFF";
 
@@ -101,12 +101,12 @@ function bindBrowserViewEvents({
   getShortcuts,
   getHiddenDefaultShortcutIds,
   unhideDefaultShortcut,
-  appName = "SlackeFish",
+  appName = "躲躲猫",
 }) {
   if (!view || !view.webContents) return;
 
   // 将主题读取方法挂到 view 上，供 _applyWhiteBackground 使用（避免循环依赖 store）
-  view.__slackeFishThemeGetter = typeof getTheme === "function" ? getTheme : undefined;
+  view.__hideCatThemeGetter = typeof getTheme === "function" ? getTheme : undefined;
 
   // 新窗口打开：直接在当前 view 内打开
   view.webContents.setWindowOpenHandler(({ url: targetUrl }) => {

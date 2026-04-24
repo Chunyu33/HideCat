@@ -171,7 +171,7 @@ const HomePageOnly = ({ onUpdateTab, currentKey }) => {
           userSelect: "none",
         }}
       >
-        SlackeFish
+        躲躲猫
       </Title>
 
       <Search
@@ -236,7 +236,7 @@ const HomePageOnly = ({ onUpdateTab, currentKey }) => {
       />
 
       {/* <footer className="copyright">
-        Copyright © {new Date().getFullYear()} SlackeFish. All rights reserved.
+        Copyright © {new Date().getFullYear()} 躲躲猫. All rights reserved.
       </footer> */}
     </div>
   );

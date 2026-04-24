@@ -171,7 +171,7 @@ const HomePage = ({ onNewTab, onUpdateTab, currentKey }) => {
         }}
         onClick={handleShowManual}
       >
-        SlackeFish
+        躲躲猫
       </Title>
 
       <Search
@@ -241,7 +241,7 @@ const HomePage = ({ onNewTab, onUpdateTab, currentKey }) => {
       />
       {/* 
       <footer className="copyright">
-        Copyright © {new Date().getFullYear()} SlackeFish. All rights reserved.
+        Copyright © {new Date().getFullYear()} 躲躲猫. All rights reserved.
       </footer> */}
     </div>
   );

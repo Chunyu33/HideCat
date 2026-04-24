@@ -1,8 +1,8 @@
 {
-  "name": "slacke-fish",
-  "productName": "SlackeFish",
+  "name": "hide-cat",
+  "productName": "HideCat",
   "version": "1.6.0",
-  "description": "SlackeFish",
+  "description": "躲躲猫",
   "main": "src/main/main.js",
   "scripts": {
     "dev": "vite --config src/renderer/vite.config.js",
@@ -12,7 +12,7 @@
     "make": "npm run build:renderer && electron-builder"
   },
   "build": {
-    "appId": "com.liuchunyu.slackefish",
+    "appId": "com.liuchunyu.hideCat",
     "asar": true,
     "files": [
       "src/main/**/*",
@@ -57,7 +57,7 @@
     "publish": {
       "provider": "github",
       "owner": "Chunyu33",
-      "repo": "SlackeFish",
+      "repo": "HideCat",
       "releaseType": "release"
     }
   },

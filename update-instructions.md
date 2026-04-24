@@ -35,7 +35,7 @@ git push origin main --tags
 ```
 
 3. 在 GitHub 上创建 Release：
-   - 访问 https://github.com/Chunyu33/SlackeFish/releases
+   - 访问 https://github.com/Chunyu33/HideCat/releases
    - 点击 "Draft a new release"
    - 输入标签版本 (如 v1.2.1)
    - 添加发布说明
