@@ -72,6 +72,7 @@
     "@babel/preset-react": "^7.28.5",
     "@vercel/webpack-asset-relocator-loader": "^1.7.3",
     "@vitejs/plugin-react": "^5.1.1",
+    "antd": "^5.27.6",
     "babel-loader": "^10.0.0",
     "copy-webpack-plugin": "^13.0.1",
     "cross-env": "^10.1.0",
@@ -80,11 +81,12 @@
     "electron": "39.0.0",
     "electron-builder": "^26.0.12",
     "node-loader": "^2.1.0",
-    "style-loader": "^3.3.4",
-    "vite": "^7.2.2",
-    "antd": "^5.27.6",
+    "png-to-ico": "^3.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "sharp": "^0.34.5",
+    "style-loader": "^3.3.4",
+    "vite": "^7.2.2",
     "zustand": "^5.0.8"
   },
   "dependencies": {

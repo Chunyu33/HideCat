@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4A90D9;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#357ABD;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- 圆形背景 -->
+  <circle cx="128" cy="128" r="120" fill="url(#bgGrad)"/>
+  
+  <!-- 猫咪身体 - 黑色 -->
+  <ellipse cx="128" cy="165" rx="55" ry="45" fill="#1a1a1a"/>
+  
+  <!-- 猫咪头部 -->
+  <circle cx="128" cy="105" r="50" fill="#1a1a1a"/>
+  
+  <!-- 左耳朵 -->
+  <path d="M78 75 L68 35 L98 60 Z" fill="#1a1a1a"/>
+  <path d="M80 70 L73 42 L93 60 Z" fill="#ff9eb5"/>
+  
+  <!-- 右耳朵 -->
+  <path d="M178 75 L188 35 L158 60 Z" fill="#1a1a1a"/>
+  <path d="M176 70 L183 42 L163 60 Z" fill="#ff9eb5"/>
+  
+  <!-- 左眼睛 - 闭着（躲猫猫的样子） -->
+  <path d="M100 95 Q108 105 116 95" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/>
+  
+  <!-- 右眼睛 - 闭着 -->
+  <path d="M140 95 Q148 105 156 95" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/>
+  
+  <!-- 鼻子 -->
+  <ellipse cx="128" cy="115" rx="6" ry="5" fill="#ff9eb5"/>
+  
+  <!-- 嘴巴 -->
+  <path d="M128 120 Q118 130 108 125" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M128 120 Q138 130 148 125" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  
+  <!-- 胡须 - 左边 -->
+  <line x1="70" y1="105" x2="95" y2="110" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+  <line x1="68" y1="115" x2="95" y2="117" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+  <line x1="70" y1="125" x2="95" y2="122" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- 胡须 - 右边 -->
+  <line x1="186" y1="105" x2="161" y2="110" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+  <line x1="188" y1="115" x2="161" y2="117" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+  <line x1="186" y1="125" x2="161" y2="122" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- 前爪 - 左 -->
+  <ellipse cx="95" cy="195" rx="18" ry="12" fill="#1a1a1a"/>
+  <circle cx="88" cy="198" r="3" fill="#2a2a2a"/>
+  <circle cx="95" cy="200" r="3" fill="#2a2a2a"/>
+  <circle cx="102" cy="198" r="3" fill="#2a2a2a"/>
+  
+  <!-- 前爪 - 右 -->
+  <ellipse cx="161" cy="195" rx="18" ry="12" fill="#1a1a1a"/>
+  <circle cx="154" cy="198" r="3" fill="#2a2a2a"/>
+  <circle cx="161" cy="200" r="3" fill="#2a2a2a"/>
+  <circle cx="168" cy="198" r="3" fill="#2a2a2a"/>
+  
+  <!-- 尾巴 -->
+  <path d="M183 165 Q210 150 215 120 Q220 100 205 95" stroke="#1a1a1a" stroke-width="14" fill="none" stroke-linecap="round"/>
+</svg>

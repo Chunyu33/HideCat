@@ -110,8 +110,30 @@ function bindBrowserViewEvents({
 
   // 新窗口打开：直接在当前 view 内打开
   view.webContents.setWindowOpenHandler(({ url: targetUrl }) => {
+    // 拦截非 HTTP/HTTPS 协议的链接，避免触发系统弹窗
+    if (targetUrl && !/^https?:\/\//i.test(targetUrl)) {
+      console.log(`[setWindowOpenHandler] 拦截非标准协议链接: ${targetUrl}`);
+      return { action: "deny" };
+    }
     view.webContents.loadURL(targetUrl);
     return { action: "deny" };
+  });
+
+  // 拦截页面内导航，阻止非 HTTP/HTTPS 协议（如 bytedance://、snssdk://）触发系统弹窗
+  view.webContents.on("will-navigate", (event, url) => {
+    if (url && !/^https?:\/\//i.test(url)) {
+      console.log(`[will-navigate] 拦截非标准协议链接: ${url}`);
+      event.preventDefault();
+    }
+  });
+
+  // 拦截 frame 内的导航请求
+  view.webContents.on("will-frame-navigate", (details) => {
+    const url = details.url;
+    if (url && !/^https?:\/\//i.test(url)) {
+      console.log(`[will-frame-navigate] 拦截非标准协议链接: ${url}`);
+      details.preventDefault();
+    }
   });
 
   view.webContents.on(

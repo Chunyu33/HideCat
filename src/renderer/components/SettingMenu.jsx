@@ -34,7 +34,7 @@ const NAV_ITEMS = [
   { key: "about", label: "关于", icon: <InfoCircleOutlined /> },
 ];
 
-const CONTACT_WECHAT = "B_HH6050";
+const CONTACT_WECHAT = "ZENITH3399";
 const CONTACT_EMAIL = "1378813463@qq.com";
 
 const SettingMenu = ({ onClose, onScaleChange }) => {
@@ -580,7 +580,7 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
                     </div>
 
                     <div className="setting-feedback-items">
-                      <div className="setting-feedback-row">
+                      {/* <div className="setting-feedback-row">
                         <div className="setting-feedback-label">微信号</div>
                         <div className="setting-feedback-right">
                           <span className="setting-feedback-value">
@@ -596,7 +596,7 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
                             复制
                           </Button>
                         </div>
-                      </div>
+                      </div> */}
 
                       <div className="setting-feedback-row">
                         <div className="setting-feedback-label">邮箱</div>
