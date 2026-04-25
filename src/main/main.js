@@ -10,6 +10,7 @@ const windowControl = require("./windowControl");
 const autoUpdate = require("./autoUpdate");
 const registerIpcHandlers = require("./ipcHandlers");
 const { registerShortcuts, unregisterShortcuts } = require("./shortcuts");
+const store = require("./store");
 
 // Squirrel startup check removed - using NSIS installer
 
@@ -19,6 +20,7 @@ let tray;
 let isDev = process.env.NODE_ENV === "development" || !app.isPackaged;
 
 const createWindow = () => {
+  const transparentBorder = store.get("transparentBorder", false);
 
   mainWindow = new BrowserWindow({
     width: 800,
@@ -27,9 +29,10 @@ const createWindow = () => {
     minWidth: 350,
     minHeight: 260,
     frame: false,
-    hasShadow: false,
+    hasShadow: !transparentBorder,
     resizable: true,
-    transparent: false, // 开启透明
+    transparent: transparentBorder, // 透明边框，需要在窗口创建时确定
+    backgroundColor: transparentBorder ? "#00000000" : "#ffffff",
     fullscreenable: false,        // 禁止系统级全屏（绿色按钮 / 双击标题栏）
     simpleFullscreen: false,      // 禁止 macOS 独立空间全屏
     titleBarStyle: "hiddenInset", // 隐藏标题栏不会影响此行为

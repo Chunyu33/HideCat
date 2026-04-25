@@ -12,6 +12,7 @@ const store = new Store({
     globalShortcuts: {}, // 全局快捷键配置（可自定义）
     searchEngine: "bing", // 搜索引擎（bing/google）
     theme: "light", // 主题
+    transparentBorder: false, // 主窗口透明边框（需要重启窗口生效）
   },
 });
 

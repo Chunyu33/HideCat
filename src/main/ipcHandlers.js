@@ -1,6 +1,7 @@
 const {
   quit,
   minimizeWindow,
+  toggleMaximizeWindow,
   setMainWindow,
   openSettingsWindow,
   closeSettingsWindow,
@@ -11,6 +12,8 @@ const {
   setAutoHide,
   getAutoHideState,
   setOpacity,
+  setTransparentBorder,
+  getTransparentBorder,
   setScale,
   setAutoZoom,
   getAutoZoom,
@@ -75,6 +78,7 @@ function registerIPC(ipcMain, mainWindow) {
   // 主窗口操作
   // ======================
   ipcMain.handle("minimize-window", () => minimizeWindow());
+  ipcMain.handle("toggle-maximize-window", () => toggleMaximizeWindow());
   ipcMain.handle("show-window", () => showWindow());
   ipcMain.handle("hide-window", (_, ms) => hideWindow(ms));
   ipcMain.handle("hide-immediately", () => hideImmediately());
@@ -98,6 +102,10 @@ function registerIPC(ipcMain, mainWindow) {
 
   ipcMain.handle("set-opacity", (_, val) => setOpacity(val));
   ipcMain.handle("get-opacity", () => require("./store").get("opacity"));
+  ipcMain.handle("set-transparent-border", (_, enabled) =>
+    setTransparentBorder(enabled)
+  );
+  ipcMain.handle("get-transparent-border", () => getTransparentBorder());
 
   ipcMain.handle("set-scale", (_, val) => setScale(val));
   ipcMain.handle("get-scale", () => require("./store").get("scale"));

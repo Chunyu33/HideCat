@@ -7,6 +7,7 @@ import {
   IconRefresh,
   IconSetting,
   IconMinimize,
+  IconMaximize,
   IconClose,
   IconPin,
 } from "./Icon";
@@ -28,6 +29,7 @@ const Header = ({ onOpenSettings, headerVisible, onRequestHide }) => {
     window.electronAPI?.navigateView?.(action);
   };
   const handleMinimize = () => window.electronAPI?.minimizeWindow();
+  const handleMaximize = () => window.electronAPI?.toggleMaximizeWindow();
   const handleClose = () => window.electronAPI?.closeWindow();
 
   // 处理置顶窗口
@@ -137,8 +139,12 @@ const Header = ({ onOpenSettings, headerVisible, onRequestHide }) => {
           <IconButton title="设置" onClick={onOpenSettings}>
             <IconSetting />
           </IconButton>
+          <span className="header-action-divider" />
           <IconButton title="最小化" onClick={handleMinimize}>
             <IconMinimize />
+          </IconButton>
+          <IconButton title="最大化/还原" onClick={handleMaximize}>
+            <IconMaximize />
           </IconButton>
           <IconButton title="关闭" onClick={handleClose}>
             <IconClose />

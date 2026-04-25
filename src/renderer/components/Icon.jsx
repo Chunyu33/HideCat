@@ -59,6 +59,21 @@ export const IconMinimize = ({ size = 14 }) => (
   </svg>
 );
 
+export const IconMaximize = ({ size = 14 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24">
+    <rect
+      x="6"
+      y="6"
+      width="12"
+      height="12"
+      rx="1"
+      stroke="currentColor"
+      strokeWidth="2"
+      fill="none"
+    />
+  </svg>
+);
+
 export const IconClose = ({ size = 14 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24">
     <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" />

@@ -3,6 +3,7 @@ const { contextBridge, ipcRenderer } = require("electron");
 contextBridge.exposeInMainWorld("electronAPI", {
   // 窗口操作
   minimizeWindow: () => ipcRenderer.invoke("minimize-window"),
+  toggleMaximizeWindow: () => ipcRenderer.invoke("toggle-maximize-window"),
   closeWindow: () => ipcRenderer.invoke("close-window"),
   hideWindow: (ms = 0) => ipcRenderer.invoke("hide-window", ms),
   showWindow: () => ipcRenderer.invoke("show-window"),
@@ -22,6 +23,9 @@ contextBridge.exposeInMainWorld("electronAPI", {
   // 窗口样式
   setOpacity: (val) => ipcRenderer.invoke("set-opacity", val),
   getOpacity: () => ipcRenderer.invoke("get-opacity"),
+  setTransparentBorder: (enabled) =>
+    ipcRenderer.invoke("set-transparent-border", enabled),
+  getTransparentBorder: () => ipcRenderer.invoke("get-transparent-border"),
   setScale: (val) => ipcRenderer.invoke("set-scale", val),
   getScale: () => ipcRenderer.invoke("get-scale"),
   setAutoZoom: (enabled) => ipcRenderer.invoke("set-auto-zoom", enabled),

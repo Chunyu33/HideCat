@@ -169,8 +169,7 @@ function _registerFromOverrides(overridesInput) {
 function registerShortcuts() {
   const overrides = _getStoredOverrides();
   const result = _registerFromOverrides(overrides);
-  // 确保 store 中只保存“最终生效”的覆盖配置（避免下次启动反复注册失败）
-  store.set(STORE_KEY, result.effectiveOverrides || {});
+  // 启动注册时不覆盖用户保存的配置，避免偶发注册失败导致重启后恢复默认
   return result;
 }
 
@@ -204,7 +203,8 @@ function getGlobalShortcuts() {
  */
 function setGlobalShortcuts(overrides) {
   const result = _registerFromOverrides(overrides);
-  store.set(STORE_KEY, result.effectiveOverrides || {});
+  // 持久化用户在设置页保存的配置；运行态注册失败时只在当前结果里回退，不覆盖用户配置
+  store.set(STORE_KEY, _sanitizeOverrides(overrides));
   return result;
 }
 

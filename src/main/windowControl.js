@@ -99,6 +99,32 @@ function minimizeWindow() {
   mainWindow.minimize();
 }
 
+// 最大化/还原窗口
+function toggleMaximizeWindow() {
+  if (!mainWindow || mainWindow.isDestroyed()) return false;
+  if (mainWindow.isMaximized()) {
+    mainWindow.unmaximize();
+    return false;
+  }
+  mainWindow.maximize();
+  return true;
+}
+
+// 设置主窗口透明边框状态
+function setTransparentBorder(enabled) {
+  const next = !!enabled;
+  store.set("transparentBorder", next);
+  return {
+    enabled: next,
+    requiresRestart: true,
+  };
+}
+
+// 获取主窗口透明边框状态
+function getTransparentBorder() {
+  return store.get("transparentBorder", false);
+}
+
 // =================== 功能设置窗口逻辑 ===================
 function openSettingsWindow() {
   if (!mainWindow) return false;
@@ -722,6 +748,7 @@ module.exports = {
   quit,
   setMainWindow,
   minimizeWindow,
+  toggleMaximizeWindow,
   openSettingsWindow,
   closeSettingsWindow,
   openExternalUrl,
@@ -731,6 +758,8 @@ module.exports = {
   setAutoHide,
   getAutoHideState,
   setOpacity,
+  setTransparentBorder,
+  getTransparentBorder,
   setScale,
   setAutoZoom,
   getAutoZoom,

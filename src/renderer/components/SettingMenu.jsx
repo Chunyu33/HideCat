@@ -41,6 +41,7 @@ const CONTACT_GITHUB = "https://github.com/Chunyu33/HideCat/issues";
 const SettingMenu = ({ onClose, onScaleChange }) => {
   const [autoHide, setAutoHide] = useState(false);
   const [opacity, setOpacity] = useState(0.9);
+  const [transparentBorder, setTransparentBorder] = useState(false);
   const [scale, setScale] = useState(1.0);
   const [autoZoom, setAutoZoom] = useState(true); // 自动缩放开关
   const [theme, setTheme] = useState("auto"); // 本地状态
@@ -55,9 +56,10 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
   useEffect(() => {
     // 初始化时读取设置
     const fetchSettings = async () => {
-      const [auto, op, sc, az, th, se] = await Promise.all([
+      const [auto, op, tb, sc, az, th, se] = await Promise.all([
         window.electronAPI.getAutoHide?.(),
         window.electronAPI.getOpacity?.(),
+        window.electronAPI.getTransparentBorder?.(),
         window.electronAPI.getScale?.(),
         window.electronAPI.getAutoZoom?.(),
         window.electronAPI.getTheme?.(),
@@ -65,6 +67,7 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
       ]);
       if (auto !== undefined) setAutoHide(auto);
       if (op !== undefined) setOpacity(op);
+      if (tb !== undefined) setTransparentBorder(!!tb);
       if (sc !== undefined) setScale(sc);
       if (az !== undefined) setAutoZoom(az);
       if (th !== undefined) {
@@ -89,6 +92,15 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
   const handleOpacity = (value) => {
     setOpacity(value);
     window.electronAPI?.setOpacity?.(value);
+  };
+
+  // 处理透明边框
+  const handleTransparentBorder = async (checked) => {
+    setTransparentBorder(checked);
+    const result = await window.electronAPI?.setTransparentBorder?.(checked);
+    if (result?.requiresRestart) {
+      message.info("透明边框已保存，重启应用后生效");
+    }
   };
 
   // 处理缩放
@@ -439,6 +451,26 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
 
                     <div className="setting-item">
                       <span className="setting-label row-center">
+                        透明边框
+                        <Tooltip
+                          title="开启后主窗口会使用 Electron 透明窗口能力，隐藏系统背景边框。该能力需要在窗口创建时确定，重启应用后生效。"
+                          placement="bottomRight"
+                          color="#4caf50"
+                          styles={{ body: { color: "#fff" } }}
+                        >
+                          <QuestionMark size="13" />
+                        </Tooltip>
+                      </span>
+                      <div className="range-input">
+                        <Switch
+                          checked={transparentBorder}
+                          onChange={handleTransparentBorder}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="setting-item">
+                      <span className="setting-label row-center">
                         窗口透明
                         <Tooltip
                           title="窗口的透明度，范围0.2~1.0。"
@@ -495,7 +527,7 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
                         <Slider
                           min={0.5}
                           max={1.5}
-                          step={0.1}
+                          step={0.01}
                           value={scale}
                           onChange={handleScale}
                           style={{ width: "100%" }}
