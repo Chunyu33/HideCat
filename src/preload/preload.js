@@ -111,6 +111,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
   },
 
   // 自动更新
+  getAppVersion: () => ipcRenderer.invoke("get-app-version"),
   checkForUpdates: () => ipcRenderer.invoke("check-for-updates"),
   quitAndInstall: () => ipcRenderer.invoke("quit-and-install"),
   

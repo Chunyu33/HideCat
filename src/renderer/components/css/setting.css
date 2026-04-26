@@ -549,6 +549,12 @@
   min-width: 0;
 }
 
+.update-checker-version {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-color-secondary);
+}
+
 .update-checker-status {
   font-size: 13px;
   color: var(--text-color-secondary);

@@ -45,6 +45,7 @@ const {
 } = require("./shortcuts");
 const { checkForUpdates, quitAndInstall } = require("./autoUpdate");
 const { randomUUID } = require("crypto");
+const { app } = require("electron");
 
 function registerIPC(ipcMain, mainWindow) {
   // 初始化主窗口引用
@@ -161,6 +162,7 @@ function registerIPC(ipcMain, mainWindow) {
   // ======================
   // 自动更新管理
   // ======================
+  ipcMain.handle("get-app-version", () => app.getVersion());
   ipcMain.handle("check-for-updates", () => checkForUpdates());
   ipcMain.handle("quit-and-install", () => quitAndInstall());
 }

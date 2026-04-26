@@ -7,8 +7,22 @@ const UpdateChecker = () => {
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [devMessage, setDevMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [currentVersion, setCurrentVersion] = useState('');
 
   useEffect(() => {
+    const loadCurrentVersion = async () => {
+      try {
+        const version = await window.electronAPI?.getAppVersion?.();
+        if (version) {
+          setCurrentVersion(version);
+        }
+      } catch (e) {
+        console.warn('读取当前版本失败', e);
+      }
+    };
+
+    loadCurrentVersion();
+
     console.log('UpdateChecker: useEffect called, registering event listeners')
     
     // ✅ 修复:移除 event 参数,直接接收数据
@@ -144,6 +158,9 @@ const UpdateChecker = () => {
       <div className="update-checker-header">
         <div className="update-checker-title">
           应用更新
+          {currentVersion ? (
+            <span className="update-checker-version">当前版本 v{currentVersion}</span>
+          ) : null}
           <span className="update-checker-status">
             {getStatusText()}
           </span>
