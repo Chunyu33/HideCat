@@ -71,8 +71,8 @@ const UserManual = ({ visible, onClose }) => {
               boxShadow: 'var(--shadow-color)',
             }}
           >
-            <h3 style={{ color: 'var(--primary-color)' }}>Q{index + 1}: {item.q}</h3>
-            <p style={{ color: 'var(--text-color-secondary)' }}>A: {item.a}</p>
+            <h3 style={{ color: 'var(--primary-color)' }}>{index + 1}: {item.q}</h3>
+            <p style={{ color: 'var(--text-color-secondary)' }}> {item.a}</p>
             {/* 条件渲染图片 */}
             {item.img && (
               <div style={{ textAlign: 'center', marginTop: '15px' }}>
