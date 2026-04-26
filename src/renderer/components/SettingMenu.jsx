@@ -451,9 +451,9 @@ const SettingMenu = ({ onClose, onScaleChange }) => {
 
                     <div className="setting-item">
                       <span className="setting-label row-center">
-                        透明边框
+                        边框透明
                         <Tooltip
-                          title="开启后主窗口会使用 Electron 透明窗口能力，隐藏系统背景边框。该能力需要在窗口创建时确定，重启应用后生效。"
+                          title="开启后主窗口会隐藏系统背景边框。该功能需要在窗口创建时确定，重启应用后生效。"
                           placement="bottomRight"
                           color="#4caf50"
                           styles={{ body: { color: "#fff" } }}

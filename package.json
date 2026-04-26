@@ -51,6 +51,9 @@
     },
     "nsis": {
       "artifactName": "${productName}-Setup-${version}.${ext}",
+      "shortcutName": "躲躲猫",
+      "uninstallDisplayName": "躲躲猫",
+      "language": "2052",
       "oneClick": false,
       "allowToChangeInstallationDirectory": true
     },
