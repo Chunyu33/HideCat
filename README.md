@@ -5,6 +5,8 @@
 
 当前项目已开源。
 
+完整更新日志请见：[`update-logs.md`](./update-logs.md)
+
 ## 功能介绍
 
 ### 1) 主窗口与交互
@@ -162,6 +164,12 @@ node src/scripts/generateIcons.js
 会生成：
 - `src/assets/app.png`
 - `src/assets/app.ico`
+
+
+### 关于暂停Mac版本发布
+
+- 由于MacOs用户较少，且打包流程较为复杂，因此暂时停止发布Mac版本。后续会根据用户需求和开发资源情况决定是否恢复。
+
 
 ## 开源与许可证
 
