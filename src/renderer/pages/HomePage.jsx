@@ -12,6 +12,7 @@ import ShortcutListModal from "../components/ShortcutListModal";
 import AddShortcutModal from "../components/AddShortcutModal";
 import { useShortcutStore } from "../store/useShortcutStore";
 import UserManual from "./UserManual";
+import CatBadgeCanvas from "../components/CatBadgeCanvas";
 import "./css/homepage.css";
 
 const { Title, Text } = Typography;
@@ -159,20 +160,25 @@ const HomePage = ({ onNewTab, onUpdateTab, currentKey }) => {
         padding: "60px 20px",
       }}
     >
-      <Title
-        level={1}
-        style={{
-          color: "var(--text-color-title)",
-          fontSize: "2.6rem",
-          fontWeight: 300,
-          marginBottom: 36,
-          userSelect: "none",
-          cursor: "pointer",
-        }}
-        onClick={handleShowManual}
-      >
-        躲躲猫
-      </Title>
+      <div className="cat-title-shell clickable" onClick={handleShowManual}>
+        <CatBadgeCanvas className="cat-title-badge" type="paw" size={26} />
+        <Title
+          className="cat-title"
+          level={1}
+          style={{
+            color: "var(--text-color-title)",
+            fontSize: "2.6rem",
+            fontWeight: 300,
+            marginBottom: 0,
+            userSelect: "none",
+            cursor: "pointer",
+          }}
+        >
+          躲躲猫
+        </Title>
+        <CatBadgeCanvas className="cat-title-badge" type="paw" size={26} />
+        <CatBadgeCanvas className="cat-title-corner-paw" type="paw" size={18} />
+      </div>
 
       <Search
         placeholder={getSearchPlaceholder(searchEngine)}

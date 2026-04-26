@@ -8,6 +8,52 @@
   color: var(--text-color);
 }
 
+.cat-title-shell {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 36px;
+}
+
+.cat-title-shell.clickable {
+  cursor: pointer;
+}
+
+.cat-title {
+  margin: 0;
+  line-height: 1;
+  text-shadow: 0 2px 12px color-mix(in srgb, var(--text-color-title) 18%, transparent 82%);
+}
+
+.cat-title-badge {
+  display: block;
+  width: 26px;
+  height: 26px;
+  opacity: 0.95;
+}
+
+.cat-title-badge:first-child {
+  transform: rotate(-8deg) translateY(1px);
+}
+
+.cat-title-badge:nth-of-type(2) {
+  transform: rotate(8deg) translateY(1px);
+}
+
+.cat-title-corner-paw {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  width: 18px;
+  height: 18px;
+  opacity: 0.88;
+}
+
+.cat-title-shell.clickable:hover .cat-title {
+  text-shadow: 0 2px 14px color-mix(in srgb, var(--text-color-title) 24%, transparent 76%);
+}
+
 /* 快捷方式项 */
 .shortcut-item {
   width: 70px;

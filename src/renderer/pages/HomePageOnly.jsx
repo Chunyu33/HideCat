@@ -13,6 +13,7 @@ import AddShortcutModal from "../components/AddShortcutModal";
 import { useShortcutStore } from "../store/useShortcutStore";
 import "./css/homepage.css";
 import WebViewSkeleton from "../components/WebViewSkeleton"; // 骨架屏
+import CatBadgeCanvas from "../components/CatBadgeCanvas";
 
 const { Title, Text } = Typography;
 const { Search } = Input;
@@ -161,18 +162,24 @@ const HomePageOnly = ({ onUpdateTab, currentKey }) => {
       {/* 展示骨架屏 */}
       {isSkeletonVisible && <WebViewSkeleton />}
 
-      <Title
-        level={1}
-        style={{
-          color: "var(--text-color-title)",
-          fontSize: "2.6rem",
-          fontWeight: 300,
-          marginBottom: 36,
-          userSelect: "none",
-        }}
-      >
-        躲躲猫
-      </Title>
+      <div className="cat-title-shell">
+        <CatBadgeCanvas className="cat-title-badge" type="paw" size={26} />
+        <Title
+          className="cat-title"
+          level={1}
+          style={{
+            color: "var(--text-color-title)",
+            fontSize: "2.6rem",
+            fontWeight: 300,
+            marginBottom: 0,
+            userSelect: "none",
+          }}
+        >
+          躲躲猫
+        </Title>
+        <CatBadgeCanvas className="cat-title-badge" type="paw" size={26} />
+        <CatBadgeCanvas className="cat-title-corner-paw" type="paw" size={18} />
+      </div>
 
       <Search
         placeholder={getSearchPlaceholder(searchEngine)}
