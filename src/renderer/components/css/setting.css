@@ -29,7 +29,7 @@
 .setting-body {
   display: grid;
   grid-template-columns: 180px 1fr;
-  height: 100%;
+  flex: 1;
   min-height: 0;
   background: var(--background-secondary);
 }
@@ -95,6 +95,8 @@
 
 .setting-content {
   background: #f6f6f6;
+  overflow: hidden;
+  min-height: 0;
 }
 
 [data-theme="dark"] .setting-content {

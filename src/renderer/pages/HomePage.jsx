@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Input, Typography, Space, Tooltip, message } from "antd";
 import { SearchOutlined, PlusOutlined, MoreOutlined } from "@ant-design/icons";
-import BrowserMark from "../components/BrowserMark";
+import Favicon from "../components/Favicon";
 import defaultShortcuts from "../services/defaultShortcuts";
 import {
   buildSearchUrl,
@@ -206,7 +206,7 @@ const HomePage = ({ onNewTab, onUpdateTab, currentKey }) => {
             style={{ cursor: "pointer" }}
           >
             <div className="shortcut-icon">
-              {item.icon || <BrowserMark size={22} />}
+              {item.icon || <Favicon url={item.url} size={22} />}
             </div>
             <Tooltip title={item.name} placement="bottom" color="var(--button-bg-hover)"
               styles={{ body: { color: "var(--text-color)" } }}>

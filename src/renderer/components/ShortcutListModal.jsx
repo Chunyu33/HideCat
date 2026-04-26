@@ -1,7 +1,7 @@
 import React from "react";
 import { Modal, List, Typography, Button, Popconfirm, message } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
-import BrowserMark from "./BrowserMark";
+import Favicon from "./Favicon";
 
 const { Text } = Typography;
 
@@ -73,7 +73,7 @@ const ShortcutListModal = ({
                 gap: 10,
               }}
             >
-              <BrowserMark size={20} />
+              <Favicon url={item.url} size={20} />
               <div style={{ overflow: "hidden" }}>
                 <Text
                   strong
