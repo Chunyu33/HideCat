@@ -2,30 +2,34 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 33px;
-  background: linear-gradient(to right, var(--background-header), var(--background-color));
-  padding: 0 10px;
+  height: 36px;
+  background: color-mix(in srgb, var(--background-color) 85%, transparent 15%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 0 12px;
   -webkit-app-region: drag;
   user-select: none;
-  border-bottom: 1px solid var(--border-color); /* 使用 divider-color 变量 */
-  box-shadow: 0 2px 6px var(--shadow-color); /* 底部阴影 */
+  border-bottom: 1px solid color-mix(in srgb, var(--border-color) 60%, transparent 40%);
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--shadow-color) 40%, transparent 60%);
+  transition: background-color 0.3s ease;
 }
 .pinned-box {
   display: flex;
   align-items: center;
-  padding: 2px 4px;
-  border-radius: 6px;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: transform 0.15s cubic-bezier(0.3, 0.7, 0.4, 1.4);
+  color: var(--text-color);
+  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  -webkit-app-region: no-drag;
 }
 .pinned-box:hover{
-  background: var(--hover-bg-color); /* 可以使用自定义的 hover 背景色 */
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
-  transform: scale(110%); 
+  background: color-mix(in srgb, var(--text-color) 8%, transparent 92%);
 }
 .pinned{
   color: var(--primary-color);
-  font-weight: bold;
 }
 
 .header-title {
@@ -39,7 +43,7 @@
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   -webkit-app-region: no-drag;
 }
 
@@ -48,40 +52,36 @@
   border: none;
   color: var(--text-color);
   cursor: pointer;
-  padding: 4px 6px;
-  border-radius: 6px;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition:
-    background-color 0.2s ease,
-    transform 0.15s cubic-bezier(0.3, 0.7, 0.4, 1.4),
-    box-shadow 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .header-btn:hover{
-  background: var(--hover-bg-color);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
-  transform: translateY(-1px); 
+  background: color-mix(in srgb, var(--text-color) 8%, transparent 92%);
 }
 
 .header-action-divider {
   width: 1px;
-  height: 16px;
-  background: var(--border-color);
-  opacity: 0.75;
-  margin: 0 2px;
+  height: 14px;
+  background: color-mix(in srgb, var(--border-color) 80%, transparent 20%);
+  margin: 0 6px;
+  border-radius: 1px;
 }
 
 .header-btn:last-child:hover {
-  background-color: #e84118;
-  color: #f2f2f2;
+  background-color: #ff4d4f;
+  color: #ffffff;
 }
 
 .header-btn:active {
-  background: var(--active-bg-color);
-  transform: scale(0.9);
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.25);
+  background: color-mix(in srgb, var(--text-color) 12%, transparent 88%);
+  transform: scale(0.94);
 }
 
 .no-drag {

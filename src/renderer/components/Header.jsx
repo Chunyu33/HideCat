@@ -72,20 +72,19 @@ const Header = ({ onOpenSettings, headerVisible, onRequestHide }) => {
     }
   };
 
-  const baseStyle = { width: "18px", height: "18px", borderRadius: "2px" };
+  const baseStyle = { width: "16px", height: "16px", borderRadius: "2px" };
   const iconStyle = useMemo(() => {
+    // 现代版不强制 filter: invert，依赖 SVG 自身的 stroke=currentColor/fill=currentColor，或者保持轻量修改。
+    // 为了兼容旧组件不至于变黑块，只对深色模式下的必要纯黑图标进行反转，但现在的毛玻璃背景不需要太极端的处理。
     if (theme === "auto") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
-        ? "dark"
-        : "light";
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
       return systemTheme === "dark"
-        ? { ...baseStyle, filter: "invert(100%)" }
-        : { ...baseStyle, filter: "invert(0%)" };
+        ? { ...baseStyle, filter: "invert(90%) drop-shadow(0 1px 2px rgba(0,0,0,0.5))" }
+        : { ...baseStyle, filter: "invert(0%) drop-shadow(0 1px 1px rgba(255,255,255,0.5))" };
     }
     return theme === "dark"
-      ? { ...baseStyle, filter: "invert(100%)" }
-      : { ...baseStyle, filter: "invert(0%)" };
+      ? { ...baseStyle, filter: "invert(90%) drop-shadow(0 1px 2px rgba(0,0,0,0.5))" }
+      : { ...baseStyle, filter: "invert(0%) drop-shadow(0 1px 1px rgba(255,255,255,0.5))" };
   }, [theme]);
 
   return (
@@ -108,10 +107,6 @@ const Header = ({ onOpenSettings, headerVisible, onRequestHide }) => {
       >
         {/* 左侧 Logo + 导航 */}
         <div className="header-left">
-          {/* <div className="header-title">
-            <img src={AppIcon} alt="" style={iconStyle} />
-            躲躲猫
-          </div> */}
           {/* 生成一个置顶的图标 */}
           <div
             className="pinned-box"
