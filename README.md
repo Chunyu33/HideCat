@@ -169,6 +169,6 @@ node src/scripts/generateIcons.js
 
 ## 作者
 
-- Evan Lau（刘春渝）
+- Evan Lau
 - Email: `1378813463@qq.com`
 - GitHub: `https://github.com/Chunyu33/HideCat`
