@@ -32,6 +32,33 @@
   color: var(--primary-color);
 }
 
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  -webkit-app-region: drag;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  -webkit-app-region: drag;
+}
+
+.header-logo {
+  width: 20px;
+  height: 20px;
+}
+
+.header-title-text {
+  padding-top: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
 .header-title {
   font-size: 13px;
   color: var(--text-color); /* 使用 text-color 变量 */

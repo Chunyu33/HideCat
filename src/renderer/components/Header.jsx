@@ -12,7 +12,7 @@ import {
   IconPin,
 } from "./Icon";
 import useTheme from "../hooks/useTheme";
-// import AppIcon from "../../assets/app.png";
+import logoSvg from "../../assets/icon.svg";
 
 const IconButton = ({ title, onClick, children }) => (
   <button className="header-btn" onClick={onClick} title={title}>
@@ -105,15 +105,11 @@ const Header = ({ onOpenSettings, headerVisible, onRequestHide }) => {
         onMouseLeave={handleMouseLeave}
         onMouseDown={handleDragStart}
       >
-        {/* 左侧 Logo + 导航 */}
+        {/* 左侧 Logo + 标题 */}
         <div className="header-left">
-          {/* 生成一个置顶的图标 */}
-          <div
-            className="pinned-box"
-            title={isPinned ? "取消置顶" : "置顶窗口"}
-            onClick={handlePinToggle}
-          >
-            <IconPin className={isPinned ? "pinned" : ""} />
+          <div className="header-brand">
+            <img src={logoSvg} className="header-logo" alt="" />
+            <div className="header-title-text">躲躲猫</div>
           </div>
         </div>
 
@@ -134,6 +130,13 @@ const Header = ({ onOpenSettings, headerVisible, onRequestHide }) => {
           <IconButton title="设置" onClick={onOpenSettings}>
             <IconSetting />
           </IconButton>
+          <div
+            className="header-btn pinned-box"
+            title={isPinned ? "取消置顶" : "置顶窗口"}
+            onClick={handlePinToggle}
+          >
+            <IconPin className={isPinned ? "pinned" : ""} />
+          </div>
           <span className="header-action-divider" />
           <IconButton title="最小化" onClick={handleMinimize}>
             <IconMinimize />
