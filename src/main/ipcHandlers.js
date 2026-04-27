@@ -35,6 +35,8 @@ const {
   getSearchEngine,
   dragWindow,
   stopDragging,
+  startWindowResize,
+  stopWindowResize,
   pinWindow
 } = require("./windowControl");
 const {
@@ -85,10 +87,17 @@ function registerIPC(ipcMain, mainWindow) {
   ipcMain.handle("hide-immediately", () => hideImmediately());
   ipcMain.handle("drag-window", () => dragWindow());
   ipcMain.handle("toggle-pin-window", () => pinWindow());
+  ipcMain.handle("start-window-resize", (_, direction) =>
+    startWindowResize(direction)
+  );
   
   // 停止拖动（通过 IPC 消息）
   ipcMain.on("stop-dragging", () => {
     stopDragging();
+  });
+
+  ipcMain.on("stop-window-resize", () => {
+    stopWindowResize();
   });
   
   // ======================

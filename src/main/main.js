@@ -32,6 +32,7 @@ const createWindow = () => {
     hasShadow: !transparentBorder,
     resizable: true,
     transparent: transparentBorder, // 透明边框，需要在窗口创建时确定
+    thickFrame: true,
     backgroundColor: transparentBorder ? "#00000000" : "#ffffff",
     fullscreenable: false,        // 禁止系统级全屏（绿色按钮 / 双击标题栏）
     simpleFullscreen: false,      // 禁止 macOS 独立空间全屏

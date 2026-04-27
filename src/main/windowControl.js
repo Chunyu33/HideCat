@@ -18,6 +18,7 @@ let startupTimer = null;
 let lastCursorInside = true;
 let autoShowPaused = false; // 是否暂停自动显示
 let dragInterval = null; // 拖动定时器
+let resizeInterval = null; // 透明窗口缩放定时器
 let resizeDebounceTimer = null; // 窗口缩放防抖定时器
 
 const COUNTDOWN = 3500; // 倒计时
@@ -732,6 +733,58 @@ function stopDragging() {
   }
 }
 
+function startWindowResize(direction) {
+  if (!mainWindow || mainWindow.isDestroyed() || !direction) return;
+  if (mainWindow.isMaximized() || mainWindow.isFullScreen()) return;
+
+  stopWindowResize();
+
+  const startMouse = screen.getCursorScreenPoint();
+  const startBounds = mainWindow.getBounds();
+  const [minWidth, minHeight] = mainWindow.getMinimumSize();
+
+  resizeInterval = setInterval(() => {
+    if (!mainWindow || mainWindow.isDestroyed()) {
+      stopWindowResize();
+      return;
+    }
+
+    const currentMouse = screen.getCursorScreenPoint();
+    const dx = currentMouse.x - startMouse.x;
+    const dy = currentMouse.y - startMouse.y;
+    const nextBounds = { ...startBounds };
+
+    if (direction.includes("e")) {
+      nextBounds.width = Math.max(minWidth, startBounds.width + dx);
+    }
+
+    if (direction.includes("s")) {
+      nextBounds.height = Math.max(minHeight, startBounds.height + dy);
+    }
+
+    if (direction.includes("w")) {
+      const nextWidth = Math.max(minWidth, startBounds.width - dx);
+      nextBounds.x = startBounds.x + startBounds.width - nextWidth;
+      nextBounds.width = nextWidth;
+    }
+
+    if (direction.includes("n")) {
+      const nextHeight = Math.max(minHeight, startBounds.height - dy);
+      nextBounds.y = startBounds.y + startBounds.height - nextHeight;
+      nextBounds.height = nextHeight;
+    }
+
+    mainWindow.setBounds(nextBounds);
+  }, 16);
+}
+
+function stopWindowResize() {
+  if (resizeInterval) {
+    clearInterval(resizeInterval);
+    resizeInterval = null;
+  }
+}
+
 // ========================== 置顶窗口 ==========================
 function pinWindow() {
   if (!mainWindow || mainWindow.isDestroyed()) return;
@@ -784,5 +837,7 @@ module.exports = {
   setAutoShow,
   dragWindow,
   stopDragging,
+  startWindowResize,
+  stopWindowResize,
   pinWindow,
 };

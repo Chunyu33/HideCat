@@ -56,6 +56,92 @@ const App = () => {
     initSettings();
   }, []);
 
+  useEffect(() => {
+    if (isSettingsWindow || isHome) return;
+
+    const edgeSize = 6;
+    let resizeEnabled = false;
+    let resizeDirection = "";
+
+    window.electronAPI?.getTransparentBorder?.().then((enabled) => {
+      resizeEnabled = !!enabled;
+    });
+
+    const getResizeDirection = (event) => {
+      const { clientX, clientY } = event;
+      const { innerWidth, innerHeight } = window;
+      const north = clientY <= edgeSize;
+      const south = clientY >= innerHeight - edgeSize;
+      const west = clientX <= edgeSize;
+      const east = clientX >= innerWidth - edgeSize;
+
+      if (north && west) return "nw";
+      if (north && east) return "ne";
+      if (south && west) return "sw";
+      if (south && east) return "se";
+      if (north) return "n";
+      if (south) return "s";
+      if (west) return "w";
+      if (east) return "e";
+      return "";
+    };
+
+    const getCursor = (direction) => {
+      if (direction === "n" || direction === "s") return "ns-resize";
+      if (direction === "e" || direction === "w") return "ew-resize";
+      if (direction === "nw" || direction === "se") return "nwse-resize";
+      if (direction === "ne" || direction === "sw") return "nesw-resize";
+      return "";
+    };
+
+    const handleMouseMove = (event) => {
+      if (!resizeEnabled) return;
+      if (event.buttons !== 0) return;
+      resizeDirection = getResizeDirection(event);
+      document.body.style.cursor = getCursor(resizeDirection);
+    };
+
+    const handleMouseDown = (event) => {
+      if (!resizeEnabled) return;
+      if (event.button !== 0) return;
+      const direction = getResizeDirection(event);
+      if (!direction) return;
+
+      resizeDirection = direction;
+      document.body.style.cursor = getCursor(direction);
+      window.electronAPI?.startWindowResize?.(direction);
+      event.preventDefault();
+    };
+
+    const handleMouseUp = () => {
+      if (!resizeEnabled) return;
+      if (!resizeDirection) return;
+      resizeDirection = "";
+      document.body.style.cursor = "";
+      window.electronAPI?.stopWindowResize?.();
+    };
+
+    const handleMouseLeave = () => {
+      if (!resizeEnabled) return;
+      if (resizeDirection) return;
+      document.body.style.cursor = "";
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mousedown", handleMouseDown);
+    window.addEventListener("mouseup", handleMouseUp);
+    window.addEventListener("mouseleave", handleMouseLeave);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mousedown", handleMouseDown);
+      window.removeEventListener("mouseup", handleMouseUp);
+      window.removeEventListener("mouseleave", handleMouseLeave);
+      document.body.style.cursor = "";
+      window.electronAPI?.stopWindowResize?.();
+    };
+  }, []);
+
   const toggleSettings = () => {
     window.electronAPI.openSettingsWindow();
   };

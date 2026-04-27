@@ -9,6 +9,9 @@ contextBridge.exposeInMainWorld("electronAPI", {
   showWindow: () => ipcRenderer.invoke("show-window"),
   dragWindow: () => ipcRenderer.invoke("drag-window"),
   stopDragging: () => ipcRenderer.send("stop-dragging"),
+  startWindowResize: (direction) =>
+    ipcRenderer.invoke("start-window-resize", direction),
+  stopWindowResize: () => ipcRenderer.send("stop-window-resize"),
   togglePinWindow: () => ipcRenderer.invoke("toggle-pin-window"),
 
   // 打开外部链接
