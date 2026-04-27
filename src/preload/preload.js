@@ -159,3 +159,86 @@ contextBridge.exposeInMainWorld("electronAPI", {
     return () => ipcRenderer.removeListener("update-check-result", handler);
   },
 });
+
+(() => {
+  const edgeSize = 8;
+  let transparentResizeEnabled = false;
+  let resizing = false;
+  let resizeDirection = "";
+
+  ipcRenderer.invoke("get-transparent-border").then((enabled) => {
+    transparentResizeEnabled = !!enabled;
+  }).catch(() => {});
+
+  const isBrowserViewPage = () => {
+    return !location.href.startsWith("http://localhost:5173") &&
+      !location.href.startsWith("file://") &&
+      !location.search.includes("window=");
+  };
+
+  const getResizeDirection = (event) => {
+    const { clientX, clientY } = event;
+    const { innerWidth, innerHeight } = window;
+    const north = !isBrowserViewPage() && clientY <= edgeSize;
+    const south = clientY >= innerHeight - edgeSize;
+    const west = clientX <= edgeSize;
+    const east = clientX >= innerWidth - edgeSize;
+
+    if (north && west) return "nw";
+    if (north && east) return "ne";
+    if (south && west) return "sw";
+    if (south && east) return "se";
+    if (north) return "n";
+    if (south) return "s";
+    if (west) return "w";
+    if (east) return "e";
+    return "";
+  };
+
+  const getCursor = (direction) => {
+    if (direction === "n" || direction === "s") return "ns-resize";
+    if (direction === "e" || direction === "w") return "ew-resize";
+    if (direction === "nw" || direction === "se") return "nwse-resize";
+    if (direction === "ne" || direction === "sw") return "nesw-resize";
+    return "";
+  };
+
+  const setCursor = (cursor) => {
+    if (document?.body) {
+      document.body.style.cursor = cursor;
+    }
+  };
+
+  const stopResize = () => {
+    if (!resizing) return;
+    resizing = false;
+    resizeDirection = "";
+    setCursor("");
+    ipcRenderer.send("stop-window-resize");
+  };
+
+  window.addEventListener("mousemove", (event) => {
+    if (!transparentResizeEnabled || resizing || event.buttons !== 0) return;
+    const direction = getResizeDirection(event);
+    setCursor(getCursor(direction));
+  }, true);
+
+  window.addEventListener("mousedown", (event) => {
+    if (!transparentResizeEnabled || event.button !== 0) return;
+    const direction = getResizeDirection(event);
+    if (!direction) return;
+
+    resizing = true;
+    resizeDirection = direction;
+    setCursor(getCursor(resizeDirection));
+    ipcRenderer.invoke("start-window-resize", resizeDirection);
+    event.preventDefault();
+    event.stopPropagation();
+  }, true);
+
+  window.addEventListener("mouseup", stopResize, true);
+  window.addEventListener("blur", stopResize, true);
+  window.addEventListener("mouseleave", () => {
+    if (!resizing) setCursor("");
+  }, true);
+})();

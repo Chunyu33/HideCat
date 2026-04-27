@@ -22,6 +22,8 @@ let resizeInterval = null; // 透明窗口缩放定时器
 let resizeDebounceTimer = null; // 窗口缩放防抖定时器
 
 const COUNTDOWN = 3500; // 倒计时
+const MAIN_WINDOW_MIN_WIDTH = 350;
+const MAIN_WINDOW_MIN_HEIGHT = 260;
 
 // 设置主窗口引用
 function setMainWindow(win) {
@@ -29,6 +31,11 @@ function setMainWindow(win) {
   
   // 监听窗口大小变化，自动调整所有 BrowserView 的缩放（带防抖）
   if (win) {
+    // 透明无边框窗口在 Windows hide/show 或 BrowserView 切换后，
+    // Electron/Chromium 有概率不再稳定遵守构造参数里的 minWidth/minHeight。
+    // 这里在拿到窗口引用后再次显式设置最小尺寸，作为主进程侧的第一层保护。
+    win.setMinimumSize(MAIN_WINDOW_MIN_WIDTH, MAIN_WINDOW_MIN_HEIGHT);
+
     win.on("resize", () => {
       // 防抖处理，避免拖拽时频繁触发
       if (resizeDebounceTimer) clearTimeout(resizeDebounceTimer);
@@ -226,7 +233,11 @@ function getAutoHideState() {
 function showWindow() {
   if (!mainWindow || mainWindow.isDestroyed()) return;
 
+  // 透明无边框窗口在 hide/show 之后可能丢失原生最小尺寸约束。
+  // 恢复显示前重新应用一次，避免后续手动缩放突破最小值。
+  mainWindow.setMinimumSize(MAIN_WINDOW_MIN_WIDTH, MAIN_WINDOW_MIN_HEIGHT);
   mainWindow.show(); // 原来的抢焦点方式
+  _syncActiveBrowserViewBounds();
   // mainWindow.showInactive(); // 不抢焦点
   isWindowVisible = true;
 
@@ -309,7 +320,11 @@ function startMouseWatcher() {
       }
       // 鼠标进入窗口范围
       if (!isWindowVisible) {
+        // 自动隐藏恢复显示走的是 mainWindow.show()，不会经过 showWindow()。
+        // 因此这里也要恢复最小尺寸约束，保证自动隐藏/显示后仍可缩小到正确边界。
+        mainWindow.setMinimumSize(MAIN_WINDOW_MIN_WIDTH, MAIN_WINDOW_MIN_HEIGHT);
         mainWindow.show();
+        _syncActiveBrowserViewBounds();
         isWindowVisible = true;
         console.log("🟢 in -> show");
       }
@@ -392,6 +407,18 @@ function _getBorserSize() {
     y: 36,
   };
   return sizeObj;
+}
+
+function _syncActiveBrowserViewBounds() {
+  if (!mainWindow || !activeTabKey) return;
+
+  const activeView = browserViews.get(activeTabKey);
+  if (!activeView || activeView.webContents.isDestroyed()) return;
+
+  // 手动 setBounds 缩放透明窗口时，BrowserView 的 autoResize 在部分场景下
+  // 会晚于主窗口 bounds 更新，导致切换 tab/恢复窗口后边缘命中区域和视觉区域不一致。
+  // 每次窗口 bounds 改变后立即同步一次当前 BrowserView，保证内容区尺寸跟随主窗口。
+  activeView.setBounds(_getBorserSize());
 }
 
 /**
@@ -738,10 +765,13 @@ function startWindowResize(direction) {
   if (mainWindow.isMaximized() || mainWindow.isFullScreen()) return;
 
   stopWindowResize();
+  mainWindow.setMinimumSize(MAIN_WINDOW_MIN_WIDTH, MAIN_WINDOW_MIN_HEIGHT);
 
   const startMouse = screen.getCursorScreenPoint();
   const startBounds = mainWindow.getBounds();
-  const [minWidth, minHeight] = mainWindow.getMinimumSize();
+  const minWidth = MAIN_WINDOW_MIN_WIDTH;
+  const minHeight = MAIN_WINDOW_MIN_HEIGHT;
+  let lastBounds = { ...startBounds };
 
   resizeInterval = setInterval(() => {
     if (!mainWindow || mainWindow.isDestroyed()) {
@@ -755,26 +785,43 @@ function startWindowResize(direction) {
     const nextBounds = { ...startBounds };
 
     if (direction.includes("e")) {
+      // 右侧缩放只改变宽度，左边界保持不动。
       nextBounds.width = Math.max(minWidth, startBounds.width + dx);
     }
 
     if (direction.includes("s")) {
+      // 底部缩放只改变高度，上边界保持不动。
       nextBounds.height = Math.max(minHeight, startBounds.height + dy);
     }
 
     if (direction.includes("w")) {
+      // 左侧缩放需要同时移动 x 和改变 width。
+      // 到达最小宽度后，将右边界固定在起始位置，避免继续拖动导致窗口“漂移”。
       const nextWidth = Math.max(minWidth, startBounds.width - dx);
       nextBounds.x = startBounds.x + startBounds.width - nextWidth;
       nextBounds.width = nextWidth;
     }
 
     if (direction.includes("n")) {
+      // 顶部缩放需要同时移动 y 和改变 height。
+      // 到达最小高度后，将下边界固定在起始位置，避免突破最小尺寸或出现回弹。
       const nextHeight = Math.max(minHeight, startBounds.height - dy);
       nextBounds.y = startBounds.y + startBounds.height - nextHeight;
       nextBounds.height = nextHeight;
     }
 
+    if (
+      nextBounds.x === lastBounds.x &&
+      nextBounds.y === lastBounds.y &&
+      nextBounds.width === lastBounds.width &&
+      nextBounds.height === lastBounds.height
+    ) {
+      return;
+    }
+
+    lastBounds = { ...nextBounds };
     mainWindow.setBounds(nextBounds);
+    _syncActiveBrowserViewBounds();
   }, 16);
 }
 
